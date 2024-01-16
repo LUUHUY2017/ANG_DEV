@@ -85,6 +85,7 @@ export class TerminalMonitorComponent implements OnInit, OnDestroy {
     this.watchStateChange();
     this.setDefaultCrud(false);
     this.getConfig();
+    this.realTimeData();
   }
   // done
   open(url) {
@@ -304,6 +305,40 @@ export class TerminalMonitorComponent implements OnInit, OnDestroy {
       ignoreBackdropClick: true
     });
   }
+
+  realTimeData() {
+    var that = this;
+    setInterval(function () {
+      that.getRealTimeData();
+    }, 15000);
+  }
+  // done
+  getRealTimeData() {
+    const data = {
+      organization_id: this.organizationId
+      , deleted: this.optionDelete
+    };
+    const url = this.defaultModel.getData;
+    this.siteArray = [];
+    this.siteFilterModel = null;
+    this.appservice.post(data, url).subscribe(res => {
+      console.log(res);
+      const retrieveData = res.retrieveData;
+      for (let i = 0; i < retrieveData.length; i++) {
+        if (retrieveData[i].ip_address === null) {
+          retrieveData[i].ip_address = this.language.chua_cap_nhat;
+        }
+      }
+      this.updateState(environment.STATE.retrieve, retrieveData);
+    },
+      (error) => {
+        console.log(error);
+      }).add(() => {
+      });
+  }
+
+
+
   // done
   getData() {
     this.blockUI.start(this.language.dang_tai_du_lieu);
@@ -347,6 +382,10 @@ export class TerminalMonitorComponent implements OnInit, OnDestroy {
         this.blockUI.stop();
       });
   }
+
+
+
+
   // done
   addNewItem(item) {
     if (item.invalid || !this.siteSelected) {
