@@ -1,0 +1,35 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+const routes: Routes = [
+    {
+        path: '',
+        data: {
+            title: 'Feedback Any Where'
+        },
+        children: [
+            {
+                path: 'terminals',
+                loadChildren: './devices/devices.module#DevicesModule'
+            },
+            {
+                path: 'terminals/:id',
+                loadChildren: './devices/devices.module#DevicesModule'
+            },
+            {
+                path: 'tablets',
+                loadChildren: './fba-tablet/fba-tablet.module#FbaTabletModule'
+            },
+            {
+                path: 'tablets/:id',
+                loadChildren: './fba-tablet/fba-tablet.module#FbaTabletModule'
+            }
+        ]
+    }
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
+})
+export class  AdministrationRoutingModule { }

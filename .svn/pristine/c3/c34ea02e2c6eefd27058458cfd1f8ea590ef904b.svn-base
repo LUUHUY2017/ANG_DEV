@@ -1,0 +1,20 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AdminAddSettingComponent } from './addsetting.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: AdminAddSettingComponent,
+    data: {
+      title: 'Add Question'
+    }
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AdminAddSettingRoutingModule {}

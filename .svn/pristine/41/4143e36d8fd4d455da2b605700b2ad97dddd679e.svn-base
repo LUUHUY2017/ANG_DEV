@@ -1,0 +1,115 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row mr-0 ml-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 headmap-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child">
+            <div class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <div>
+                      <ng-select class="bootstrap selecttimeview select-visits" [items]="dropdownselect"
+                        bindLabel="label" bindValue="value" groupBy="group" [clearable]=false
+                        [(ngModel)]="index_source"></ng-select>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 3px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary float-right btnapdung buttoncommand"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat buttoncommand"> {{language.xuat}}
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor:pointer" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                          <!-- <li role="menuitem"><a class="dropdown-item  float-right" href="#">Xuất  ra PDF</a>    </li>
+                              <li role="menuitem"><a class="dropdown-item  float-right" href="#">Other</a></li> -->
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-body card-body-bottom">
+              <div class="row foot-title-show">{{ title_index }} &nbsp; {{ starttime }} - {{ endtime }} &nbsp;
+                {{ title_time_period }}: {{ time_period }} </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <div class="table-responsive ">
+                  <table style="width: 100%;min-width: 900px" class="table table-striped table-comparation">
+                    <thead>
+                      <tr>
+                        <th style="width:220px;padding-left: 2.5rem;"> {{language.cua_hang}} </th>
+                        <th style="width:220px"> {{ title_index }}{{valueSuffix}} </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td> </td>
+                        <ng-container *ngIf="title_index === indexes.avg_time">
+                          <td> {{total_index ? toHHMMSS((total_index)) : '00:00:00' }} </td>
+                        </ng-container>
+                        <ng-container *ngIf="title_index != indexes.avg_time">
+                          <td> {{total_index | number:'1.0-2'}} {{valueSuffix}}</td>
+                        </ng-container>
+                      </tr>
+                      <tr *ngFor="let item of all_data">
+                        <td style="padding-left: 2.5rem;">{{item.name}}</td>
+                        <ng-container *ngIf="title_index === indexes.avg_time">
+                          <td> {{item.value ? toHHMMSS((item.value)*60 ) : '00:00:00' }} </td>
+                        </ng-container>
+                        <ng-container *ngIf="title_index != indexes.avg_time">
+                          <td> {{item.value | number:'1.0-2'}}
+                            <span [hidden]="title_index === indexes.turn_in_rate"
+                              class="spancell">({{Go_number(item.value,total_index) | number:'1.0-2'}}%)</span>
+                            <span class="spancell">{{valueSuffix}}</span>
+                          </td>
+                        </ng-container>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="divbaocao" style="float: right; font-size: 11px"> {{language.bao_cao_duoc_tao}}
+                {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
+                {{time_generate_report | date: 'hh:mm:ss'}} -
+                <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<notifier-container></notifier-container>

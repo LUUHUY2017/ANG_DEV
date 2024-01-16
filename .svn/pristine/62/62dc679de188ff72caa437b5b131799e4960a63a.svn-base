@@ -1,0 +1,311 @@
+.d-md-block .btn-custom:not(:disabled):not(.disabled).active {
+  color: #222;
+  background-image: -webkit-linear-gradient(top, #f0f0f0, #dfdfdf);
+  background-color: #c8ced3;
+  border-color: #c8ced3;
+  border-color: #ccc;
+  font-weight: 700;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+.d-md-block .btn-custom {
+  color: #222;
+  font-weight: 700;
+  background-color: transparent;
+  border-color: #c8ced3;
+}
+
+.bg-xd {
+  background-color: #069d30;
+}
+
+.bg-xn {
+  background-color: #a0c883;
+}
+
+.bg-bt {
+  background-color: #e18889;
+}
+
+.bg-dd {
+  background-color: #ed1e24;
+}
+
+.bg-modal-body {
+  background-color: #e6e6e6;
+}
+
+.config-text-dashboard {
+  padding: 7px 4px 0 0;
+}
+
+.khung-location-dashboard {
+  position: absolute;
+  left: 3.3%;
+  width: 92.5%;
+  height: auto;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 3px;
+  z-index: 10;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+.khung-location-dashboard #khung-location-scroll {
+  overflow-y: scroll;
+  height: 100%;
+}
+
+ul#ul-location {
+  padding: 0;
+  margin: 0;
+}
+
+.khung-location-dashboard li {
+  padding: 8px 0 8px 8px;
+  cursor: pointer;
+  padding-left: 10px;
+  list-style: none;
+}
+
+.khung-location-dashboard > input {
+  padding: 20px 8px 8px 8px;
+}
+
+.khung-location-dashboard input:focus {
+  color: #5c6873;
+  background-color: #fff;
+  border-color: none;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.khung-location-dashboard > li:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.location {
+  font-size: 17px;
+}
+
+.khung-location-dashboard .menu-0 {
+  width: 100%;
+}
+
+.khung-location-dashboard .menu-1 {
+  margin-left: 25px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 25px) !important;
+}
+
+.khung-location-dashboard .menu-2 {
+  margin-left: 35px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 35px) !important;
+}
+
+.khung-location-dashboard .menu-3 {
+  margin-left: 45px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 45px) !important;
+}
+
+.khung-location-dashboard .menu-4 {
+  margin-left: 55px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 55px) !important;
+}
+
+.khung-location-dashboard .menu-5 {
+  margin-left: 65px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 65px) !important;
+}
+
+.khung-location-dashboard .menu-6 {
+  margin-left: 75px;
+  border-left: 1px dotted #a19292;
+  width: calc(100% - 75px) !important;
+}
+
+.khung-question {
+  position: absolute;
+  left: 0;
+  min-width: 320px;
+  height: 180px;
+  overflow: hidden;
+  z-index: 10;
+  background: #fff;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+#khung-question-scroll {
+  padding: 0 0 8px 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#khung-question-scroll .timePeriod span {
+  display: block;
+}
+
+.small-metric {
+  font-size: 10px;
+  border-bottom: 1px solid #e1e2e1;
+  font-style: italic;
+  font-weight: 700;
+  padding: 7px 0 3px 0;
+}
+
+#khung-question-scroll li {
+  cursor: pointer;
+  padding: 8px 0 5px 10px;
+}
+
+.questionText {
+  color: #228b22;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.timePeriod {
+  font-size: 10px;
+}
+
+#khung-time-scroll #ul-time li.active {
+  color: #2bb540;
+}
+
+.khung-time #khung-time-scroll {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.khung-time li {
+  padding: 8px 0 8px 8px;
+  cursor: pointer;
+  padding-left: 10px;
+  list-style: none;
+  font-size: 15px;
+}
+
+.khung-time li:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+ul#ul-time-dashboard {
+  padding: 4px !important;
+  margin: 0;
+}
+
+.title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: 400;
+  font-family: Roboto, sans-serif;
+  padding: 8px 0 8px 22px;
+}
+
+.title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.pb-0 {
+  padding-top: 2px !important;
+}
+
+li.active {
+  color: #1f8ad9 !important;
+}
+
+.ng-select {
+  display: inline-block !important;
+}
+
+.ng-select1 {
+  width: 49%;
+  background-color: #fff;
+  margin-top: 7px;
+}
+
+.ng-select2 {
+  width: 49%;
+  float: right;
+  margin-right: 4px;
+  background-color: #fff;
+  margin-top: 7px;
+}
+
+.ng-select3 {
+  background-color: #fff;
+  width: 99.2%;
+  margin-top: 7px;
+}
+
+.ng-select0 {
+  background-color: #fff;
+  width: 99.2%;
+}
+
+ng-select > div > div.single > div.toggle {
+  font-size: 10px !important;
+}
+
+ng-select > div > div.single > div.clear,
+ng-select > div > div.single > div.toggle {
+  color: #090909 !important;
+  line-height: 30px;
+  text-align: center;
+  width: 18px !important;
+}
+
+.multiselect-dropdown .dropdown-btn {
+  padding: 6px 2px 6px 12px !important;
+}
+
+.multiselect-dropdown .dropdown-btn .dropdown-down {
+  border-top: 7px solid #23282c !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+}
+
+.multiselect-dropdown .dropdown-btn {
+  margin-top: 7px !important;
+}
+
+.multiselect-dropdown .dropdown-btn .dropdown-up {
+  border-bottom: 7px solid #23282c !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+}
+
+.multiselect-dropdown .dropdown-btn {
+  background-color: #fff;
+  width: 99.05% !important;
+  border: 1px solid #ddd !important;
+  border-radius: unset !important;
+  margin-top: 4px;
+}
+
+.config-text-dashboard .text-select,
+.modal-body ng-multiselect-dropdown .dropdown-btn {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+}
+
+.dropdown-list li {
+  padding: 1px 3px !important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}

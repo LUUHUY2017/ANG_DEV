@@ -1,0 +1,654 @@
+import { IOption } from 'ng-select';   // select option <option>
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  sequence,
+} from '@angular/animations';
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+import { language } from '../../admin_language';
+import { language_en } from '../../admin_language_en';
+
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import validate form
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PasswordValidation } from './users-form.validator';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+// import notification
+import { NotifierService } from 'angular-notifier';
+import { Subject, BehaviorSubject, Subscription } from 'rxjs';
+
+@Component({
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('openClose', [
+      transition('* => void', [
+        style({ height: '*', opacity: '1' }),
+        sequence([
+          animate('.25s ease', style({ height: '*', opacity: '.2' })),
+          animate('.1s ease', style({ height: '0', opacity: 0 }))
+        ])
+      ]),
+      transition('void => active', [
+        style({ height: '0', opacity: '0', transform: 'translateX(20px)', 'box-shadow': 'none' }),
+        sequence([
+          animate('.1s ease', style({ height: '*', opacity: '.2', transform: 'translateX(20px)', 'box-shadow': 'none' })),
+          animate('.35s ease'
+            , style({ height: '*', opacity: 1, transform: 'translateX(0)', 'box-shadow': '0 1px 4px 0 rgba(0, 0, 0, 0.3)' }))
+        ])
+      ])
+    ])
+  ]
+})
+@ViewChild(GeneralMenuComponent)
+export class UsersComponent implements OnInit, OnDestroy {
+  page_id = '\'' + environment.Pages.administration.users + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  id_deleted: number;
+  private readonly notifier: NotifierService;
+  snap_user: any;
+  error_array: any;
+  can_search: boolean;
+  showSelectCrud: boolean;
+  webState: BehaviorSubject<any>;
+  subcription: any;
+  can_add: boolean;
+  can_edit: boolean;
+  can_delete: boolean;
+  can_restore: boolean;
+  // Khai báo kiểu dữ kiệu
+  form: FormGroup;
+  user_organization: any;
+  organization_arr_option: Array<IOption>;
+  organization_arr: Array<IOption>;
+  org_selected: string;
+  org_selectedform: string;
+  tu_khoa: string;
+  data2: any;
+  info_user: any;
+  public modalRef: BsModalRef;
+  lever_arr: any[];
+  lever: string;
+  email_logs: any;
+  userlogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  is_admin_of_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  config = {
+    backdrop: true,
+    ignoreBackdropClick: true
+  };
+  option_delete = 0;
+  idStatusDelete: any;
+  errorDisplayMessage: string;
+  site_recusive_array: any;
+  snap_site_array: any;
+  siteUserArray: any;
+  sourceUrl: string = window.location.origin;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  language: any;
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private appservice: AppService,
+    notifierService: NotifierService,
+    private modalService: BsModalService,
+    private fb: FormBuilder) {
+    this.type_language === 'vn' ? this.language = language : this.language = language_en;
+    this.notifier = notifierService;
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    this.webState = new BehaviorSubject(firstState);
+    this.set_default_crud(false);
+    this.setDefaultValue();
+    this.watchStateChange();
+    // this.tu_khoa = '';
+    this.get_organization();
+  }
+  setDefaultValue() {
+    this.user_organization = [];
+    this.snap_user = [];
+    this.errorDisplayMessage = null;
+    this.data2 = null;
+    this.error_array = [];
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const oldState = this.webState.getValue();
+      const currentState = res.state;
+      const item = res.data;
+      // console.log('trạng thái trước', oldState);
+      // console.log('trạng thái hiện tại', currentState);
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        // Sự kiện nhận dữ liệu về thì bỏ hành động tìm kiếm trước đó
+        this.tu_khoa = null;
+        this.snap_user = item;
+        this.user_organization = this.snap_user;
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.snap_user.push(item);
+        // Nếu trạng thái trước đó là search
+        // if (oldState === environment.STATE.search) {
+        this.updateState(environment.STATE.search);
+        // }
+        this.notifier.notify('success', this.language.them_moi_thanh_cong);
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        for (let i = 0; i < this.snap_user.length; i++) {
+          if (Number(this.snap_user[i].id) === Number(item.id)) {
+            this.snap_user[i] = item;
+            break;
+          }
+        }
+        // Nếu trạng thái trước đó là search
+        // if (oldState === environment.STATE.search) {
+        this.updateState(environment.STATE.search);
+        // }
+        this.notifier.notify('success', this.language.cap_nhat_thanh_cong);
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.snap_user.splice(this.snap_user.findIndex(e => e.id === item.id), 1);
+        // Nếu trạng thái trước đó là search
+        // if (oldState === environment.STATE.search) {
+        this.updateState(environment.STATE.search);
+        // }
+        this.notifier.notify('success', this.language.xoa_thanh_cong);
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        const string = this.tu_khoa ? this.tu_khoa.toLowerCase() : '';
+        // console.log(string);
+        if (string === '') {
+          this.user_organization = this.snap_user;
+        } else {
+          this.user_organization = this.snap_user.filter(x => x.email.toLowerCase().indexOf(string) !== -1);
+        }
+      } else if (currentState === 'resetpassword') {
+        if (this.option_delete === 1) {
+          this.snap_user.splice(this.snap_user.findIndex(e => e.id === item.id), 1);
+          this.updateState(environment.STATE.search);
+          // this.notifier.notify('success', 'Gửi mật khẩu mới thành công');
+        }
+        this.notifier.notify('success', this.language.gui_mat_khau_moi_thanh_cong);
+      }
+    });
+  }
+  showSelectFunc() {
+    this.showSelectCrud = false;
+    const lever = Number(this.userlogged.lever);
+    const org_id = Number(this.userlogged.organization_id);
+    if (lever === 0 && org_id === 0) {
+      this.showSelectCrud = true;
+    }
+  }
+  set_default_crud(bool: boolean) {
+    // Nếu là bật, check xem có phải là delete = 1
+    if (bool) {
+      if (Number(this.option_delete) === 0) {
+        this.can_add = true;
+      } else {
+        this.can_add = false;
+      }
+    } else { // Nếu là tắt
+      this.can_add = bool;
+    }
+    this.can_search = bool;
+  }
+  show_dialog(dialog: TemplateRef<any>, item: any) {
+    this.modalRef = this.modalService.show(dialog, this.config);
+    this.id_deleted = item.id;
+    this.idStatusDelete = item.deleted;
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    this.webState.next(stateWithData);
+    // return returnData;
+  }
+  // Lấy thông tin tổ chức lên ng-select
+  get_organization() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const url = environment.API.userGetOrg;
+    this.appservice.get(url).subscribe(
+      param => {
+        if (!environment.production) {
+          // console.log('get_user_page_parametter', param);
+        }
+        if ('message' in param) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          return;
+        }
+        const org = param.organization_arr.slice(0);
+        this.organization_arr = org;
+        this.org_selectedform = param.organization_arr[0].value;
+        this.get_data();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+        this.blockUI.stop();
+      });
+  }
+  // // click hiện thêm mới
+  openModal(template: TemplateRef<any>) {
+    this.error_array = [];
+    this.modalRef = this.modalService.show(template, this.config);
+  }
+  get_insert(template: TemplateRef<any>) {
+    this.openModal(template);
+  }
+  clone_array(array: any[]) {
+    return array.slice(0);
+  }
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, templates: TemplateRef<any>) {
+    if (!environment.production) {
+      // console.log('data thay đổi', item);
+    }
+    this.error_array = [];
+    this.data2 = Object.assign({}, item);
+    this.modalRef = this.modalService.show(templates, this.config);
+  }
+  // show modal mật khẩu
+  show_dialog_(item, password: TemplateRef<any>) {
+    if (!environment.production) {
+      // console.log('data thay đổi', item);
+    }
+    this.data2 = Object.assign({}, item);
+    console.log(this.data2);
+    this.modalRef = this.modalService.show(password, this.config);
+  }
+  //  thay đổi tổ chức
+  thaydoitochuc(event) {
+    if (!environment.production) {
+      // console.log('id', event.value);
+    }
+    this.org_selectedform = event.value;
+    this.tu_khoa = '';
+    this.get_data();
+  }
+  // Hàm tìm kiếm menu
+  search_user() {
+    this.updateState(environment.STATE.search);
+  }
+  // lấy data thông thường
+  get_data() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const data = {
+      organization_id: this.org_selectedform
+      , deleted: this.option_delete
+    };
+    if (!environment.production) {
+      // console.log('data gửi đi', data);
+    }
+    this.appservice.post(data, environment.FBA.Administration.get_users).subscribe(res => {
+      if (!environment.production) {
+        // console.log(res);
+      }
+      this.siteUserArray = res.siteArray;
+      this.set_default_crud(true);
+      this.updateState('retrieve', res.user_array);
+    },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', this.language.co_loi_xay_ra);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // Thêm mới users
+  insertform(item: any) {
+    if (item.invalid) {
+      // console.log(item);
+      this.notifier.notify('error', this.language.co_loi_xay_ra);
+      return;
+    }
+    // xét error về rỗng.
+    this.error_array = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    if (!environment.production) {
+      // console.log('dữ liệu gửi đi', item);
+    }
+    const data = {...item.value, subdomain: this.sourceUrl};
+    this.appservice.post(data, environment.FBA.Administration.insert_users).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.updateState(environment.STATE.insert, res.insertedData);
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+          // console.log(this.error_array);
+        }
+      },
+      (error) => {
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  updateform(item) {
+    if (item.invalid) {
+      // console.log(item);
+      this.notifier.notify('error', this.language.co_loi_xay_ra);
+      return;
+    }
+    this.error_array = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    if (!environment.production) {
+      // console.log('dữ liệu gửi đi', item.value);
+    }
+    if (!item.dirty) {
+      this.modalRef.hide();
+      this.notifier.notify('warning', this.language.thong_tin_khong_thay_doi);
+      this.blockUI.stop();
+      return;
+    }
+    if (item.value.email === this.data2.email) {
+      delete item.value.email;
+    }
+    const data = item.value;
+    this.appservice.post(data, environment.FBA.Administration.edit_users).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.updateState(environment.STATE.update, res.updatedData);
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+          // console.log(this.error_array);
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.error_array.push(this.language.khong_the_ket_noi_du_lieu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+
+  preventChange() {
+    this.modalRef.hide();
+  }
+
+  send_password_for_user(item) {
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    // return;
+    this.appservice.post(data, environment.FBA.Administration.edit_users + '_and_send_password').subscribe(
+      para => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', para);
+        }
+        if (para.status === 1) {
+          this.updateState('resetpassword', item.value);
+          this.modalRef.hide();
+        } else {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+        // this.get_data();
+      }, (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', this.language.co_loi_xay_ra);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // xóa users
+  delete_users() {
+    const data = {
+      id: this.id_deleted
+      , deleted: this.idStatusDelete
+    };
+    if (!environment.production) {
+      // console.log(data);
+    }
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, environment.FBA.Administration.delete_users).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.updateState('delete', data);
+        } else {
+          this.notifier.notify('error', param.message);
+        }
+        // this.get_data();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', this.language.co_loi_xay_ra);
+      }).add(() => {
+        this.modalRef.hide();
+        this.blockUI.stop();
+      });
+  }
+  ngOnDestroy() {
+    this.webState.complete();
+    // console.log(this.webState);
+  }
+  updaterole(item: any) {
+    if (item.invalid) {
+      this.error_array.push(this.language.du_lieu_khong_phu_hop);
+      return;
+    }
+    this.snap_site_array = this.site_recusive_array.filter(e => e.enables === '1');
+    this.removeEnableNull();
+    if (this.snap_site_array.length === 0) {
+      this.error_array.push(this.language.site_khong_duoc_de_trong);
+      return;
+    }
+    const data = {
+      role_id: item.value.role_id
+      , role_array: this.snap_site_array.filter(e => e)
+      , role_type: item.value.role_type
+      , organization_id: item.value.organization_id
+      , user_id: item.value.user_id
+    };
+    console.log(data.role_array);
+    // return;
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, environment.API.update_user_single_role).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          // this.updateState(environment.STATE.update, res.updatedData);
+          this.modalRef.hide();
+          this.notifier.notify('success', this.language.cap_nhat_thanh_cong);
+          this.get_data();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+          // console.log(this.error_array);
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.error_array.push(this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  removeEnableNull() {
+    this.snap_site_array.forEach(e => {
+      if (e.enables !== null) {
+        // console.log(e);
+        this.recusiveRemoveNull(e.id);
+      }
+    });
+  }
+  recusiveRemoveNull(id: any) {
+    this.snap_site_array.forEach((e: any, key: number) => {
+      if (e.parent_id === id) {
+        const a_id = e.id;
+        delete this.snap_site_array[key];
+        this.recusiveRemoveNull(a_id);
+      }
+    });
+  }
+  chinhsuaquyen(item: any, template: TemplateRef<any>) {
+    const data = {
+      user_id: item.id
+      , organization_id: item.organization_id
+    };
+    let errStatus = 0;
+    this.site_recusive_array = [];
+    this.snap_site_array = [];
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    this.appservice.post(data, environment.API.userGetSite).subscribe(
+      param => {
+        try {
+          if (param.siteArray.filter(i => i.parent_id).length === 0) {
+            this.notifier.notify('warning', this.language.to_chuc_chua_co_dia_diem);
+            return;
+          }
+          this.data2 = param.roleArray[0];
+          this.data2.username = item.name;
+          this.data2.role_type = Number(this.data2.role_type);
+          // console.log(this.data2);
+          this.openModal(template);
+          const siteArray = param.siteArray.filter(e => e.parent_id);
+          // console.log(siteArray);
+          siteArray.forEach(element => {
+            element.disabled = true;
+            this.siteUserArray.forEach(el => {
+              if (element.id === el.id && el.enables === '1') {
+                element.disabled = false;
+                return;
+              }
+            });
+          });
+          this.recusive_menu(siteArray);
+        } catch (error) {
+          errStatus = 1;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        errStatus = 1;
+      }).add(() => {
+        this.blockUI.stop();
+        if (errStatus === 1) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+      });
+  }
+  log(item: any) {
+    if (item.disabled) {
+      this.modalRef.hide();
+      this.notifier.notify('error', this.language.co_loi_xay_ra);
+      return;
+    }
+    const toggleEnum = item.enables === '1' ? null : '1';
+    item.enables = toggleEnum;
+    if (toggleEnum === null) {
+      this.recusive_unchecked_parent(item.parent_id);
+    } else {
+      this.parentToggleClick(item);
+    }
+    this.childToggleClick(item, toggleEnum);
+  }
+  childToggleClick(item: any, toggleEnum: string) {
+    for (let i = 0; i < this.site_recusive_array.length; i++) {
+      if (this.site_recusive_array[i].parent_id === item.id) {
+        this.site_recusive_array[i].enables = toggleEnum;
+        this.childToggleClick(this.site_recusive_array[i], toggleEnum);
+      }
+    }
+  }
+  recusive_unchecked_parent(id: number) {
+    this.site_recusive_array.forEach(element => {
+      if (element.id === id) {
+        element.enables = null;
+        const a_id = element.parent_id;
+        this.recusive_unchecked_parent(a_id);
+      }
+    });
+  }
+  parentToggleClick(index: any) {
+    let checker = true;
+    const check_array = this.site_recusive_array.filter(item2 => item2.parent_id === index.parent_id);
+    if (check_array.length > 0) {
+      check_array.forEach(element2 => {
+        if (element2.enables === null) {
+          checker = false;
+        }
+      });
+      if (checker) {
+        const data = this.site_recusive_array.find(item3 => item3.id === index.parent_id);
+        if (data) {
+          data.enables = '1';
+          const a_index = {
+            id: data.id,
+            parent_id: data.parent_id
+          };
+          this.parentToggleClick(a_index);
+        }
+      }
+    }
+    // console.log(check_array);
+  }
+  recusive_menu(array: any[], id = '0', space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.site_recusive_array.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables === '1' ? '1' : null
+          , store: element.store
+          , disabled: element.disabled
+        });
+        const scope = space + 1;
+        this.recusive_menu(array, a_id, scope);
+      }
+    });
+  }
+}
+
+
+

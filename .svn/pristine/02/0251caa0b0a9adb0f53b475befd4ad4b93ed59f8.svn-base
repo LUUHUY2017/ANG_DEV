@@ -1,0 +1,88 @@
+.metric-comparison-time>app-timeperiod {
+    float: right;
+}
+
+:host ::ng-deep {
+    ng-select {
+        width: auto;
+    }
+    .select-visits {
+        width: fit-content !important;
+        >div {
+            width: 220px;
+            min-width: 220px;
+        }
+    }
+    .starttime {
+        width: fit-content !important;
+        >div {
+            width: 100px;
+            min-width: 100px;
+        }
+    }
+    .endtime {
+        width: fit-content !important;
+        >div {
+            width: 100px;
+            min-width: 100px;
+        }
+    }
+    .select-group-store {
+        width: fit-content !important;
+        >div {
+            width: 100px;
+            min-width: 100px;
+        }
+    }
+    #metric-comapri-hienthi {
+        text-align: right;
+        float: right;
+        margin-bottom: 5px;
+    }
+    #metric-comapri-hienthi label {
+        font-family: Roboto, sans-serif;
+        border: 1px solid #5ca6c4;
+        background-color: white;
+        background: white;
+        color: black;
+    }
+    #metric-comapri-hienthi label.active {
+        background: #1b69a7;
+        border: none;
+        color: white;
+    }
+    #metric-comapri-hienthi label.btn {
+        font-size: 13px;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+    }
+    .ng-select.ng-select-single .ng-select-container {
+        height: 30px;
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .metric-comparison-time>app-timeperiod {
+        float: left;
+    }
+}
+
+.table-comparation tr th {
+    border-bottom: 1px solid #e4eaef !important;
+    border-top: unset !important;
+    vertical-align: middle !important;
+}
+
+.foot-title-show {
+    line-height: 19px;
+    color: #7b7b7b;
+    font-size: 11px;
+    font-weight: normal;
+    font-family: "Roboto", sans-serif;
+    padding: 8px 0 8px 20px;
+}
+
+.foot-title-show .title-show2 {
+    padding-left: 10px;
+    padding-right: 10px;
+}

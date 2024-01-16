@@ -1,0 +1,57 @@
+
+.spancell {
+	font-size: 11px;
+	font-family: 'Roboto', sans-serif;
+	color: #9e9e9e;
+	font-style: italic;
+}
+
+#headmapmenu.selecttimeview {
+	width: 80px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+#headmapmenu {
+	width: 100%;
+}
+
+#headmapmenu input[type='text'] {
+	width: 110px!important;
+	padding-left: 4px !important;
+}
+
+#headmapmenu li {
+	list-style: none;
+}
+
+#headmapmenu>li:nth-child(1) {
+	float: left;
+}
+
+#headmapmenu>li:nth-child(2) {
+	float: right;
+}
+
+#headmapmenu {
+	margin: 0;
+	padding: 0 8px;
+}
+
+.fa-caret-down {
+	padding-left: 3px;
+}
+
+input.form-control {
+	color: black!important;
+}
+
+.email-app nav .nav-link {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.email-app nav .nav-item {
+	position: relative;
+	background: whitesmoke;
+}

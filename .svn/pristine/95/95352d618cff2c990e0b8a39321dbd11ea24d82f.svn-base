@@ -1,0 +1,23 @@
+
+1. 5/5/2019
+Nghĩa cài gói thẻ tag
+npm install ngx-chips --save
+Link: https://www.npmjs.com/package/ngx-chips
+
+Nghĩa cài gói text-editor:
+ npm install angular-froala-wysiwyg
+ npm i @tinymce/tinymce-angular
+
+2.08/07/2019
+ Huy cài gói group select
+
+ npm install --save @ng-select/ng-select
+
+
+3. 25/11/2019
+Huy cài gói show thông báo pwa
+Link: https://ciphertrick.com/browser-push-notifications-in-angular-applications/
+
+npm install -g @angular/cli
+ng new angular-push
+npm install --save ng-push

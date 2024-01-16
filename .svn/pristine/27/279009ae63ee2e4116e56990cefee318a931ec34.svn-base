@@ -1,0 +1,54 @@
+<block-ui></block-ui>
+<div class="card" style="margin-bottom: 10px;">
+    <div class="card-body body-breadcumb">
+        <div class="row khungthemmoi">
+            <ul>
+                <li>
+                    <i class="fa fa-plus-square"></i><span>&nbsp;Thêm cấu hình Notification</span>
+                </li>
+                <li><i class="fa fa-home"></i>&nbsp;<a>Admin</a>&nbsp;/&nbsp;<a routerLink="/fba/notification">Notification</a>
+                    / Add</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<form (ngSubmit)="add_notification(Form_add_notification)" #Form_add_notification="ngForm">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <ng-container *ngIf="userlogged === 0">
+                    <div class="col-md-12">
+                        <label for="">Tổ chức</label>
+                        <ng-select [options]="organization_array" [allowClear]="false" [(ngModel)]="org_selected"
+            name="organization_id"></ng-select>
+                    </div>
+                </ng-container>
+                <div class="col-md-12">
+                    <label for="">Chỉ số đạt điều kiện gửi thông báo <small><i>( đơn vị phần trăm)</i></small></label>
+                    <input type="number" required (keypress)="checknumber($event)" autocomplete="off" class="form-control"
+                        #txtchiso="ngModel" ngModel="10" name="notification_number">
+                    <small *ngIf="txtchiso.touched && txtchiso.errors?.required" class="error-message">
+                        Bạn chưa nhập chỉ số đạt điều kiện gửi thông báo
+                    </small>
+                </div>
+                <div class="col-md-12">
+                    <label for="">Khoảng thời gian xử lý điều kiện <small><i>( đơn vị tiếng )</i></small></label>
+                    <input type="number" required (keypress)="checknumber($event)" class="form-control" #txtthoigian="ngModel"
+                        ngModel="1" name="time_to_fire">
+                    <small *ngIf="txtthoigian.touched && txtthoigian.errors?.required" class="error-message">
+                        Bạn chưa nhập thời gian
+                    </small>
+                </div>
+                <div class="col-md-12 mt-4">
+                    <a routerLink="/fba/notification" class="btn btn-danger edit-button mr-2"><i class="fa fa-arrow-circle-left"></i>&nbsp;Quay
+                        lại</a>
+                    <ng-container *ngIf="!Form_add_notification.invalid">
+                        <button type="submit" class="btn btn-primary edit-button"><i class="fa fa-check"></i>&nbsp;Xác
+                            nhận
+                        </button>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

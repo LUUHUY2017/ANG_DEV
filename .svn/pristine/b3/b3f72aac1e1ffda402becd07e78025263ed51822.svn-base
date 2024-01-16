@@ -1,0 +1,152 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div class="card-body">
+          <div class="row mb-3" *ngIf="isSuperAdmin">
+            <div class="col-md-2">
+              <ng-select class="bootstrap selectimeview" required [options]="organization_arr"
+                [ngModel]="organization_id" [allowClear]="false" (selected)="changeOrg($event)"
+                placeholder="Chọn tổ chức">
+              </ng-select>
+            </div>
+          </div>
+          <ng-container *ngIf="!isOnload && errorMess == null">
+            <main class="inbox">
+              <!-- List-reports -->
+              <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+                <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show"
+                  role="alert">
+                  <strong>{{item}}</strong>
+                </div>
+                <div class="form-group">
+                  <label for="nf-email">{{language.may_chu_thu}}</label>
+                  <input class="form-control" type="text" name="server_name" [ngModel]="dataFilter?.server" required
+                    #txtserver_name="ngModel" placeholder="ex:smtp.gmail.com">
+                  <small *ngIf="txtserver_name.touched && txtserver_name.errors?.required"
+                    class="error-message">{{language.ban_chua_nhap_may_chu}}</small>
+                </div>
+                <div class="form-group">
+                  <label style="display:inline-block" for="nf-email">{{language.cong}}</label>&nbsp;
+                  <input class="form-control" type="number" name="port" [ngModel]="dataFilter?.port" required
+                    #txtport="ngModel" placeholder="ex: 587">
+                  <small *ngIf="txtport.touched && txtport.errors?.required"
+                    class="error-message">{{language.ban_chua_nhap_cong}}</small>
+                </div>
+                <div class="form-group">
+                  <label>{{language.ten_nguoi_gui}} </label>
+                  <input class="form-control" type="text" name="user_name" [ngModel]="dataFilter?.user_name" required
+                    #txtusername="ngModel" placeholder="ex: Thomas John">
+                  <small *ngIf="txtusername.touched && txtusername.errors?.required"
+                    class="error-message">{{language.ban_chua_nhap_nguoi_gui}}</small>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input class="form-control" type="email" name="email" [ngModel]="dataFilter?.email"
+                    #txtemail="ngModel" required>
+                  <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_email}}</small>
+                </div>
+                <div class="form-group">
+                  <label>{{language.mat_khau}}</label>
+                  <input class="form-control" type="{{showPassword ? 'text' : 'password'}}"
+                    [ngModel]="dataFilter?.pass_word" #txtpassword="ngModel" required name="pass_word">
+                  <small *ngIf="txtpassword.touched && txtpassword.errors?.required"
+                    class="error-message">{{language.ban_chua_nhap_mat_khau}}</small>
+                  <input type="checkbox" id="showPasswordTemplate" (click)="changeType()">
+                  <span for="showPasswordTemplate">Hiển thị mật khẩu</span>
+                </div>
+                <div class="form-group">
+                  <label>Enable SSL</label>
+                  <div class="col-md-9 col-9 col-form-label">
+                    <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'"
+                        [ngModel]="dataFilter ? dataFilter.enable_ssl : '1'" name="enable_ssl">
+                      <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-1">
+                      <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'"
+                        [ngModel]="dataFilter ? dataFilter.enable_ssl : '1'" name="enable_ssl">
+                      <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+                    </div>
+                  </div>
+                </div>
+                <!-- <a class="btn btn-danger rounded-0 {{updateForm.invalid ? 'disabledMenuItem' : null}}"
+                  style="color: #fff;" (click)="openPopupTestMail(testEmailTemplate, updateForm)">
+                  {{language.kiem_tra_gui_mail}}</a> &nbsp;&nbsp; -->
+                <button class="btn btn-success rounded-0" [disabled]="updateForm.invalid">
+                  <i class="fa fa-floppy-o">&nbsp;</i>
+                  {{language.luu_cau_hinh}}</button>
+              </form>
+            </main>
+          </ng-container>
+          <ng-container *ngIf="!isOnload && errorMess != null">
+            <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại lại
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #content_testmail>{{language.cau_hinh_se_mac_dinh}} </ng-template>
+  <!-- Modal test email -->
+  <ng-template #testEmailTemplate>
+    <form (ngSubmit)="send_email_test(info_user)" #info_user="ngForm">
+      <div style=" border-bottom:1px solid #ede4e491  !important" class="modal-header">
+        <h4 class="modal-title pull-left"> {{language.kiem_tra_gui_mail}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArrayPopup" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label"> Email</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input style="background-color: #f7f8fa !important;" class="form-control" id="nf" type="email"
+              #txtname="ngModel" required [(ngModel)]="email" name="email">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_email}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.tieu_de}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input style="background-color: #f7f8fa !important;" class="form-control" id="nf-email" #txtemail="ngModel"
+              required type="text" [(ngModel)]="tieude" name="tieude">
+            <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_tieu_de}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.noi_dung}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <textarea style="background-color: #f7f8fa !important;" class="form-control" #txtnoidung="ngModel" required
+              (ngModel)="noidung" name="noidung"></textarea>
+            <small *ngIf="txtnoidung.touched && txtnoidung.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_noi_dung}}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div style=" border-top:1px solid #ede4e491  !important" class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn  btn-primary" [disabled]="info_user.invalid"
+          (click)="modalRef.hide()">{{language.gui_mail}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+  <block-ui></block-ui>
+  <notifier-container></notifier-container>
+</main>

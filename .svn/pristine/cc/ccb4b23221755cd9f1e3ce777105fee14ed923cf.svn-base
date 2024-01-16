@@ -1,0 +1,76 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { UserPermissionGuard } from '../../shared/user_permission.guard';
+import { FootfallPermissionGuard } from '../../shared/footfall_permission.guard';
+import { environment } from '../../../environments/environment';
+
+const routes: Routes = [
+  {
+    path: '',
+    data: {
+      title: 'footfall'
+      , module_title: 'footfall'
+    },
+    canActivateChild: [UserPermissionGuard], // nếu mà module_array có footfall
+    children: [
+      {
+        // canActivate: [UserPermissionGuard],
+        // data: {
+        //   page_id: environment.Pages.footfall.time_comparison
+        // },
+        path: 'metrics-boston',
+        loadChildren: './metrics-boston/metrics-boston.module#FootfallBostonModule'
+      },
+      {
+        path: 'visits',
+        loadChildren: './effect-visits/effect-visits.module#FootfallEffectVisitsModule'
+      },
+      {
+        path: 'store-comparisons',
+        loadChildren: './effect-store/effect-store.module#FootfallEffectStoreModule'
+      },
+      {
+        path: 'time-comparisons',
+        loadChildren: './effect-time/effect-time.module#FootfallEffectTimeModule'
+      },
+      {
+        path: 'metrics-comparisons',
+        loadChildren: './effect-metrics/effect-metrics.module#FootfallEffectMetricsModule'
+      },
+      {
+        path: 'store-trending',
+        loadChildren: './store-trending/store-trending.module#FootfallStoreStrendingModule'
+      },
+      {
+        path: 'time-trending',
+        loadChildren: './time-trending/time-trending.module#FootfallTimeTrendingModule'
+      },
+      {
+        path: 'metrics-trending',
+        loadChildren: './metrics-trending/metrics-trending.module#FootfallMetricsTrendingModule'
+      },
+      {
+        path: 'reporting-stores',
+        loadChildren: './reporting-stores/reporting-stores.module#FootfallReportingStoresModule'
+      },
+      // {
+      //   path: 'performance-staff',
+      //   loadChildren: './performance_staff/performance_staff.module#PerformanceStaffModule'
+      // },
+      {
+        path: 'addministrator/import_pos_sale',
+        loadChildren: './import_pos_sale/import_pos_sale.module#ImportPosSaleModule'
+      },
+      {
+        path: 'addministrator/user-mail',
+        loadChildren: './user-mail/usermail.module#PerUserMailModule'
+      },
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class PerformanceRoutingModule { }

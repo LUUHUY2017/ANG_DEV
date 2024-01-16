@@ -1,0 +1,542 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import {
+  Component, OnInit, ViewChild, ElementRef, TemplateRef
+  , Input, OnChanges, SimpleChanges
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../../environments/environment';
+import { AppService } from '../../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import validate form
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// import notification
+// import viewchild
+import { language } from '../../../../../language';
+import { language_en } from '../../../../../language_en';
+import { NotifierService } from 'angular-notifier';
+import { Subject, BehaviorSubject, Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-fbapagemail',
+  templateUrl: './fbapagemailchildren.component.html',
+  styleUrls: ['./fbapagemailchildren.component.scss'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class FbaPagemailChilrenComponent implements OnInit, OnChanges {
+  @Input() organization_id: string;
+  @Input() defaultModule: number;
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  private readonly notifier: NotifierService;
+  // Khai báo kiểu dữ kiệu
+  form: FormGroup;
+  modalRef: BsModalRef;
+  language: any;
+  userinfo: any = JSON.parse(localStorage.getItem(environment.UserLoged));
+  orgArray: Array<any>;
+  componentStats: number;
+  canLoadChildComponent: boolean;
+  isSuperAdmin: boolean;
+  pageArray: Array<any>;
+  pageSelected: any;
+  moduleArray: Array<any>;
+  pageSelectedArray: Array<any>;
+  subcription: any;
+  webState: BehaviorSubject<any>;
+  data: Array<any>;
+  dataFilter: Array<any>;
+  rowsOnPage = 15;
+  userArray: Array<any>;
+  startTimeArray: Array<any>;
+  endTimeArray: Array<any>;
+  dataUpdate: any;
+  canAdd: boolean;
+  errorArray: Array<any>;
+  reportType: Array<any>;
+  viewBy: Array<any>;
+  siteSelected: any;
+  siteSelectionDisplay: boolean;
+  siteArray: Array<any>;
+  constructor(
+    private appservice: AppService,
+    private modalService: BsModalService,
+    notifierService: NotifierService) {
+    this.notifier = notifierService;
+    const type_language = JSON.parse(localStorage.getItem(environment.language));
+    type_language === 'vn' ? this.language = language : this.language = language_en;
+  }
+  ngOnChanges(simpleChange: SimpleChanges): void {
+    if (!simpleChange.firstChange) {
+      const organization_id = simpleChange.organization_id.currentValue;
+      this.organization_id = organization_id;
+      this.childrenGetConfig();
+    }
+  }
+  deleteCurrentItem() {
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const url = 'api/deleteReceiveReportEmail';
+    const data = {
+      id: this.dataUpdate.id
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.status === 1) {
+          this.updateState(environment.STATE.delete, this.dataUpdate);
+        } else {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.modalRef.hide();
+        this.blockUI.stop();
+      });
+  }
+  openPopupDeleteItem(item, dialog: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(dialog, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    this.dataUpdate = item;
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    this.setPermission(false);
+    this.setDefaultValue();
+    this.webState = new BehaviorSubject(firstState);
+    this.watchStateChange();
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    this.webState.next(stateWithData);
+  }
+  setPermission(bool: boolean) {
+    this.canAdd = bool;
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const oldState = this.webState.getValue();
+      const currentState = res.state;
+      const item = res.data;
+      console.log('trạng thái trước', oldState);
+      console.log('trạng thái hiện tại', currentState);
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        // Sự kiện nhận dữ liệu về thì bỏ hành động tìm kiếm trước đó
+        this.data = item;
+        this.dataFilter = this.data;
+        console.log('this.dataFilter', this.dataFilter);
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.data.push(item);
+        // Nếu trạng thái trước đó là search
+        this.notifier.notify('success', this.language.them_moi_thanh_cong);
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        for (let i = 0; i < this.data.length; i++) {
+          if (Number(this.data[i].id) === Number(item.id)) {
+            this.data[i] = item;
+            break;
+          }
+        }
+        // Nếu trạng thái trước đó là search
+        // if (oldState === environment.STATE.search) {
+        //   this.updateState(environment.STATE.search);
+        // }
+        this.notifier.notify('success', 'Cập nhật thành công');
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.data.splice(this.data.findIndex(e => e.id === item.id), 1);
+        // Nếu trạng thái trước đó là search
+        // if (oldState === environment.STATE.search) {
+        this.updateState(environment.STATE.search);
+        // }
+        this.notifier.notify('success', 'Xóa thông tin thành công');
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        // const string = this.tu_khoa ? this.tu_khoa.toLowerCase() : '';
+        // console.log(string);
+        // if (string === '') {
+        //   this.user_organization = this.snap_user;
+        // } else {
+        //   this.user_organization = this.snap_user.filter(x => x.email.toLowerCase().indexOf(string) !== -1);
+        // }
+      }
+    });
+  }
+  openPopupUpdateCurrentItem(item: any, template: TemplateRef<any>) {
+    this.dataUpdate = item;
+    const data = {
+      organization_id: this.organization_id
+      , user_id: item.user_id
+    };
+    this.siteSelectionDisplay = false;
+    this.errorArray = [];
+    this.blockUI.start('Đang tải dữ liệu');
+    this.siteArray = [];
+    const url = environment.API.userGetSite;
+    this.appservice.post(data, url).subscribe(
+      param => {
+        console.log('get_user_page_parametter', param);
+        if (param.status !== 1) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          this.blockUI.stop();
+          return;
+        }
+        const siteArray = param.siteArray || [];
+        this.recusive_menu(siteArray);
+        this.siteSelected = this.siteArray.find(e => e.id === this.dataUpdate.site_id);
+        this.changeViewBy(this.dataUpdate.report_type);
+        this.modalRef = this.modalService.show(template, {
+          backdrop: true,
+          ignoreBackdropClick: true
+        });
+      },
+      (error) => {
+        console.log(error);
+        this.notifier.notify('error', 'Không thể kết nối tới máy chủ. Vui lòng thử lại!');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  changeViewBy(value) {
+    // const value = item.value;
+    console.log(value);
+    if (value === '1') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }
+      ];
+    } else if (value === '2') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }
+      ];
+    } else if (value === '3') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }, {
+        value: 'Week'
+        , label: 'Tuần'
+      }
+      ];
+    }
+  }
+  setDefaultValue() {
+    this.siteArray = [];
+    this.viewBy = [];
+    this.pageArray = [];
+    this.moduleArray = [];
+    this.isSuperAdmin = false;
+    this.pageSelectedArray = [];
+    this.pageSelected = null;
+    this.userArray = [];
+    this.errorArray = [];
+    this.siteSelectionDisplay = false;
+    this.reportType = [
+      {
+        value: '1'
+        , label: 'Ngày'
+      },
+      {
+        value: '2'
+        , label: 'Tuần'
+      },
+      {
+        value: '3'
+        , label: 'Tháng'
+      }
+    ];
+  }
+  changeComponent(id: number) {
+    this.componentStats = id;
+  }
+  childrenGetConfig() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const url = 'api/pageMailGetConfig';
+    const data = {
+      organization_id: this.organization_id
+      , module_id: this.defaultModule
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        console.log('get_user_page_parametter', param);
+        if (param.status !== 1) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          this.blockUI.stop();
+          return;
+        }
+        if (param.pageData.length === 0) {
+          this.notifier.notify('error', 'Không tồn tại dữ liệu');
+          this.blockUI.stop();
+          return;
+        }
+        this.pageArray = param.pageData.map(function (e) {
+          return {
+            value: e.id
+            , label: e.page_name
+            , module_id: e.page_module
+          };
+        });
+        this.userArray = param.userData.map(function (e) {
+          return {
+            value: e.id
+            , label: e.name + ' - ' + e.email
+            , name: e.name
+            , email: e.email
+          };
+        });
+        this.pageSelected = this.pageArray[0].value;
+        this.startTimeArray = param.startTime;
+        this.endTimeArray = param.endTime;
+        this.getData();
+      },
+      (error) => {
+        console.log(error);
+        this.notifier.notify('error', 'Không thể kết nối tới máy chủ. Vui lòng thử lại!');
+        this.blockUI.stop();
+      });
+  }
+  recusive_menu(array: any[], id = null, space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.siteArray.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables
+          , store: element.store
+        });
+        const scope = space + 1;
+        this.recusive_menu(array, a_id, scope);
+      }
+    });
+  }
+  changeSiteSelected(item: any) {
+    this.siteSelected = item;
+    this.siteSelectionDisplay = false;
+  }
+  getSiteTreeFromUid(item: any) {
+    const user_id = item.value;
+    this.siteArray = [];
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const url = environment.API.userGetSite;
+    const data = {
+      organization_id: this.organization_id
+      , user_id: user_id
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        console.log('get_user_page_parametter', param);
+        if (param.status !== 1) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          this.blockUI.stop();
+          return;
+        }
+        const siteArray = param.siteArray || [];
+        this.recusive_menu(siteArray);
+      },
+      (error) => {
+        console.log(error);
+        this.notifier.notify('error', 'Không thể kết nối tới máy chủ. Vui lòng thử lại!');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  submitToSearch(e) {
+  }
+  updateCurrentItem(item: FormGroup) {
+    console.log(item);
+    if (item.invalid || this.siteSelected == null) {
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+      return;
+    }
+    console.log(this.siteSelected);
+    const paramJson = item.value;
+    const pageName = this.pageArray.find(e => e.value === this.pageSelected);
+    const data = {
+      id: this.dataUpdate.id
+      , module_id: this.defaultModule
+      , page_id: this.pageSelected
+      , params: JSON.stringify(paramJson)
+      , site_id: this.siteSelected.id
+      , report_type: item.value.report_type
+      , page_name: pageName.label || null
+      , site_name: this.siteSelected.site_name
+      , startTime: paramJson.start_time
+      , endTime: paramJson.end_time
+      , viewBy: paramJson.view_by
+      , user_id: this.dataUpdate.user_id
+      , actived: paramJson.actived
+    };
+    const url = 'api/updateReceiveReportEmail';
+    // xét error về rỗng.
+    this.errorArray = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, url).subscribe(
+      res => {
+        console.log('dữ liệu gửi về', res);
+        if (res.status === 1) {
+          const updatedData = res.updatedData;
+          try {
+            updatedData.startTimeLabel = this.startTimeArray.find(e => e.value === updatedData.startTime).label;
+            updatedData.endTimeLabel = this.endTimeArray.find(e => e.value === updatedData.endTime).label;
+            updatedData.name = this.userArray.find(e => Number(e.value) === Number(updatedData.user_id)).name;
+            updatedData.email = this.userArray.find(e => Number(e.value) === Number(updatedData.user_id)).email;
+          } catch (error) {
+            console.log(error);
+            updatedData.startTimeLabel = null;
+            updatedData.endTimeLabel = null;
+            updatedData.name = null;
+            updatedData.email = null;
+          }
+          this.updateState(environment.STATE.update, updatedData);
+          this.modalRef.hide();
+        } else {
+          this.errorArray = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.errorArray.push(this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  addNewItem(item: FormGroup) {
+    console.log(item);
+    if (item.invalid || this.siteSelected == null) {
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+      return;
+    }
+    console.log(this.siteSelected);
+    const paramJson = item.value;
+    const pageName = this.pageArray.find(e => e.value === this.pageSelected);
+    const data = {
+      module_id: this.defaultModule
+      , page_id: this.pageSelected
+      , params: JSON.stringify(paramJson)
+      , site_id: this.siteSelected.id
+      , report_type: item.value.report_type
+      , page_name: pageName.label || null
+      , site_name: this.siteSelected.site_name
+      , startTime: paramJson.start_time
+      , endTime: paramJson.end_time
+      , viewBy: paramJson.view_by
+      , user_id: paramJson.user_id
+      , organization_id: this.organization_id
+      , actived: paramJson.actived
+    };
+
+    const url = 'api/addReceiveReportEmail';
+    // xét error về rỗng.
+    this.errorArray = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, url).subscribe(
+      res => {
+        console.log('dữ liệu gửi về', res);
+        if (res.status === 1) {
+          const insertedData = res.insertedData;
+          insertedData.startTimeLabel = this.startTimeArray.find(e => e.value === insertedData.startTime).label;
+          insertedData.endTimeLabel = this.endTimeArray.find(e => e.value === insertedData.endTime).label;
+          insertedData.name = this.userArray.find(e => Number(e.value) === Number(insertedData.user_id)).name;
+          insertedData.email = this.userArray.find(e => Number(e.value) === Number(insertedData.user_id)).email;
+          this.updateState(environment.STATE.insert, insertedData);
+          this.modalRef.hide();
+        } else {
+          this.errorArray = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.errorArray.push(this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  openPopupAddItem(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    this.errorArray.length = 0;
+    this.siteSelectionDisplay = false;
+    this.viewBy.length = 0;
+    this.siteSelected = null;
+    this.pageSelectedArray = [];
+  }
+  getData() {
+    const data = {
+      organization_id: this.organization_id
+      , page_id: this.pageSelected
+    };
+    console.log(data);
+    const url = 'api/getPageMailData';
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    this.appservice.post(data, url).subscribe(
+      param => {
+        console.log(param);
+        if (param.status !== 1) {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+          return;
+        }
+        this.canAdd = true;
+        const retrieveData = param.retrieveData;
+        for (let i = 0; i < retrieveData.length; i++) {
+          try {
+            const jsonParam = JSON.parse(retrieveData[i].params);
+            retrieveData[i].viewBy = jsonParam.view_by;
+            retrieveData[i].startTime = jsonParam.start_time;
+            retrieveData[i].endTime = jsonParam.end_time;
+            retrieveData[i].startTimeLabel = this.startTimeArray.find(e => e.value === jsonParam.start_time).label;
+            retrieveData[i].endTimeLabel = this.endTimeArray.find(e => e.value === jsonParam.end_time).label;
+          } catch {
+            retrieveData[i].viewBy = null;
+            retrieveData[i].endTime = null;
+            retrieveData[i].startTime = null;
+            retrieveData[i].endTimeLabel = null;
+            retrieveData[i].startTimeLabel = null;
+          }
+        }
+        this.updateState(environment.STATE.retrieve, retrieveData);
+      },
+      (error) => {
+        console.log(error);
+        this.notifier.notify('error', 'Không thể kết nối tới máy chủ. Vui lòng thử lại!');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+}

@@ -1,0 +1,275 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <block-ui></block-ui>
+   <notifier-container></notifier-container>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px; font-family: Open-semi;
+               font-size: 20px; color:#1772ff;"> <i class="fa fa-id-badge" style="color:#f3b920;" aria-hidden="true"></i> Danh sách
+                  khách vip</span>
+               <button *ngIf="can_add" style="float:right; font-family: Open-semi;" type="button"
+                  class="btn btn-them buton-search" (click)="show_insert(insertTemplate)"><i
+                     class="fa fa-plus">&nbsp;&nbsp;</i>Thêm mới</button>
+            </div>
+            <div class="card-body card-table table-companies">
+               <div class="row" *ngIf="organization_arr_filter?.length > 0">
+                  <div class="col-md-3">
+                     <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr_filter"
+                        [(ngModel)]="organization_id_filter" name="organization_id" [allowClear]="false"
+                        (selected)="get_data()" placeholder="Chọn tổ chức">
+                     </ng-select>
+                  </div>
+                  <div class="col-md-3">
+                     <select *ngIf="userlogged.organization_id == 0 && userlogged.lever == 0"
+                        class="form-control boxShadow noBorderRadius" [(ngModel)]="option_delete"
+                        (ngModelChange)="get_data()">
+                        <option [ngValue]=0>Chưa xóa</option>
+                        <option [ngValue]=1>Đã xóa</option>
+                     </select>
+                  </div>
+                  <div class="col-md-4 ml-auto" style="display: flex;
+                  align-items: center;
+                  justify-content: flex-end;" *ngIf="can_search">
+                     <label for="searchinput" style="margin-bottom: 0px;">Tìm kiếm&nbsp;&nbsp;</label>
+                     <input type="text"
+                        style="padding: 3px 10px;border-radius: 25px; outline: none; font-family: Open-semi;"
+                        [(ngModel)]="search_key" (ngModelChange)="search_target()">
+                  </div>
+               </div>
+               <div class="table-responsive">
+                  <table [mfData]="viplist" #mf="mfDataTable" [mfRowsOnPage]="15"
+                     class="table companies-table table-hover" style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr style="font-family: Open-semi;">
+                           <th style="width: 10%">STT</th>
+                           <th style="width: 20%" *ngIf="user_info.lever == 0">Tổ chức</th>
+                           <th style="width: 23%">Họ tên</th>
+                           <th style="width: 10%">Hình ảnh</th>
+                           <th style="width: 15%; text-align: center;">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody [@openClose]="isOpen ? 'open' : 'closed'">
+                        <tr *ngIf="onLoad">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span><i class="fa fa-spinner fa-spin">&nbsp;</i>Đang tải dữ liệu...</span>
+                           </td>
+                        </tr>
+                        <tr *ngIf="error_message">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span>Đã có lỗi xảy ra. Bấm vào </span><a (click)="ngOnInit()"
+                                 style="color: #63c2de; cursor:pointer;">đây để tải lại</a>
+                           </td>
+                        </tr>
+                        <tr *ngIf="viplist?.length === 0 && !error_message">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span>Không có dữ liệu</span>
+                           </td>
+                        </tr>
+                        <tr class="trhover" *ngFor="let item of mf.data; let i = index">
+                           <td>{{i +1}}</td>
+                           <td *ngIf="user_info.lever == 0">
+                              {{item.organization_name ? item.organization_name : 'Không thuộc tổ chức'}}</td>
+                           <td>{{item.vip_name}}</td>
+                           <td>
+                              <img *ngIf="item.avatar" src="{{urlImage + item.avatar}}"
+                                 title="ảnh đại diện {{item.vip_name}}" style="max-width:70%">
+                              <span *ngIf="!item.avatar">Chưa có ảnh đại diện</span>
+                           </td>
+                           <td style="text-align: center;">
+                              <a *ngIf="item.deleted == 0" style="color: #63c2de;cursor: pointer;"
+                                 (click)="dulieuthaydoi(item,uploadform)"
+                                 title="Thư viện ảnh của {{item.vip_name}}">
+                                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.deleted == 0" style="color: #085220;cursor: pointer;"
+                                 (click)="show_update(item,updateTemplate)"
+                                 title="Sửa thông tin của {{item.vip_name}}">
+                                 <i class="fa fa-edit" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.deleted == 0" style="color: crimson;cursor: pointer;"
+                                 (click)="delete_target(item)" title="Xóa {{item.vip_name}}">
+                                 <i class="fa fa-times" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.deleted == 1" style="color: forestgreen; cursor: pointer;"
+                                 (click)="delete_target(item)" title="Khôi phục {{item.vip_name}}">
+                                 <i class="fa fa-undo fa-2x" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <!-- <a *ngIf="user_info.lever == 0" style="color: crimson;cursor: pointer;"
+                                 title="Xóa feedback" (click)="delete_item(item.id)"> <i class="fa fa-times"></i>
+                              </a>&nbsp; -->
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="companies_table-tfoot">
+                        <tr>
+                           <td colspan="6">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <ng-template #insertTemplate>
+      <form (ngSubmit)="insertform(insert_org)" #insert_org="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Thêm khách vip</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_update"
+                     [ngModel]="organization_id_filter" name="organization_id" [allowClear]="false"
+                     placeholder="Chọn tổ chức">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Họ tên</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" type="text" required ngModel name="vip_name">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mã code <small>(Tùy chọn)</small></label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" type="text" required ngModel name="vip_code">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Ảnh đại diện</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input style="margin-top:2px;" type="file" class="form-control"
+                     (change)="InsertUpload($event, insert_vip_avatar)">
+                  <img [hidden]="ImageUrll1" #insert_vip_avatar class="img-fluid img2" style="width:49%;"
+                     alt="ảnh đại diện blacklist" src="" title="ảnh đại diện khách vip">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <p style="margin: 0px;flex-grow: 1; color: crimson; font-style: italic;" *ngIf="error_popup_message">Đã có
+               lỗi xảy ra</p>
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" [disabled]="insert_org.invalid">
+               Thêm</button>
+         </div>
+      </form>
+   </ng-template>
+   <ng-template #updateTemplate>
+      <form (ngSubmit)="updateform(update_form)" #update_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Chỉnh sửa black list</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_update"
+                     [ngModel]="data_update[0].organization_id" name="organization_id" [allowClear]="false"
+                     placeholder="Chọn tổ chức">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Họ tên</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" type="text" required [ngModel]="data_update[0].vip_name" name="vip_name">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mã code</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-code" type="text" required [ngModel]="data_update[0].vip_code" name="vip_code">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Ảnh đại diện <small style="color: crimson;">{{data_update[0].avatar ? null : 'chưa có ảnh'}}</small></label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input style="margin-top:2px;" type="file" class="form-control"
+                     (change)="UpdateUpload($event, upload_vip_avatar)">
+                  <img [hidden]="!data_update[0].avatar" #upload_vip_avatar class="img-fluid img2" style="width:49%;"
+                     alt="ảnh đại diện vip" [src]="urlImage + data_update[0].avatar" title="ảnh đại diện vip">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <p style="margin: 0px;flex-grow: 1; color: crimson; font-style: italic;" *ngIf="error_popup_message">Đã có
+               lỗi xảy ra</p>
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               Đóng</a>
+            <button class="btn btn-success" [disabled]="update_form.invalid">
+               Chỉnh sửa</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+   <ng-template #uploadform>
+      <div class="modal-header" style="background: gray; color:#f3b21c; border-radius: 0px;">
+         <h4 class="modal-title pull-left"><i class="fa fa-picture-o"></i>&nbsp;Ảnh nhận dạng {{staff_name}}&nbsp;<i
+               class="fa fa-spinner infinity" *ngIf="onloadPopup" style="color: #fff;">&nbsp;</i></h4>
+         <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+         <div class="row" style="background: #fafafa;">
+            <div class="col-md-12" style="height: 300px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;">
+               <h5 *ngIf="library.length == 0">{{error_popup_message ? 'Đã có lỗi xảy ra' : 'Chưa có ảnh nhận dạng'}}
+               </h5>
+               <img *ngIf="active_record" style="max-width: 200px;
+               max-height: 200px;" title="{{active_record.id}}"
+                  src="data:image/jpeg;base64,{{active_record.img_base64}}">
+            </div>
+            <div class="col-md-12 text-center" style="position: relative;">
+               <input #upload type="file" (change)="getUploadData($event)" class="form-control"
+                  style="visibility: hidden; position: absolute;">
+               <i title="Tải ảnh lên" *ngIf="!onloadPopup && !error_popup_message" class="fa fa-plus mr-2 iconAddPlus"
+                  (click)="trigger_click(upload)"></i>
+               <i title="Xóa ảnh" *ngIf="active_record" (click)="delete_item(active_record)"
+                  class="fa fa-times fa-2x iconRemovePlus"></i></div>
+         </div>
+      </div>
+      <div class="modal-footer" *ngIf="library.length > 0" style="background: #808080;">
+         <div class="col-md-12" style="
+         overflow-y: auto;
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+         justify-content: center;
+         border: 1px solid #ffffff52;
+            border-radius: 2px;
+            padding: 10px 0px;    background: #999;">
+            <img *ngFor="let item of library" title="{{item.id}}" src="data:image/jpeg;base64,{{item.img_base64}}"
+               style="padding: 5px;
+         min-height: 80px;
+         width: 80px; cursor: pointer;" (click)="active_record = item;"
+               class="{{active_record?.id == item.id ? 'actived_record' : ''}}">
+         </div>
+      </div>
+   </ng-template>
+</main>

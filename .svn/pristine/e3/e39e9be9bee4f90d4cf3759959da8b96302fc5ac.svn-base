@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+
+<head>
+  <base href="./">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="ACS Analytics Platform">
+  <meta name="author" content="Cong Quyet">
+  <meta name="keyword" content="ACS Analytics Platform">
+  <meta name="theme-color" content="#F3B21C">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#F3B21C">
+  <link rel="shortcut icon" href="assets/Analytics.ico">
+
+  <title>ACS Analytics Platform</title>
+
+  <script type="text/javascript" src="./assets/daterangepicker/jquery.min.js"></script>
+  <script type="text/javascript" src="./assets/daterangepicker/moment.min.js"></script>
+  <script type="text/javascript" src="./assets/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./assets/daterangepicker/daterangepicker.css" />
+
+</head>
+
+<body class="app">
+    <style>
+        html {
+          width: 100%;
+          height: 100%;
+        }
+        .app {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          margin: 0px;
+          background-color: #fff;
+          background-image: url('assets/img/brand/web_logo.jpg');
+          background-repeat: no-repeat;
+          background-position-x: 50%;
+          background-position-y: 50%;
+          background-size: 500px;
+        }
+        @media only screen and (max-width: 768px) {
+          .app {
+            background-size: 200px;
+            background-image: url('assets/img/brand/mobi_logo.jpg');
+          }
+        }
+      </style>
+  <div class="logo">
+  </div>
+</body>
+
+</html>

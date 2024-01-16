@@ -1,0 +1,27 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+const routes: Routes = [
+    {
+        path: '',
+        data: {
+            title: 'Gender Age Setting'
+        },
+        children: [
+            {
+                path: 'terminals',
+                loadChildren: './terminals/terminals.module#TerminalsModule'
+            },
+            {
+                path: 'user-mail',
+                loadChildren: './userage/userage.module#UserAgeModule'
+            },
+        ]
+    }
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
+})
+export class  AdministratorRoutingModule { }

@@ -1,0 +1,177 @@
+<main>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div class="card-body">
+          <div style="height: 55px;" class="card-header card-font">
+            <span style="line-height:33px;"> <i class="cui-layers"
+                aria-hidden="true"></i>{{language.danh_sach_su_kien}}</span>
+            <button *ngIf="canAdd" (click)="openPopupUpdateEvent(updateTemplate)" style="float:right"
+              class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>{{language.them_moi}}</button>
+          </div>
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="table-responsive">
+                <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                  <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">{{language.STT}}</th>
+                        <th style="width: 120px;text-align: left;text-indent: 1rem;">{{language.su_kien}}</th>
+                        <th style="width: 80px;text-align: left;">{{language.ten_tai_khoan}}</th>
+                        <!-- <th style="width: 80px;text-align: left;text-indent: 1rem;"></th> -->
+                        <th style="width: 150px;">{{language.xu_ly}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                        <td>
+                          <select name="event_code" ngModel style="padding: 3px 5px 3px 5px;">
+                            <option value="">{{language.tat_ca}}</option>
+                            <option *ngFor="let item of eventArray" [ngValue]="item.event_code">{{item.label}}</option>
+                          </select>
+                        </td>
+                        <td><input type="text" name="display_name" ngModel autocomplete="off"></td>
+                        <!-- <td>
+                          <select name="actived" ngModel style="padding: 3px 5px 3px 5px;">
+                            <option value="">{{language.tat_ca}}</option>
+                            <option value=1>{{language.hoat_dong}}</option>
+                            <option value=0>{{language.ngung_hoat_dong}}</option>
+                          </select>
+                        </td> -->
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                      </tr>
+                      <tr *ngFor="let items of mf.data;let i = index">
+                        <td>{{i + 1}}</td>
+                        <td style="text-align: left;">{{items.event_name}}
+                        </td>
+                        <td style="text-align: left;">{{items.display_name}}
+                        </td>
+                        <!-- <td class="text-center">
+                          <span *ngIf="items.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                              class="fa fa-check"></i></span>
+                          <span *ngIf="items.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                              class="fa fa-remove"></i></span>
+                        </td> -->
+                        <td style="width: 100px;">
+                          <!-- <a (click)="openPopupUpdateCurrentItem(items,updateTemplate)" class="icon-blue">
+                            <i class="cui-note" aria-hidden="true"></i>
+                          </a>&nbsp; -->
+                          <a (click)="openPopupDeleteItem(items,deleteTemplate)" class="icon-red">
+                            <i class="cui-circle-x" aria-hidden="true"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length === 0">
+                        <td colspan="8" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                          <span>{{language.khong_co_du_lieu}}</span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length > rowsOnPage">
+                        <td colspan="8">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </form>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}.
+                {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                  (click)="ngOnInit()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal cập nhật  -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateEvent(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left"><i class="icon-plus"
+            style="font-size: 15px;color: #20a8d8;">&nbsp;</i>{{language.dang_ky_su_kien}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.su_kien}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" ngModel #txtmodule="ngModel"
+              [options]="eventArray" name="event_id" [allowClear]="false" required (selected)="changeEvent($event)">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <div class="col-md-5 col-5 col-form-label">
+            <span style="font-size: 13px;font-family: Open-bold;">{{language.nguoi_chua_chon}}</span>
+            <ul class="ng-data-list">
+              <li *ngIf="unFollowerArray.length === 0">{{language.khong_co_du_lieu}}</li>
+              <li *ngFor="let item of unFollowerArray" [ngClass]="{'actived': item.selected}" (click)="checkedItem(item, 1, $event.target)">
+                <i class="cui-{{item.gender == 1 ? 'user' : 'user-female'}}">&nbsp;</i>{{item.display_name}}
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-2 flex_item" style="flex-direction: column">
+            <a (click)="to_selected_array()"
+              class="form-control btn btn-primary mb-2 {{status === 2 || selectedItem.length === 0 ? 'disabledMenuItem' : null}}"
+              style="border-radius: 0px;"><i class="icon-arrow-right-circle" style="color: #fff"></i></a>
+            <a (click)="to_unselected_array()"
+              class="form-control btn btn-primary {{status === 1 || selectedItem.length === 0 ? 'disabledMenuItem' : null}}"
+              style="border-radius: 0px;"><i class="icon-arrow-left-circle" style="color: #fff"></i></a>
+          </div>
+          <div class="col-md-5 col-5 col-form-label">
+            <span style="font-size: 13px;font-family: Open-bold;"><i class="cui-circle-check"
+                style="color:#4dbd74">&nbsp;</i>{{language.nguoi_duoc_chon}}</span>
+            <ul class="ng-data-list">
+              <li *ngIf="followerArray.length === 0">{{language.khong_co_du_lieu}}</li>
+              <li *ngFor="let item of followerArray" [ngClass]="{'actived': item.selected}" (click)="checkedItem(item, 2, $event.target)">
+                <i class="cui-{{item.gender == 1 ? 'user' : 'user-female'}}">&nbsp;</i>{{item.display_name}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="updateForm.invalid">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- template xóa -->
+  <ng-template #deleteTemplate>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="deleteCurrentItem()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</main>

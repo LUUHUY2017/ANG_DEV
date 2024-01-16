@@ -1,0 +1,284 @@
+<!-- <div class="fixed-item-report-schedule {{isErrorDuringLoad ? 'errorBg' : null}}" (click)="openPopupGetData(scheduleTemplate)">
+  <i class="fa {{isErrorDuringLoad ? 'fa-exclamation-circle' : 'fa-calendar-check-o'}}" title="Danh sách"></i>
+</div> -->
+<ng-template #scheduleTemplate>
+  <ng-container *ngIf="pageNumber === 0">
+    <div class="modal-header" style="background: #757575;
+      border-color: #757575;
+      position: relative;
+      border-radius: 0px;
+      padding: 10px 15px;">
+      <h5 class="modal-title" style="color:#f3b21c;">
+        <i class="fa fa-list">&nbsp;&nbsp;</i>Danh
+        sách đăng kí nhận mail định kỳ
+      </h5>
+      <button type="button" class="close pull-right" style="color: #fff;" aria-label="Close" (click)="modalRef.hide()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row ml-5 mr-5">
+        <div class="col-md-12 text-center" style="background: #dea725;
+        color: #fff;
+        padding: 5px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 17px;
+        box-shadow: 1px 2px 2px 1px #999;" (click)="changeToAddItemPage()">
+          <i class="fa fa-plus">&nbsp;</i>
+          <span style="user-select: none;">Thêm mới</span>
+        </div>
+      </div>
+      <hr>
+      <ng-container *ngIf="dataFilter.length > 0">
+        <ng-container *ngFor="let item of dataFilter">
+          <div class="row m-0 motthongbao">
+            <div class="col-2 col-md-2 flex_item" (click)="changeToUpdateItemPage(item)"><i class="fa fa-folder"
+                style="font-size: 25px;color: #f3b21c;"></i>
+            </div>
+            <div class="col-10 col-md-10 pl-0" (click)="changeToUpdateItemPage(item)">
+              <p class="m-0 noidungnotfication" style="font-size: 19px;line-height: 19px;">
+                <ng-container *ngIf="item.actived == 1">
+                  <i class="fa fa-check-circle" style="color:#4dbd74;"></i>
+                </ng-container>
+                <ng-container *ngIf="item.actived == 0">
+                  <i class="fa fa-ban" style="color:crimson;"></i>
+                </ng-container>
+                Địa điểm: {{item.site_name}}<small *ngIf="isSuperAdmin" style="font-style: italic;">&nbsp;({{item.organization_name}})&nbsp;</small>
+              </p>
+              <p class="m-0" style="color: #4dbd74;font-size: 12px;"><i class="fa fa-exclamation-circle"></i>
+                Thời gian lấy dữ liệu: {{item.start_time}} - {{item.end_time}}</p>
+              <p class="m-0" style="color: #808080;font-size: 10px;"><i class="fa fa-clock-o"></i>
+                {{item.updated_at}}</p>
+            </div>
+            <span (click)="deleteCurrentItem(item)"><i class="fa fa-times" style="font-size: 20px;"></i></span>
+          </div>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="dataFilter.length === 0">
+        <div class="row flex_item" style="min-height: 150px;font-style: italic; color: #999;">
+          <h4><i class="fa fa-folder-open-o">&nbsp;</i> Bạn chưa đăng kí nhận báo cáo
+          </h4>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="pageNumber === 1">
+    <form (ngSubmit)="addNewItem(insertForm)" #insertForm="ngForm">
+      <div class="modal-header" style="background: #757575;
+      border-color: #757575;
+      position: relative;
+      border-radius: 0px;
+      padding: 10px 15px;">
+        <h5 class="modal-title" style="color:#f3b21c;">
+          <i class="fa fa-arrow-circle-left" style="color: #fff; cursor: pointer;"
+            (click)="changeToListPage()">&nbsp;&nbsp;</i>
+          Tạo lịch gửi báo cáo định kỳ
+        </h5>
+        <button type="button" class="close pull-right" style="color: #fff;" aria-label="Close"
+          (click)="modalRef.hide()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div [hidden]="!isSuperAdmin" class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">Tổ chức</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="orgArray" name="organization_id"
+              [ngModel]="organizationId" [allowClear]="false" (selected)="changeOrg($event)">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.dia_diem}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div class="config-text-location">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{siteSelected ? siteSelected.site_name : language.chua_chon}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of siteArray" (click)="changeSite(item)"
+                    class="menu-{{item.alevel}} {{item.site_name === siteSelected?.site_name ? 'active' : ''}} {{item.enables == 1 ? null : 'disabledMenuItem'}}">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.xem_theo}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="viewByArray" name="view_by"
+              ngModel [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.khung_gio}}</label>
+          <div class="col-md-4 col-4 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="startHourArray" name="start_time"
+              [allowClear]="false" [ngModel]="'8:00'">
+            </ng-select>
+          </div>
+          <div class="col-md-4 col-4 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="endHourArray" name="end_time"
+              [allowClear]="false" [ngModel]="'20:59'">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'" [ngModel]="'1'"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'" [ngModel]="'1'"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active"> Đóng
+        </a>
+        <button class="btn btn-primary" [disabled]="insertForm.invalid || !siteSelected">
+          Thêm mới</button>
+      </div>
+    </form>
+  </ng-container>
+  <ng-container *ngIf="pageNumber === 2">
+    <ng-container *ngIf="dataUpdate">
+      <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+        <div class="modal-header" style="background: #757575;
+      border-color: #757575;
+      position: relative;
+      border-radius: 0px;
+      padding: 10px 15px;">
+          <h5 class="modal-title" style="color:#f3b21c;">
+            <i class="fa fa-arrow-circle-left" style="color: #fff; cursor: pointer;"
+              (click)="changeToListPage()">&nbsp;&nbsp;</i>
+            Cập nhật lịch gửi báo cáo định kỳ
+          </h5>
+          <button type="button" class="close pull-right" style="color: #fff;" aria-label="Close"
+            (click)="modalRef.hide()">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{item}}</strong>
+          </div>
+          <div [hidden]="!isSuperAdmin" class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Tổ chức</label>
+            <div class="col-md-8 col-8 col-form-label">
+              <ng-select class="bootstrap selectimeview backselect" required [options]="orgArray" name="organization_id"
+                [ngModel]="organizationId" [allowClear]="false" (selected)="changeOrg($event)">
+              </ng-select>
+            </div>
+          </div>
+          <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">{{language.dia_diem}}</label>
+            <div class="col-md-8 col-8 col-form-label">
+              <div class="config-text-location">
+                <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                  (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                  <span>&nbsp; {{siteSelected ? siteSelected.site_name : language.chua_chon}} <i
+                      style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                    </i></span>
+                </div>
+              </div>
+              <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+                (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                <div id="khung-location-scroll">
+                  <ul style="padding-left: 0;">
+                    <li *ngFor="let item of siteArray" (click)="changeSite(item)"
+                      class="menu-{{item.alevel}} {{item.site_name === siteSelected?.site_name ? 'active' : ''}} {{item.enables == 1 ? null : 'disabledMenuItem'}}">
+                      {{item.site_name}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">{{language.xem_theo}}</label>
+            <div class="col-md-8 col-8 col-form-label">
+              <ng-select class="bootstrap selectimeview backselect" required [options]="viewByArray" name="view_by"
+                [ngModel]="dataUpdate.view_by" [allowClear]="false">
+              </ng-select>
+            </div>
+          </div>
+          <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">{{language.khung_gio}}</label>
+            <div class="col-md-4 col-4 col-form-label">
+              <ng-select class="bootstrap selectimeview backselect" required [options]="startHourArray"
+                name="start_time" [allowClear]="false" [ngModel]="dataUpdate.start_time">
+              </ng-select>
+            </div>
+            <div class="col-md-4 col-4 col-form-label">
+              <ng-select class="bootstrap selectimeview backselect" required [options]="endHourArray" name="end_time"
+                [allowClear]="false" [ngModel]="dataUpdate.end_time">
+              </ng-select>
+            </div>
+          </div>
+          <div class="form-group row form-no-marbottom">
+            <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}</label>
+            <div class="col-md-8 col-8 col-form-label">
+              <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'"
+                  [ngModel]="dataUpdate.actived" name="actived">
+                <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+              </div>
+              <div class="form-check form-check-inline mr-1">
+                <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'"
+                  [ngModel]="dataUpdate.actived" name="actived">
+                <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a (click)="modalRef.hide()" class="btn  btn-huy active">Đóng</a>
+          <button class="btn btn-success" [disabled]="updateForm.invalid || !siteSelected">
+            Cập nhật</button>
+        </div>
+      </form>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngIf="pageNumber === 3">
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-success">
+            <i class="fa fa-plus fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>Anh chị có muốn nhận báo cáo này định kỳ qua email không?</h3>
+          <p>Báo này sẽ được tự động gửi tới email: {{userInfo.email}} vào {{contentLabel}} của kỳ báo cáo</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="saveDataFromParent()"
+            style="background:#05c46b; border-color: #05c46b;">Có</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            Không</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

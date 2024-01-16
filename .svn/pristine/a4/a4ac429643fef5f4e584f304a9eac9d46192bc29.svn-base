@@ -1,0 +1,253 @@
+<block-ui></block-ui>
+<div class="row">
+    <div class="container-fluid">
+        <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+        <div class="animated fadeIn">
+            <div class="card card-parent">
+                <div class="card-header" style="background: #f3b21c;
+        border: none;
+        border-radius: 0px;
+        color: #fff;
+        font-family: Open-Bold;
+        text-transform: uppercase;">
+                    <h4 class="mb-0">How It Work</h4>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Đang cập nhật... -->
+                    <div class="row cardbody-items ml-mr-0">
+                        <div class="col-md-12">
+                            <h4 class="float-left" style="font-family: Open-Bold;
+              font-size: 32px;">ACS® Analytics Platform</h4>
+                        </div>
+                    </div>
+                    <div class="row mt-4 cardbody-items ml-mr-0">
+                        <div class="col-md-12 alignitem">
+                            <img src="assets/img/iconmenu/generalchart.jpg" style="max-width:100%">
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <p style="max-width: 770px;
+              color: #777;
+              font-size: 1.2em;
+              line-height: 1.6875;">{{language.title}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mt-3 ml-mr-0 grayblock pb-5">
+                        <div class="col-md-12 alignitem pt-4 pb-4 mb-2">
+                            <h2 class="mb-0">
+                                ACS® Analytics platform works through a series of steps
+                            </h2>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 1 ? 'active' : ''}}" (click)="status = 1"
+                                src="assets/img/iconmenu/colection.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 1 ? 'active' : ''}}">COLLECTION</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 2 ? 'active' : ''}}" (click)="status = 2"
+                                src="assets/img/iconmenu/analisis.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 2 ? 'active' : ''}}">ANALYSIS</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 3 ? 'active' : ''}}" (click)="status = 3"
+                                src="assets/img/iconmenu/visualization.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 3 ? 'active' : ''}}">VISUALIZATION</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 4 ? 'active' : ''}}" (click)="status = 4"
+                                src="assets/img/iconmenu/insight.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 4 ? 'active' : ''}}">INSIGHTS</span>
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="align-items: center; margin-top: 4rem !important;">
+                            <div class="row">
+                                <div *ngIf="status === 1" class="col-md-9 khoinoidung" id="noidung1">
+                                    <p>{{language.colection1}}
+                                    </p>
+                                </div>
+                                <div *ngIf="status === 2" class="col-md-9 khoinoidung" id="noidung2">
+                                    <p>
+                                        {{language.colection2}}
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span> {{language.colection2_1}}</span></li>
+                                                <li><span> {{language.colection2_2}}</span></li>
+                                                <li><span> {{language.colection2_3}}</span></li>
+                                                <li><span> {{language.colection2_4}}</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span> {{language.colection2__1}}</span></li>
+                                                <li><span>{{language.colection2__2}}</span></li>
+                                                <li><span>{{language.colection2__3}}</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="status === 3" class="col-md-9 khoinoidung" id="noidung3">
+                                    <p>
+                                        {{language.colection3}}
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>Web dashboard</span></li>
+                                                <li><span>  {{language.colection3_1}}</span></li>
+                                                <li><span>  {{language.colection3_2}}</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>  {{language.colection3__1}}</span></li>
+                                                <li><span>  {{language.colection3__2}}</span></li>
+                                                <li><span>  {{language.colection3__3}}</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="status === 4" class="col-md-9 khoinoidung" id="noidung4">
+                                    <p>
+                                        {{language.colection4}}
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Số lượng khách hàng tới mua sắm tại từng
+                                                stores và toàn hệ thống ?</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Số lượng người đi qua store (Passerby Traffic) ?</span></li>
+                                                <li><span>Số lượng khách hàng tới mua sắm?</span></li>
+                                                <li><span>Trong tổng số lượt khách, bao nhiêu là khách hàng tới mua và
+                                                        bao nhiêu là từ nhân viên
+                                                        (shoppers vs. staff) ?</span></li>
+                                                <li><span>Mức độ nhân sự được so sánh với lượng khách hàng trong
+                                                        ngày?</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Ai là khách hàng của bạn?</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Khách hàng là nam hay nữ, độ tuổi bao nhiêu (male/female, age,
+                                                        etc.)?</span></li>
+                                                <li><span>Họ là khách mới lần đầu tới mua sắm hay là khách cũ, khách đã
+                                                        từng tới mua sắm
+                                                        (New/returning visitors)?</span></li>
+                                                <li><span>Họ là khách VIP, Loyalty?</span></li>
+                                                <li><span>Tỷ lệ khách VIP/Loyalty tới cửa hàng và mua hàng/Không mua
+                                                        hàng (VIP Purchased/VIP Non
+                                                        Purchases)?</span></li>
+                                                <li><span>Ảnh hưởng của trẻ con đối với quyết định mua sắm của bố mẹ
+                                                        chúng ?</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Hàng vi của khách hàng trong suốt quá
+                                                trình mua sắm (customer behavior)?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Thời gian khách hàng trải nghiệm (Avg time)</span></li>
+                                                <li><span>Họ dừng ở gian hàng nào, khu vực nào (Dwelling time &
+                                                        Heatmap)</span></li>
+                                                <li><span>Giá trị đơn hàng trung bình cho mỗi đơn hàng (Avg Transaction
+                                                        Value - ATV)</span></li>
+                                                <li><span>Số lượng sản phẩm, hàng hóa cho mỗi đơn hàng (Avg Transaction
+                                                        Itimes - ATI)</span>
+                                                </li>
+                                                <li><span>Họ có hài lòng với dịch vụ, sản phẩm bạn cung cấp không (CX
+                                                        Index, NPS Index)?</span>
+                                                </li>
+                                                <li><span>Khách hàng tương tác với các sản phẩm mới, mẫu mới, … </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Vai trò của nhân viên bán hàng với kết
+                                                quả tại từng store - KPI?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Việc phân bổ nhân sự tại từng của hàng đã phù hợp với nhu cầu,
+                                                        tối ưu chưa (Visits per
+                                                        sales hour)?</span></li>
+                                                <li><span>Hiệu suất của nhân viên bán hàng (sale per sale hour)?</span>
+                                                </li>
+                                                <li><span>Đánh giá KPI của nhân viên bán hàng trên từng store và toàn hệ
+                                                        thống</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Hiểu quả của từng store theo các chỉ số
+                                                hiệu quả chính KPI?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>So sánh và đánh giá mối tương quan về hiểu quả giữa các chỉ
+                                                        số: Visits, tỷ lệ chuyển
+                                                        đổi - CR, doanh thu - sales, giá trị đơn hàng trung bình – ATV,
+                                                        … </span></li>
+                                                <li><span>Hiệu quả hoạt động theo từng chỉ số chính của từng Store với
+                                                        nhóm Store, tất cả Store
+                                                        theo mô hình Boston</span></li>
+                                                <li><span>Yếu tố bên người nào ảnh hưởng tới kết quả chung như thời
+                                                        tiết, yếu tố văn hóa địa
+                                                        phương, các dự kiện, giao thông?</span></li>
+                                                <li><span>Hiệu qủa của các chương trình Marketing: thu hút thêm nhiều
+                                                        khách hàng, có đúng đối
+                                                        tượng khách hàng không, có làm gia tăng doanh số không, …</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <img src="assets/Analytics.ico" style="width: 70px;">
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <div class="row" style="justify-content:center;">
+                                <div class="col-md-6 contactinfo">
+                                    <h3 style="position:relative;">
+                                        <i class="fa fa-phone-square" style="position: absolute;
+                    top: -5px;
+                    font-size: 35px;
+                    left: -50px;
+                    color: #f3b21c;"></i> 0904 839 338</h3>
+                                    <p>We're here to answer any questions you have. Friendly staff are standing
+                                        by.&nbsp;<a href="https://www.acs.vn"
+                                            style="text-decoration: underline;">Contact us.</a></p>
+                                </div>
+                                <div class="col-md-6 contactinfo">
+                                    <h3 style="position:relative;">
+                                        <i class="fa fa-envelope-o" style="position: absolute;
+                      top: -5px;
+                      font-size: 35px;
+                      left: -50px;
+                      color: #f3b21c;"></i>sales@acs.vn</h3>
+                                    <p>Subscribe to our news feed for retail industry news and trends.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

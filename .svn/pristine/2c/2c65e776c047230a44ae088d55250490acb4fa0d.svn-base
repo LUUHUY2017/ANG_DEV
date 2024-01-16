@@ -1,0 +1,538 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, OnDestroy } from '@angular/core';
+
+import { environment } from '../../../../environments/environment';
+import { AppService } from '../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+// import { Router } from '@angular/router';
+// import { ActivatedRoute } from '@angular/router';
+// import viewchild
+import { UserMenuComponent } from '../../viewchild/usermenu/usermenu.component';
+// import notification
+import { NotifierService } from 'angular-notifier';
+import { BehaviorSubject } from 'rxjs';
+import { language } from '../../admin/admin_language';
+import { language_en } from '../../admin/admin_language_en';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+// import * as io from 'socket.io-client';
+@ViewChild(UserMenuComponent)
+
+@Component({
+  templateUrl: './useremailconfig.component.html',
+  styleUrls: ['./useremailconfig.component.scss'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class UserEmailConfigComponent implements OnInit, OnDestroy {
+  @BlockUI() blockUI: NgBlockUI;
+  private readonly notifier: NotifierService;
+  can_add: boolean;
+  @ViewChild('searchForm') searchForm: FormGroup;
+  // Khai báo kiểu dữ kiệu
+  public data: any;
+  dataFilter: any;
+  dataUpdate: any;
+  organizationId: string;
+  moduleArray: Array<IOption>;
+  modalRef: BsModalRef;
+  // phân trang bảng
+  rowsOnPage = 15;
+  SelectionDisplay: boolean;
+  siteSelectionDisplay: boolean;
+  userlogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  webState: BehaviorSubject<any>;
+  showSelectCrud: boolean;
+  subcription: any;
+  tu_khoa: any;
+  optionDelete: number;
+  oldState: string;
+  errorArray: Array<any>;
+  delete_object: any;
+  locationSelected: any[];
+  language: any;
+  siteFilterModel: any;
+  recordDate: string;
+  reportType: Array<any>;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  // unReceiveUser: Array<any>;
+  pageArray: Array<any>;
+  siteArray: Array<any>;
+  viewBy: Array<any>;
+  startTimeArray: Array<any>;
+  endTimeArray: Array<any>;
+  siteSelected: any;
+  siteTreeDisplay: boolean;
+  pageSelectedArray: Array<any>;
+  constructor(
+    public router: Router,
+    notifierService: NotifierService,
+    private appservice: AppService,
+    private modalService: BsModalService) {
+    this.notifier = notifierService;
+    this.type_language === 'vn' ? this.language = language : this.language = language_en;
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    this.webState = new BehaviorSubject(firstState);
+    this.setDefaultValue();
+    this.setDefaultCrud(false);
+    this.watchStateChange();
+    this.getConfig();
+    console.log(this.searchForm);
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const currentState = res.state;
+      const item = this.cloneArray(res.data);
+      const oldState = this.oldState;
+      // console.log('trạng thái trước', this.oldState);
+      // console.log('trạng thái hiện tại', currentState);
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        // Sự kiện nhận dữ liệu về thì bỏ hành động tìm kiếm trước đó
+        this.data = item;
+        this.dataFilter = this.data;
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.data.push(item);
+        // Nếu trạng thái trước đó là search
+        this.notifier.notify('success', this.language.them_moi_thanh_cong);
+        if (oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        console.log(this.data);
+        for (let i = 0; i < this.data.length; i++) {
+          if (Number(this.data[i].id) === Number(item.id)) {
+            this.data[i] = item;
+            break;
+          }
+        }
+        this.notifier.notify('success', this.language.cap_nhat_thanh_cong);
+        if (oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.data.splice(this.data.findIndex(e => e.id === item.id), 1);
+        this.notifier.notify('success', this.language.xoa_thanh_cong);
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        let oldData = this.data;
+        const inputData = this.searchForm.value;
+        // tslint:disable-next-line: forin
+        for (const key in inputData) {
+          if (inputData[key]) {
+            const lowerStr = inputData[key] !== null ? inputData[key].toLowerCase() : null;
+            oldData = oldData.filter((e: any) => e.hasOwnProperty(key) && (inputData[key] === ''
+              || e[key].toLowerCase().indexOf(lowerStr) !== -1));
+          }
+        }
+        // console.log('oldData', oldData);
+        this.dataFilter = oldData;
+      }
+    }, (error) => {
+      console.log(error);
+    }, () => {
+      console.log('this.tu_khoa', this.tu_khoa);
+      if (this.tu_khoa !== '') {
+        this.updateState(environment.STATE.search);
+      }
+    });
+  }
+  recusive_menu(array: any[], id = null, space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.siteArray.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables
+          , store: element.store
+        });
+        const scope = space + 1;
+        this.recusive_menu(array, a_id, scope);
+      }
+    });
+  }
+  cloneArray(item: Array<any>) {
+    const newJSONString = JSON.stringify(item);
+    return JSON.parse(newJSONString);
+  }
+  setDefaultCrud(bool: boolean) {
+    this.can_add = bool;
+  }
+  changeViewBy(value) {
+    // const value = item.value;
+    console.log(value);
+    if (value === '1') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }
+      ];
+    } else if (value === '2') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }
+      ];
+    } else if (value === '3') {
+      this.viewBy = [{
+        value: 'Hour'
+        , label: 'Giờ'
+      }, {
+        value: 'Day'
+        , label: 'Ngày'
+      }, {
+        value: 'Week'
+        , label: 'Tuần'
+      }
+      ];
+    }
+  }
+  setDefaultValue() {
+    this.viewBy = [];
+    this.reportType = [
+      {
+        value: '1'
+        , label: 'Ngày'
+      },
+      {
+        value: '2'
+        , label: 'Tuần'
+      },
+      {
+        value: '3'
+        , label: 'Tháng'
+      }
+    ];
+    this.moduleArray = [];
+    this.startTimeArray = [];
+    this.endTimeArray = [];
+    this.siteArray = [];
+    this.dataFilter = [];
+    this.data = [];
+    this.dataUpdate = null;
+    this.errorArray = [];
+    this.optionDelete = 0;
+    this.siteSelectionDisplay = false;
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    const oldStateObj = this.webState.getValue();
+    this.oldState = oldStateObj.state;
+    this.webState.next(stateWithData);
+  }
+  changeModule(item) {
+    const module_id = item.value;
+    console.log(module_id);
+    console.log(this.pageArray);
+    const page = environment.reportPage;
+    if (page == null) {
+      this.modalRef.hide();
+      this.notifier.notify('error', 'Không tìm thấy module');
+      return;
+    }
+    const newData = [];
+    this.pageSelectedArray = this.pageArray.filter(e => e.module_id === module_id);
+    console.log(this.pageSelectedArray);
+  }
+  submitToSearch(form: any) {
+    const inputData = form.value; // Where
+    this.updateState(environment.STATE.search, inputData);
+  }
+  // Lấy thông tin tổ chức lên ng-select
+  getConfig() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const url = 'api/userEmailGetConfig';
+    this.appservice.get(url).subscribe(
+      param => {
+        console.log('param', param);
+        if (param.status === 0) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          this.blockUI.stop();
+          return;
+        }
+        if (param.moduleData.length === 0) {
+          this.notifier.notify('error', 'Không tồn tại module');
+          this.blockUI.stop();
+          return;
+        }
+        this.startTimeArray = param.startTime;
+        this.endTimeArray = param.endTime;
+        this.setDefaultCrud(true);
+        const retrieveData = param.retrieveData;
+        for (let i = 0; i < retrieveData.length; i++) {
+          try {
+            const jsonParam = JSON.parse(retrieveData[i].params);
+            retrieveData[i].viewBy = jsonParam.view_by;
+            retrieveData[i].startTime = jsonParam.start_time;
+            retrieveData[i].endTime = jsonParam.end_time;
+            retrieveData[i].startTimeLabel = this.startTimeArray.find(e => e.value === jsonParam.start_time).label;
+            retrieveData[i].endTimeLabel = this.endTimeArray.find(e => e.value === jsonParam.end_time).label;
+          } catch {
+            retrieveData[i].viewBy = null;
+            retrieveData[i].endTime = null;
+            retrieveData[i].startTime = null;
+            retrieveData[i].endTimeLabel = null;
+            retrieveData[i].startTimeLabel = null;
+          }
+        }
+        console.log(retrieveData);
+        this.updateState(environment.STATE.retrieve, retrieveData);
+        const siteData = param.siteData || [];
+        this.recusive_menu(siteData);
+        console.log('siteData', siteData);
+        this.moduleArray = param.moduleData.map(function (e) {
+          return {
+            value: e.module_id
+            , label: e.module_name
+          };
+        });
+        this.pageArray = param.pageData.map(function (e) {
+          return {
+            value: e.id
+            , label: e.page_name
+            , module_id: e.page_module
+          };
+        });
+      },
+      (error) => {
+        console.log(error);
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // Modal hỏi xóa
+  openPopupDeleteItem(item, dialog: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(dialog, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    this.dataUpdate = item;
+  }
+  // Open Modal thêm mới
+  openPopupAddItem(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    this.errorArray.length = 0;
+    this.siteSelectionDisplay = false;
+    this.viewBy.length = 0;
+    this.siteSelected = null;
+    this.pageSelectedArray = [];
+  }
+  // Open modal update từng thiết bị
+  openPopupUpdateItem(item, template: TemplateRef<any>) {
+    console.log('dữ liệu từng bản ghi', item);
+    this.siteSelectionDisplay = false;
+    this.dataUpdate = Object.assign({}, item);
+    const site_id = item.site_id;
+    this.siteSelected = this.siteArray.find(e => e.id === site_id);
+    this.pageSelectedArray = this.pageArray.filter(e => e.module_id === item.module_id);
+    this.changeViewBy(item.report_type);
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // thêm thiết bị
+  addNewItem(item: FormGroup) {
+    console.log(item);
+    console.log(this.siteSelected);
+    const paramJson = { ...item.value };
+    const pageName = this.pageArray.find(e => e.value === item.value.page_id);
+    const moduleModel = this.moduleArray.find(e => e.value === item.value.module_id);
+    const data = {
+      module_id: item.value.module_id
+      , page_id: item.value.page_id
+      , params: JSON.stringify(paramJson)
+      , site_id: this.siteSelected.id
+      , report_type: item.value.report_type
+      , page_name: pageName.label || null
+      , site_name: this.siteSelected.site_name
+      , module_name: moduleModel.label || null
+      , startTime: paramJson.start_time
+      , endTime: paramJson.end_time
+      , viewBy: paramJson.view_by
+    };
+    console.log(data);
+    if (item.invalid || this.siteSelected == null) {
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+      return;
+    }
+    const url = 'api/addReceiveReportEmail';
+    // xét error về rỗng.
+    this.errorArray = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, url).subscribe(
+      res => {
+        console.log('dữ liệu gửi về', res);
+        if (res.status === 1) {
+          const insertedData = res.insertedData;
+          insertedData.startTimeLabel = this.startTimeArray.find(e => e.value === insertedData.startTime).label;
+          insertedData.endTimeLabel = this.endTimeArray.find(e => e.value === insertedData.startTime).label;
+          this.updateState(environment.STATE.insert, insertedData);
+          this.modalRef.hide();
+        } else {
+          this.errorArray = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.errorArray.push(this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  preventChange() {
+    this.modalRef.hide();
+    this.notifier.notify('error', this.language.loi_du_lieu_khong_the_thay_doi);
+  }
+  changeSiteSelected(item: any) {
+    console.log('id', item);
+    this.siteSelectionDisplay = false;
+    if (item.enables === '0') {
+      this.modalRef.hide();
+      this.notifier.notify('error', this.language.co_loi_xay_ra);
+      return;
+    }
+    this.siteSelected = item;
+  }
+  // cập nhật thiết bị
+  updateCurrentItem(item: FormGroup) {
+    console.log(item);
+    // if (item.invalid || !this.siteSelected) {
+    //   this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+    //   return;
+    // }
+    if (!item.dirty) {
+      this.notifier.notify('warning', 'Dữ liệu không thay đổi');
+      return;
+    }
+    // Nếu như serial number không sửa
+    if (item.invalid || this.siteSelected == null) {
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+      this.modalRef.hide();
+      return;
+    }
+    const paramJson = { ...item.value };
+    const pageName = this.pageArray.find(e => e.value === item.value.page_id);
+    const moduleModel = this.moduleArray.find(e => e.value === item.value.module_id);
+    const data = {
+      id: this.dataUpdate.id
+      , module_id: item.value.module_id
+      , page_id: item.value.page_id
+      , params: JSON.stringify(paramJson)
+      , site_id: this.siteSelected.id
+      , report_type: item.value.report_type
+      , page_name: pageName.label || null
+      , site_name: this.siteSelected.site_name
+      , module_name: moduleModel.label || null
+      , startTime: paramJson.start_time
+      , endTime: paramJson.end_time
+      , viewBy: paramJson.view_by
+    };
+    console.log(data);
+    this.errorArray = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const url = 'api/updateReceiveReportEmail';
+    this.appservice.post(data, url).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.status === 1) {
+          const updatedData = res.updatedData;
+          updatedData.startTimeLabel = this.startTimeArray.find(e => e.value === updatedData.startTime).label;
+          updatedData.endTimeLabel = this.endTimeArray.find(e => e.value === updatedData.startTime).label;
+          this.updateState(environment.STATE.update, res.updatedData);
+          this.modalRef.hide();
+        } else {
+          this.errorArray = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.errorArray.push(this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  search_table(searchString: string) {
+    this.tu_khoa = searchString;
+    this.updateState(environment.STATE.search);
+  }
+  soft_delete_item() {
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const url = 'api/softDeleteTerminal';
+    const data = {
+      id: this.delete_object.id
+      , deleted: this.delete_object.deleted
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.updateState(environment.STATE.delete, this.delete_object);
+        } else {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.modalRef.hide();
+        this.blockUI.stop();
+      });
+  }
+  deleteCurrenItem() {
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const url = 'api/deleteReceiveReportEmail';
+    const data = {
+      id: this.dataUpdate.id
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.status === 1) {
+          this.updateState('delete', this.dataUpdate);
+        } else {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.modalRef.hide();
+        this.blockUI.stop();
+      });
+  }
+  ngOnDestroy() {
+    this.webState.complete();
+  }
+}

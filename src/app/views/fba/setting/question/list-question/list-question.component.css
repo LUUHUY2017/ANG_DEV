@@ -1,0 +1,217 @@
+/*----------  CSS  question.component.css  ----------*/
+body{
+  font-family: Roboto,sans-serif;
+}
+.main .container-fluid {
+  padding: 0 30px;
+}
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+} 
+.breadcrumb {
+  position: relative;
+  border-radius: 0;
+  border-bottom: 1px solid #c8ced3;
+}
+.breadcrumb li a{
+  color: gray;
+}
+/* .card-font span{
+    font-family: Roboto,sans-serif;
+    font-size: 18px;
+} */
+.breadcrumb {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  margin-bottom: 1.5rem;
+  list-style: none;
+  background-color: #fff;
+  border-radius: 0;
+}
+.form-control:focus {
+  color: #5c6873;
+  background-color: #fff;
+  border-color: #8ad4ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.01rem rgba(32, 168, 216, 0.25);
+}
+.popup-table{
+  top: 55%;
+  left: 50%;
+  width: 80%;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  z-index: 2;
+  /*opacity: 0;*/
+  /*visibility: hidden;*/
+}
+.khung-black{
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;     
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  z-index: 1;
+}
+#reason-table thead th{
+  text-align: center;
+}
+.header-admin-question select, .header-admin-question input{
+  border-radius: 0;
+}
+.add-question{
+   background: cornflowerblue !important; 
+   color: white  !important; 
+   width: auto; 
+   padding: 3px 14px !important; 
+   margin-right: 5px;
+   border-radius: 0 !important;
+}
+.add-question:hover{
+  background: cornflowerblue !important; 
+  color: white !important; 
+}
+#reason-table thead th{
+  vertical-align: middle;
+  text-align: center;
+}
+.selectimeview .clear{
+  display: none
+}
+/*-------------------Phần bảng ----------------------*/
+.card-table{
+  padding: 1.25rem;
+}
+.question-list .ui-paginator-bottom{
+  float: right;
+  margin-top: 1px;
+  font-size: 12px;
+}
+.question-list body .ui-paginator{
+  background-color: #6495ed !important;
+  color: #ffffff;
+}
+.question-list table tbody tr td {
+  padding: 7px 0;
+  vertical-align: middle;
+}
+.question-list table thead th{
+	border-bottom: 1px solid #c8ced3 !important;
+  border-top: unset !important;
+  padding: 10px 0 10px 0;
+  vertical-align: middle;
+}
+.table-td-bat-tat,.table-td-xu-ly,.table-td-start-time,.table-td-end-time{
+  text-align: center;
+}
+.question-list_filter_table 
+{
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.question-list_filter_table ul
+{
+    width: 100%;
+	  padding: 0;
+    height: 30px;
+    margin-bottom: 0px;
+}
+.question-list_filter_table li
+{
+    list-style: none;
+}
+.question-list_filter_table li>a
+{
+    color: #20a8d8;
+    cursor: pointer;
+}
+.question-list_filter_table li>a:hover
+{
+    text-decoration: underline;
+}
+.question-list_filter_table li:nth-child(1)
+{
+    float: left;
+}
+.question-list_filter_table li:nth-child(2)
+{
+    float: right;
+}
+.question-list_filter_table li:nth-child(2) .input_filter_table
+{
+	width: 130px;
+	padding-left: 5px;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,0.15), 0 0 0px rgba(82,168,236,.2);   
+	outline: none;
+	border: 1px solid #ddd;
+}
+.question-list_filter_table li:nth-child(2) .input_filter_table:focus,.question-list_filter_table .select_cus_table:focus
+{
+    border-color: rgba(82,168,236,.8);
+}
+.question-list_filter_table .select_cus_table
+{
+	box-shadow: inset 0 1px 1px rgba(0,0,0,0.15), 0 0 0px rgba(82,168,236,.2);   
+}
+tfoot.question-list-tfoot ul.pagination{
+	float: right;
+	margin-bottom: -1rem;
+}
+tfoot.question-list-tfoot tr td{
+  padding: 3px 0 3px 3px;
+}
+.question-list_filter_table #showrow select
+{
+    padding: 1px 5px;
+    border-radius: 0px;
+    border-color: #ddd;
+}
+.table-quality-close{
+  display: block;
+  text-align: right;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  opacity: 0.7;
+  text-shadow: 0 1px 0 #fff;
+  padding: 0px 5px 0 5px;
+  cursor: pointer;
+}
+.table-quality-close:hover{
+  opacity: 1;
+}
+/*Modal hỏi xóa*/
+.box-shadow
+{
+  box-shadow: 2px 2px 3px rgba(2, 2, 2, 0.24) !important;
+}
+#border-remove
+{
+  width: fit-content;
+  margin: auto;
+  padding: 10px 15px;
+  border-radius: 50%;
+  border: 2px solid #9c1b1b;
+}
+#border-remove>i
+{
+  color: #9c1b1b;
+}
+@media only screen and (max-width: 452px){
+	.question-list_filter_table li:nth-child(2) .input_filter_table{
+		width:110px;
+  }
+  .font-span-table{
+		font-size: 12px;
+	}
+
+}

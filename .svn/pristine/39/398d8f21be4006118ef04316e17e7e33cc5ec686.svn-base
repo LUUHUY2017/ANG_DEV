@@ -1,0 +1,16 @@
+<div class="app flex-row align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="clearfix">
+          <h1 class="float-left display-3 mr-4">404</h1>
+          <h4 class="pt-3">Ồ! Có vẻ như</h4>
+          <p class="text-muted">Trang bạn tìm kiếm không tồn tại</p>
+        </div>
+        <div class="input-prepend input-group">
+          <button [routerLink]="[ '/dashboard' ]" class="btn btn-outline-primary"><i class="fa fa-angle-left">&nbsp;</i>Quay lại trang chủ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,330 @@
+<main>
+  <app-fbamenu></app-fbamenu>
+  <!-- <div class="row">
+      <div class="col-md-12">
+         <app-adminstratormenu></app-adminstratormenu>
+      </div>
+   </div> -->
+  <div class="row">
+    <div class="col-lg-12">
+      <block-ui></block-ui>
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"> <i class="fa fa-list-alt" aria-hidden="true"></i>
+            {{language.danh_sach_thiet_bi}}</span>
+          <button *ngIf="can_add" (click)="open_modal_them_moi(templates)" style="float:right"
+            class="btn btn-them buton-search ">
+            {{language.them_moi}}</button>
+        </div>
+        <div class="card-body card-table table-fba-tablet">
+          <div class="row">
+            <div class="col-md-2">
+              <ng-select class="bootstrap selectimeview" required [options]="organization_arr"
+                  [ngModel]="organization_id" [allowClear]="false"
+                  (selected)="changeorganization_table($event)" placeholder="Chọn tổ chức">
+                </ng-select>
+            </div>
+            <!-- <ul>
+              <li id="showrow">
+                <span class="font-span-table">{{language.so_dong}} &nbsp;</span>
+                <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                  <option [ngValue]="15">15</option>
+                  <option [ngValue]="25">25</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+                <select style="margin-left:10px;" class="input-sm select_cus_table"
+                  (change)="changeorganization_table($event.target.value)">
+                  <option *ngFor="let item of organization_arr" value="{{item.value}}">{{item.label}}</option>
+                </select>
+              </li>
+              <li><span class="font-span-table">{{language.tim_kiem}} &nbsp;</span><input type="text"
+                  class="input_filter_table" (keyup)="search_table($event.target.value)"></li>
+            </ul> -->
+          </div>
+          <div class="table-responsive">
+            <table [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage" style="width: 100%;min-width: 900px"
+              class="table table-striped  fba-tablets_table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">{{language.STT}}</th>
+                  <th style="width: 180px;">Serial number</th>
+                  <th style="width: 120px;text-align: left;padding-left:1rem;">{{language.ten_thiet_bi}}</th>
+                  <th style="width: 120px;text-align: left;padding-left:1rem;">{{language.ten_to_chuc}}</th>
+                  <th style="width: 120px;text-align: left;padding-left:1rem;">{{language.dia_diem}}</th>
+                  <th style="width: 120px;text-align: left;padding-left:1rem;">{{language.vi_tri}}</th>
+                  <th style="width: 100px;">{{language.kich_hoat}}</th>
+                  <th style="width: 90px;">{{language.xu_ly}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let items of mf.data;let i = index">
+                  <td>{{i+1}}</td>
+                  <td style="text-align: left;padding-left:1rem;word-break: break-all;">
+                    {{items.serial_number}}
+                    <span style="color:red;font-size: 14px;" *ngIf="items.actived==0">*</span>
+                  </td>
+                  <td class="{{items.tablet_name ? 'tablet-left' : 'tablet-right'}}">
+                    {{items.tablet_name ? items.tablet_name : ' '}}</td>
+                  <td style="text-align: left;padding-left:1rem;">
+                    {{items.organization_name ?  items.organization_name : ' '}}</td>
+                  <td style="text-align: left;padding-left:1rem;"> {{items.site_name ? items.site_name :' '}}</td>
+                  <td style="text-align: left;padding-left:1rem;"> {{items.location_name ? items.location_name : ' '}}
+                  </td>
+                  <td> {{items.created_at | date: 'dd/MM/yyyy'}} </td>
+                  <td style="width: 100px;" class="">
+                    <a (click)="open_modal_update(items,template)" style="color:#333;cursor: pointer;" class="icon-blue"
+                      title="Sửa thiết bị">
+                      <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="can_delete" (click)="modal_question(items.serial_number,dialog)" class="icon-red"
+                      title="Xóa thiết bị">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </a>&nbsp;
+                  </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                  <td colspan="8" *ngIf="data?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot class="fba-tablet-list-tfoot">
+                <tr>
+                  <td colspan="8">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                    <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Model hỏi xóa -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_tablets()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Modal thêm mới  -->
+  <ng-template #templates>
+    <form (ngSubmit)="insert_tablet(devices_insert)" #devices_insert="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_thiet_bi}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-3 col-4 col-form-label lh-label">Serial
+            number</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input class="form-control " id="nf" type="text" [(ngModel)]="serial_number" required
+              #txtserial_number="ngModel" name="serial_number">
+            <small *ngIf="txtserial_number.touched && txtserial_number.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_serial_number}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.ten_thiet_bi}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input class="form-control " type="text" [(ngModel)]="tablet_name" name="tablet_name">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.ten_to_chuc}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" [options]="organization_arr"
+              [(ngModel)]="org_selected" (selected)="get_menutree_by_or($event.value)" required
+              #txtorganization_id="ngModel" name="organization_id" [allowClear]="true">
+            </ng-select>
+            <small *ngIf="txtorganization_id.touched && txtorganization_id.errors?.required" class="error-message">
+              {{language.ban_chua_chon_to_chuc}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.dia_diem}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-fba-table">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{site_add_name}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-fba-tablet block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <div style="position: relative;width: 100%;" class="inputgroup">
+                  <input (keyup)="search_menu($event.target.value)" style="border:none !important;padding-left: 7px"
+                    type="text" class="form-control" placeholder={{language.tim_kiem_dia_diem}}>
+                  <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                    class="fa fa-search" aria-hidden="true"></i>
+                </div>
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of menu_tree1"
+                    (click)=" item.enables == 1 ? change_site_seleted(item.organization_id, item.id,item.site_name) : ''"
+                    class="menu-{{item.alevel}} {{item.site_name === site_update_name ? 'active' : ''}} {{item.enables == '0' ? 'li_unlist' : ''}} ">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.vi_tri}} &nbsp;&nbsp;
+          </label>
+          <div class="col-md-9 col-8 col-form-label">
+            <ng-select style="position: relative;" class="bootstrap selectimeview backselect" [options]="location_arr"
+              required #txtlocation_id="ngModel" [(ngModel)]="location_id" name="location_id" [allowClear]="true">
+            </ng-select>
+            <!-- <img [hidden]="!show_icon" style="position: absolute;  right: 50%; top: 9px;" src="{{url_img}}"> -->
+            <small *ngIf="txtlocation_id.touched && txtlocation_id.errors?.required" class="error-message">
+              {{language.ban_chua_chon_vi_tri}}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn  btn-primary" [disabled]="devices_insert.invalid" (click)="modalRef.hide()">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal thêm mới -->
+
+  <!-- Modal  cập nhật -->
+  <ng-template #template>
+    <form (ngSubmit)="update_tablet(devices_update)" #devices_update="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_thiet_bi}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="display:none" class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">ID_thiết bị</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input class="form-control " id="nf" type="text" [(ngModel)]="data2.serial_number" name="id">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-3 col-4 col-form-label lh-label">Serial
+            number</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input class="form-control " id="nf" type="text" #txtser="ngModel" required
+              [(ngModel)]="data2.serial_number" name="serial_number">
+            <small *ngIf="txtser.touched && txtser.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_serial_number}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.ten_thiet_bi}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <input class="form-control " #tablet_name="ngModel" type="text" [(ngModel)]="data2.tablet_name"
+              name="tablet_name">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.ten_to_chuc}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" #txtorr="ngModel" required
+              [options]="organization_arr" [(ngModel)]="data2.organization_id"
+              (selected)="get_menutree_by_or2($event.value,1)" name="organization_id" [allowClear]="true">
+            </ng-select>
+            <small *ngIf="txtorr.touched && txtorr.errors?.required" class="error-message">
+              {{language.ban_chua_chon_to_chuc}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.dia_diem}}</label>
+          <div class="col-md-9 col-8 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-fba-table">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{site_update_name}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-fba-tablet block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <div style="position: relative;width: 100%;" class="inputgroup">
+                  <input (keyup)="search_menu2($event.target.value)" style="border:none !important;padding-left: 7px"
+                    type="text" class="form-control" placeholder={{language.tim_kiem_dia_diem}}>
+                  <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                    class="fa fa-search" aria-hidden="true"></i>
+                </div>
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of menu_tree2"
+                    (click)=" item.enables == 1 ? change_site_seleted(item.organization_id, item.id,item.site_name) : ''"
+                    class="menu-{{item.alevel}} {{item.site_name === site_update_name ? 'active' : ''}} {{item.enables == '0' ? 'li_unlist' : ''}} ">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-4 col-form-label lh-label">{{language.vi_tri}} &nbsp;&nbsp;
+          </label>
+          <div class="col-md-9 col-8 col-form-label">
+            <ng-select style="position:relative" class="bootstrap selectimeview backselect" #txtloca="ngModel" required
+              [options]="location_arr" [(ngModel)]="location_id2 " name="location_id" [allowClear]="true">
+            </ng-select>
+            <!-- <img [hidden]="!show_icon" style="position: absolute;  right: 50%; top: 9px;" src="{{url_img}}"> -->
+            <small *ngIf="txtloca.touched && txtloca.errors?.required" class="error-message">
+              {{language.ban_chua_chon_vi_tri}}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn  btn-primary" (click)="modalRef.hide()" *ngIf="devices_update.valid && can_update">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+</main>

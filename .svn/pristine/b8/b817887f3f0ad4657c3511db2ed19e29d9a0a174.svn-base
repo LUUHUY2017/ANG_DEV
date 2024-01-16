@@ -1,0 +1,441 @@
+import { IOption } from 'ng-select';   // select option <option>
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { NotifierService } from 'angular-notifier';
+import { language } from '../../../admin/admin_language';
+import { language_en } from '../../../admin/admin_language_en';
+// import viewchild
+import { FootfallSettingMenuComponent } from '../../../viewchild/footfallsettingmenu/footfallsettingmenu.component';
+import { BehaviorSubject } from 'rxjs';
+@ViewChild(FootfallSettingMenuComponent)
+@Component({
+  templateUrl: './poc_brickstream_terminal.component.html',
+  styleUrls: ['./poc_brickstream_terminal.component.scss'],
+  // encapsulation: ViewEncapsulation.None
+})
+export class PocbrickstreamterminalComponent implements OnInit, OnDestroy {
+  @BlockUI() blockUI: NgBlockUI;
+  public modalRef: BsModalRef;
+  private readonly notifier: NotifierService;
+  userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+  organization_array: Array<IOption>;
+  location_array: Array<any>;
+  selected_location: any;
+  data_update: Array<any>;
+  hidden_select_organization: boolean;
+  id_status: number;
+  interval;
+  site_array: Array<any>;
+  selected_site: any;
+  siteSelectionDisplay: boolean;
+  tu_khoa: string;
+  organization_id: any;
+  selected_search_organization: string;
+  rowsOnPage = 15;
+  can_delete: boolean;
+  can_update: boolean;
+  can_add: boolean;
+  deleted: any;
+  data: any;
+  data_filter: any;
+  error_array: any[];
+  option_delete: number;
+  subcription: any;
+  webState: BehaviorSubject<any>;
+  oldState: string;
+  menu_tree: any;
+  locationSelected: any[];
+  siteFilterModel: any;
+  siteFilterDisplay: boolean; language: any;
+  constructor(private router: Router
+    , private route: ActivatedRoute
+    , private appservice: AppService
+    , private modalService: BsModalService
+    , notifierService: NotifierService) {
+    this.notifier = notifierService;
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    const type_language = JSON.parse(localStorage.getItem(environment.language));
+    type_language === 'vn' ? this.language = language : this.language = language_en;
+    this.webState = new BehaviorSubject(firstState);
+    this.setDefaultValue();
+    this.get_organization();
+    this.watchStateChange();
+  }
+  search_organization() {
+    this.tu_khoa = null;
+    this.get_site();
+  }
+  site_filter(item: any) {
+    this.siteFilterModel = item;
+    this.siteFilterDisplay = true;
+    this.get_data();
+  }
+  setDefaultValue() {
+    this.data_filter = [];
+    this.data = [];
+    this.data_update = null;
+    this.error_array = [];
+    this.option_delete = 0;
+    this.tu_khoa = null;
+    this.siteFilterDisplay = true;
+  }
+  get_organization() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const url = environment.API.userGetOrg;
+    this.appservice.get(url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        if ('message' in param) {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+          this.blockUI.stop();
+          return;
+        }
+        const org = param.organization_arr.slice(0);
+        this.organization_array = org;
+        this.organization_id = param.organization_arr[0].value;
+        this.get_site();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+        this.blockUI.stop();
+      });
+  }
+  get_site() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.menu_tree = [];
+    const url = environment.API.sites + '_get_site_with_permission';
+    const data = {
+      organization_id: this.organization_id
+      , deleted: 0
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_site_tree', param);
+        }
+        if (param.site_in_role.length === 0) {
+          this.notifier.notify('warning', 'Tổ chức chưa tạo site');
+          this.blockUI.stop();
+          return;
+        }
+        this.recusive_menu(param.site_in_role);
+        this.siteFilterModel = this.menu_tree.find(i => i.enables === '1');
+        this.get_data();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+        this.blockUI.stop();
+      });
+  }
+  search_table(searchString: string) {
+    this.tu_khoa = searchString;
+    this.updateState(environment.STATE.search);
+  }
+  change_delete_option() {
+    this.tu_khoa = null;
+    this.get_data();
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const currentState = res.state;
+      const item = res.data;
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        this.data = item;
+        this.data_filter = this.data;
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.data.push(item);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Thêm mới dữ liệu thành công');
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        for (let i = 0; i < this.data.length; i++) {
+          if (Number(this.data[i].id) === Number(item.id)) {
+            this.data[i] = item;
+            break;
+          }
+        }
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Cập nhật dữ liệu thành công');
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.data.splice(this.data.findIndex(e => e.id === item.id), 1);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Xóa dữ liệu thành công');
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        const string = this.tu_khoa ? this.tu_khoa.toLowerCase() : '';
+        // console.log(string);
+        if (string === '') {
+          this.data_filter = this.data;
+        } else {
+          this.data_filter = this.data.filter(x => x.serial_number.toLowerCase().indexOf(string) !== -1);
+        }
+      }
+    });
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    const oldStateObj = this.webState.getValue();
+    this.oldState = oldStateObj.state;
+    this.webState.next(stateWithData);
+  }
+  get_data() {
+    // this.blockUI.start('Đang tải dữ liệu...');
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    const data = {
+      organization_id: this.organization_id
+      , deleted: this.option_delete
+      , site_id: this.siteFilterModel ? this.siteFilterModel.id : 0
+    };
+    this.appservice.post(data, environment.POC.get_brickstream_terminals).subscribe(
+      para => {
+        this.location_array = para.locationArray;
+        this.updateState('retrieve', para.brick_array);
+      },
+      (error) => {
+        this.notifier.notify('error', 'Đã có lỗi xảy ra');
+      }).add(() => {
+        this.blockUI.stop();
+        this.setInterval();
+      });
+  }
+  show_update(update_template: TemplateRef<any>, item: any) {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    this.data_update = item;
+    const current_location_selected = this.location_array.find(e => e.value === item.location_id);
+    this.selected_site = this.menu_tree.find(e => e.id === current_location_selected.site_id);
+    this.locationSelected = this.location_array.filter(e => e.site_id === this.selected_site.id);
+    this.openModal(update_template);
+  }
+  show_insert(insert_template: TemplateRef<any>) {
+    this.openModal(insert_template);
+    this.selected_site = null;
+    this.locationSelected = [];
+    this.error_array = [];
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+  closeModal() {
+    this.modalRef.hide();
+    this.setInterval();
+  }
+  updateform(item) {
+    if (item.invalid) {
+      this.notifier.notify('error', 'Nhập liệu gặp sự cố');
+      return;
+    }
+    const url = environment.POC.get_brickstream_terminals + '_post_update';
+    // xét error về rỗng.
+    item.value.serial_number = String(item.value.serial_number);
+    this.error_array = [];
+    this.blockUI.start('Đang thêm dữ liệu...');
+    this.appservice.post(item.value, url).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.modalRef.hide();
+          this.notifier.notify('success', 'Thêm mới thành công');
+          this.get_data();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.error_array.push('Không thể kết nối máy chủ');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  insertform(item) {
+    if (item.invalid) {
+      this.notifier.notify('error', 'Nhập liệu gặp sự cố');
+      return;
+    }
+    const url = environment.POC.get_brickstream_terminals + '_post_add';
+    // xét error về rỗng.
+    item.value.serial_number = String(item.value.serial_number);
+    this.error_array = [];
+    this.blockUI.start('Đang thêm dữ liệu...');
+    this.appservice.post(item.value, url).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.modalRef.hide();
+          this.notifier.notify('success', 'Thêm mới thành công');
+          this.get_data();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.error_array.push('Không thể kết nối máy chủ');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  preventChange() {
+    this.modalRef.hide();
+    this.notifier.notify('error', 'Lỗi dữ liệu không được thay đổi');
+  }
+
+  setInterval() {
+    this.interval = setInterval(() => {
+      this.get_data();
+    }, 10000);
+  }
+
+  recusive_menu(array: any[], id = null, space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.menu_tree.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables
+          , store: element.store
+        });
+        const scope = space + 1;
+        this.recusive_menu(array, a_id, scope);
+      }
+    });
+  }
+  change_site_seleted(item: any) {
+    if (!environment.production) {
+      console.log('id', item);
+    }
+    if (item.store === '0' || item.enables === '0') {
+      this.modalRef.hide();
+      this.notifier.notify('error', 'Đã có lỗi xảy ra');
+      return;
+    }
+    this.selected_site = item;
+    this.siteSelectionDisplay = false;
+    this.locationSelected = this.location_array.filter(e => e.site_id === item.id);
+  }
+  show_delete(delete_templates: TemplateRef<any>, id: number) {
+    this.id_status = id;
+    this.openModal(delete_templates);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+  rollbackData(rollbackTemplates: TemplateRef<any>, id: number) {
+    this.id_status = id;
+    this.openModal(rollbackTemplates);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+  delete_method() {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.POC.get_brickstream_terminals + '_soft_delete';
+    const data = {
+      serial_number: this.id_status
+      , deleted: this.option_delete
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.notifier.notify('success', 'Đã xóa thành công');
+          this.get_data();
+        } else {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+        this.blockUI.stop();
+      }).add(() => {
+        this.modalRef.hide();
+      });
+  }
+  delete_method_data() {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.POC.get_brickstream_terminals + '_delete';
+    const data = {
+      serial_number: this.id_status
+    };
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.notifier.notify('success', 'Đã xóa thành công');
+          this.get_data();
+        } else {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+        this.blockUI.stop();
+      }).add(() => {
+        this.modalRef.hide();
+      });
+  }
+  open(url) {
+    // console.log(url);
+    window.open(url, '_blank');
+  }
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
+}
+
+
+

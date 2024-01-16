@@ -1,0 +1,567 @@
+const menu_icon_url = 'assets/img/iconmenu/';
+
+export const navItems = [
+  {
+    name: 'Dashboard',
+    url: '/dashboard',
+    module_title: 'default',
+    icon: 'icon-home',
+    display: true,
+    badge: {
+      variant: 'info',
+      text: 'NEW'
+    }
+  },
+  // Quyet them 3/9/2018
+  // Menu Footfall
+  {
+    name: 'Hệ thống Footfall',
+    url: '/footfall',
+    module_title: 'footfall',
+    icon_src: menu_icon_url + 'footfall.jpg',
+    icon: 'icon-star', // type = 0 là báo cáo, type = 1 là quản trị
+    children: [
+      {
+        name: 'Tổng quan',
+        type: 0,
+        title: 'footfall',
+        url: '/footfall/overview',
+        icon: 'fa fa-bar-chart',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Live Accupancy',
+        type: 0,
+        title: 'footfall',
+        url: '/footfall/liveview',
+        icon: 'fa fa-bar-chart',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Phân tích chỉ số', // Footfall Metrics
+        type: 0,
+        url: '/footfall/visits',
+        title: 'footfall',
+        icon: 'fa fa-bar-chart',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Báo cáo so sánh', // Footfall Metrics
+        type: 0,
+        title: 'footfall',
+        url: '/footfall/visits',
+        icon: 'fa fa-code',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        },
+        children: [
+          {
+            name: 'Cửa hàng', // Footfall Store
+            title: 'footfall',
+            url: '/footfall/store-comparison',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          {
+            name: 'Thời gian', // Footfall Time
+            title: 'footfall',
+            url: '/footfall/time-comparison',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          {
+            name: 'Chỉ số', // Footfall Metrics
+            title: 'footfall',
+            url: '/footfall/metrics-comparison',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          }
+        ]
+      },
+      {
+        name: 'Phân tích xu hướng', // Footfall Metrics
+        title: 'footfall',
+        type: 0,
+        url: '/footfall/visits',
+        icon: 'fa fa-code',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        },
+        children: [
+          {
+            name: 'Cửa hàng', // Footfall Store
+            title: 'footfall',
+            type: 0,
+            url: '/footfall/store-trend',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          // {
+          //   name: 'Thời gian', // Footfall Time
+          //   type: 0,
+          //   url: '/footfall/time-trend',
+          //   icon: 'fa fa-bar-chart',
+          //   badge: {
+          //     variant: 'danger',
+          //     text: 'BETA'
+          //   }
+          // },
+          {
+            name: 'Chỉ số', // Footfall Metrics
+            title: 'footfall',
+            type: 0,
+            url: '/footfall/metrics-trend',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          }
+        ]
+      },
+      // {
+      //   name: 'Hiệu quả nhân sự',
+      //   title: 'footfall',
+      //   type: 0,
+      //   url: '/footfall/heatmap',
+      //   icon: 'fa fa-bar-chart',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      {
+        name: 'Bản đồ nhiệt Heatmap',
+        title: 'footfall',
+        type: 0,
+        url: '/footfall/heatmap',
+        icon: 'fa fa-bar-chart',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      // {
+      //   name: 'Mô hình Boston',
+      //   type: 0,
+      //   url: '/footfall/metrics-boston',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      // {
+      //   name: 'Quản trị hiệu quả hoạt động',
+      //   type: 1,
+      //   url: '/footfall/setting/terminals',
+      //   icon: 'icon-settings',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+    ]
+  },
+  {
+    name: 'Trải nghiệm khách hàng', // FBA
+    url: '/fba',
+    module_title: 'fba',
+    icon_src: menu_icon_url + 'fba.jpg',
+    icon: 'icon-star',
+    children: [
+      {
+        name: 'Tổng quan',
+        title: 'fba',
+        type: 0,
+        url: '/fba/overview',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Phân tích chỉ số',
+        title: 'fba',
+        type: 0,
+        url: '/fba/metrics-analytics',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Báo cáo so sánh',
+        title: 'fba',
+        type: 0,
+        url: '/fba/metrics-comparison',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Lý do không hài lòng',
+        title: 'fba',
+        type: 0,
+        url: '/fba/reason',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Thông tin khách hàng',
+        title: 'fba',
+        type: 0,
+        url: '/fba/customer-info',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      // {
+      //   name: 'Quản lý câu hỏi',      // Quesstion
+      //   title: 'fba',
+      //   type: 1,
+      //   url: '/fba/question/list-question',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      // {
+      //   name: 'Quản lý cấu hình',
+      //   title: 'fba',
+      //   type: 1,
+      //   url: '/fba/setting/setting',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      // {
+      //   name: 'Giám sát thiết bị',
+      //   title: 'fba',
+      //   type: 1,
+      //   url: '/fba/tablets/list-tablets',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      // {
+      //   name: 'Thông báo tự động',
+      //   title: 'fba',
+      //   type: 1,
+      //   url: '/fba/notification',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      // {
+      //   name: 'Quản trị hệ thống', // FBA
+      //   title: 'fba',
+      //   type: 1,
+      //   url: '/administration/tablets',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+    ]
+  },
+  {
+    name: 'Giới tính - Độ tuổi',
+    url: '/gender-age',
+    module_title: 'genderage',
+    icon_src: menu_icon_url + 'genderage.jpg',
+    icon: 'icon-star',
+    children: [
+      {
+        name: 'Tổng quan',
+        title: 'genderage',
+        type: 0,
+        url: '/gender-age/overview',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Phân tích',
+        title: 'genderage',
+        type: 0,
+        url: '/gender-age/visit',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Độ tuổi',
+        title: 'genderage',
+        type: 0,
+        url: '/gender-age/metrics-age',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Giới tính',
+        title: 'genderage',
+        type: 0,
+        url: '/gender-age/metrics-gender',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      // {
+      //   name: 'Quản trị hệ thống',
+      //   title: 'genderage',
+      //   type: 1,
+      //   url: '/gender-age/administration/terminals',
+      //   icon: 'icon-drop',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+    ]
+  },
+  {
+    name: 'Hiệu quả hoạt động',
+    url: '/footfall',
+    module_title: 'performance',
+    icon_src: menu_icon_url + 'performance.jpg',
+    icon: 'icon-star', // type = 0 là báo cáo, type = 1 là quản trị
+    children: [
+      {
+        name: 'Mô hình Boston',
+        title: 'performance',
+        type: 0,
+        url: '/performance/metrics-boston',
+        icon: 'icon-drop',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Phân tích chỉ số',
+        title: 'performance',
+        type: 0,
+        url: '/performance/visits',
+        icon: 'fa fa-bar-chart',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      // {
+      //   name: 'Hiệu quả nhân sự',
+      //   title: 'performance',
+      //   type: 0,
+      //   url: '/performance/performance-staff',
+      //   icon: 'fa fa-bar-chart',
+      //   badge: {
+      //     variant: 'danger',
+      //     text: 'BETA'
+      //   }
+      // },
+      {
+        name: 'Báo cáo so sánh',
+        title: 'performance',
+        type: 0,
+        url: '/performance/performance',
+        icon: 'fa fa-code',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        },
+        children: [
+          {
+            name: 'Cửa hàng',
+            title: 'performance',
+            url: '/performance/store-comparisons',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          {
+            name: 'Thời gian',
+            title: 'performance',
+            url: '/performance/time-comparisons',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          {
+            name: 'Chỉ số',
+            title: 'performance',
+            url: '/performance/metrics-comparisons',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          }
+        ]
+      },
+      {
+        name: 'Phân tích xu hướng',
+        title: 'performance',
+        type: 0,
+        url: '/performance/performance',
+        icon: 'fa fa-code',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        },
+        children: [
+          {
+            name: 'Cửa hàng',
+            title: 'performance',
+            type: 0,
+            url: '/performance/store-trending',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          },
+          // {
+          //   name: 'Thời gian',
+          //   type: 0,
+          //   url: '/performance/time-trending',
+          //   icon: 'fa fa-bar-chart',
+          //   badge: {
+          //     variant: 'danger',
+          //     text: 'BETA'
+          //   }
+          // },
+          {
+            name: 'Chỉ số',
+            title: 'performance',
+            type: 0,
+            url: '/performance/metrics-trending',
+            icon: 'fa fa-bar-chart',
+            badge: {
+              variant: 'danger',
+              text: 'BETA'
+            }
+          }
+        ]
+      },
+    ]
+  },
+  {
+    name: 'Quản trị',
+    module_title: 'all',
+    url: '/general',
+    icon: 'icon-settings',
+    children: [
+      {
+        name: 'Hệ thống Footfall', // FOOTFALL
+        title: 'footfall',
+        url: '/footfall/setting/terminals',
+        icon: 'icon-settings',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Trải nghiệm khách hàng', // FBA
+        title: 'fba',
+        url: '/fba/setting/setting',
+        icon: 'icon-settings',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Giới tính độ tuổi', // GENDERAGE
+        title: 'genderage',
+        url: '/gender-age/administration/terminals',
+        icon: 'icon-settings',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Hiệu quả hoạt động', // FOOTFALL
+        title: 'performance',
+        url: '/performance/addministrator/user-mail',
+        icon: 'icon-settings',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      },
+      {
+        name: 'Cấu hình chung', // Tất cả
+        title: 'all',
+        url: '/general/companies',
+        icon: 'icon-settings',
+        badge: {
+          variant: 'danger',
+          text: 'BETA'
+        }
+      }
+    ]
+  },
+  {
+    name: 'Về ACS Analytics', // FBA
+    module_title: 'about',
+    url: '/about',
+    icon: 'fa fa-info-circle',
+  }
+];
+

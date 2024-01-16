@@ -1,0 +1,20 @@
+import { Component, OnInit} from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+
+
+@Component({
+    selector: 'app-fbamenu',
+    templateUrl: './fbamenu.component.html',
+    styleUrls: ['./fbamenu.component.css']
+})
+
+export class FbaMenuComponent implements OnInit {
+    // user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+    constructor(
+        private route: ActivatedRoute
+        , private router: Router) {}
+        language = JSON.parse(localStorage.getItem(environment.language));
+    ngOnInit() {}
+}

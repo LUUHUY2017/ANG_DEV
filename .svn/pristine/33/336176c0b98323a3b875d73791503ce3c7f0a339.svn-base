@@ -1,0 +1,324 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <block-ui></block-ui>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px;"> <i class="fa fa-list-alt" aria-hidden="true"></i> {{language.danh_sach_cong_ty}}</span>
+               <button *ngIf="user_info.lever == 0" style="float:right;" type="button"
+                  class="btn btn-them  buton-search " (click)="openModal(templates)">{{language.them_cong_ty}}</button>
+            </div>
+   <notifier-container></notifier-container>
+            <div class="card-body card-table table-companies">
+               <div class="table-responsive">
+                  <table [mfData]="organization" #mf="mfDataTable" [mfRowsOnPage]="15"
+                     class="table table-striped companies-table " style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px">{{language.STT}}</th>
+                           <th style="width: 100px;text-align: center">Logo </th>
+                           <th style="width: 150px">{{language.cong_ty}}</th>
+                           <th style="width: 200px">{{language.mo_ta}}</th>
+                           <th style="width: 150px">{{language.trang_thai}}</th>
+                           <th style="width: 150px">{{language.ngay_tham_gia}}</th>
+                           <th style="width: 150px;text-align: center">{{language.xu_ly}}</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let item of mf.data; let i = index">
+                           <td style="text-align:center">{{i +1}}</td>
+                           <td style="padding: 0.25rem 0.75rem !important;text-align: center"> <img
+                                 *ngIf="item.company_logo" [src]="'data:image/png;base64,'+item.company_logo"
+                                 style="width:40%;"></td>
+                           <td>{{item.organization_name ? item.organization_name : '-'}}</td>
+                           <td>{{item.organization_description ? item.organization_description : '-'}}</td>
+                           <td>
+                              <span class="badge badge-success" *ngIf="item.actived == 1">
+                                 <i class="fa fa-check"></i>
+                              </span>
+                              <span class="badge badge-danger" *ngIf="item.actived == 0">
+                                 <i class="fa fa-times"></i>
+                              </span>
+                           </td>
+                           <td>
+                              {{item.created_at | date: 'dd/MM/yyyy'}}
+                           </td>
+                           <td style="width: 150px;text-align: center">
+                              <a style="color:#333;cursor: pointer;" (click)="dulieuthaydoi(item,template)"
+                                 title="Sửa tổ chức">
+                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <!-- <a style="color:#333;cursor: pointer;" routerLink="/general/users/{{item.id}}"
+                                 title="xem thành viên"> <i class="fa fa-users"></i>
+                              </a>&nbsp; -->
+                              <!-- <a style="color:#333;cursor: pointer;" routerLink="/administration/tablets/{{item.id}}"
+                                 class="" title="Xem thiết bị"> <i class="fa fa-tablet"></i>
+                              </a>&nbsp;
+                              <a style="color:#333;cursor: pointer;" routerLink="/fba/metrics-analytics/{{item.id}}"
+                                 title="Xem nhanh"> <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                              </a>&nbsp; -->
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="companies_table-tfoot">
+                        <tr>
+                           <td colspan="7">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Modal  thêm mới  -->
+   <ng-template #templates>
+      <form (ngSubmit)="insertform(insert_org)" #insert_org="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left"> {{language.them_cong_ty}}</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf" type="text" #txtname="ngModel" required
+                     [(ngModel)]="organization_name" name="organization_name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ten_cong_ty}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.logo_cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <img *ngIf="ImageUrll1" class="img-fluid img2" [src]="ImageUrll1" style="width:49%;" alt="new logo"
+                     title="new logo">
+                  <input style="margin-top:2px;" type="file" class="form-control" ngModel name="company_logo"
+                     (change)="uploadimagequality($event.target.files,1)">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" #txtcode="ngModel" required type="text"
+                     [(ngModel)]="organization_code" name="organization_code">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ma_cong_ty}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.ten_viet_tat}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtshortname="ngModel" required
+                     [(ngModel)]="organization_shortname" name="organization_shortname">
+                  <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ten_viet_tat}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.mo_ta}} </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtdes="ngModel" required
+                     [(ngModel)]="organization_description" name="organization_description">
+                  <small *ngIf="txtdes.touched && txtdes.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_mo_ta}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.Subdomain}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtsubdomain="ngModel" required
+                     [(ngModel)]="subdomain_name" name="subdomain_name">
+                  <small *ngIf="txtsubdomain.touched && txtsubdomain.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_subdomain}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" style="border-top: 2px solid #ddd;">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.nguoi_dung_quan_tri}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtuserorganization="ngModel" required ngModel
+                     name="user_organization">
+                  <small *ngIf="txtuserorganization.touched && txtuserorganization.errors?.required"
+                     class="error-message">
+                     {{language.ban_chua_nhap_nguoi_quan_tri}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.Email_quan_tri}}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtuser_email="ngModel" required ngModel
+                     name="user_email">
+                  <small *ngIf="txtuser_email.touched && txtuser_email.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_email}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.mat_khau}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="password" #txtuser_password="ngModel" required ngModel
+                     name="user_password">
+                  <small *ngIf="txtuser_password.touched && txtuser_password.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_mat_khau}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" style="border-bottom: 2px solid #ddd;">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.Module_su_dung}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-multiselect-dropdown [placeholder]="'Chọn module'" [data]="modulelist" name="modulelist" ngModel
+                     [settings]="dropdownSettings" required>
+                  </ng-multiselect-dropdown>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.hoat_dong}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value="1" ngModel="1" name="actived">
+                     <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value="0" ngModel="1" name="actived">
+                     <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               {{language.dong}}</a>
+            <button class="btn  btn-primary" (click)="modalRef.hide()" [disabled]="insert_org.invalid">
+               {{language.them}}</button>
+         </div>
+      </form>
+   </ng-template>
+
+   <!-- Modal  cập nhật  -->
+   <ng-template #template>
+      <form (ngSubmit)="updateform(user_update)" #user_update="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">{{language.cap_nhat_cong_ty}}</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div style="display:none" class="form-group row form-no-marbottom">
+               <div class="col-md-9 col-9 col-form-label">
+                  <input hidden class="form-control color-font" id="nf" type="text" #txtname="ngModel" required
+                     [(ngModel)]="data2.id" name="id">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf" type="text" #txtname="ngModel" required
+                     [(ngModel)]="data2.organization_name" name="organization_name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ten_cong_ty}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.logo_cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <img *ngIf="data2.company_logo" [src]="'data:image/png;base64,'+data2.company_logo"
+                     style="width:35%;">
+                  <img *ngIf="ImageUrll2" class="img-fluid img2" [src]="ImageUrll2" style="width:35%;margin-left: 15%;"
+                     alt="new logo" title="new logo">
+                  <input style="margin-top:2px;" type="file" class="form-control" ngModel name="company_logo"
+                     (change)="uploadimagequality($event.target.files,2)">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_cong_ty}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" #txtcode="ngModel" required type="text"
+                     [(ngModel)]="data2.organization_code" name="organization_code">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ma_cong_ty}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.tom_tat}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtshortname="ngModel" required
+                     [(ngModel)]="data2.organization_shortname" name="organization_shortname">
+                  <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+                     {{language.ban_chua_nhap_ten_viet_tat}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.mo_ta}} </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtdes="ngModel" required
+                     [(ngModel)]="data2.organization_description" name="organization_description">
+                  <small *ngIf="txtdes.touched && txtdes.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_mo_ta}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.Domain}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtsub="ngModel" required
+                     [(ngModel)]="data2.subdomain_name" name="subdomain_name">
+                  <small *ngIf="txtsub.touched && txtsub.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_subdomain}}
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0"
+               style="border-bottom: 2px solid #ddd;">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.Module_su_dung}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-multiselect-dropdown [placeholder]="'Chọn module'" [data]="modulelist" name="modulelist"
+                     [(ngModel)]="module_update" [settings]="dropdownSettings" required>
+                  </ng-multiselect-dropdown>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.hoat_dong}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value="1" [(ngModel)]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value="0" [(ngModel)]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               {{language.dong}}</a>
+            <button class="btn  btn-primary" (click)="modalRef.hide()" *ngIf="user_update.valid && can_update">
+               {{language.cap_nhat}}</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+</main>

@@ -1,0 +1,6 @@
+<ul class="header-administration" style="overflow-x: auto;">
+  <li routerLinkActive="active"> <a [routerLink]="['/userconfig/editinfo']">Đổi mật khẩu</a>
+  <li routerLinkActive="active"> <a [routerLink]="['/userconfig/email']">Báo cáo định kỳ</a>
+    <!-- <li routerLinkActive="active"> <a [routerLink]="['/gender-age/administration/webhookage']">Webhook <small style="color:crimson">(beta)</small></a> -->
+  </li>
+</ul>

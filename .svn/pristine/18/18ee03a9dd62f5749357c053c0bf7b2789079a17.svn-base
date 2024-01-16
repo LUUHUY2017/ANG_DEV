@@ -1,0 +1,147 @@
+<main>
+    <div class="row">
+        <div class="col-md-12">
+            <app-generalmenu></app-generalmenu>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div style=" border:unset;border-radius: 3px;" class="card">
+                <div class="card-header card-font">
+                    <i class="icons cui-cloud-upload"></i> <span>Nhập dữ liệu</span>
+                </div>
+                <div class="card-body card-table table-import_pos">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <nav class="nav manual-page-tab" role="tablist">
+                                <a class="nav-link nav-item  title-step {{status === 1 ? 'active' : ''}}" (click)="changetab(1)">Tải file mẫu </a>
+                                <a class="nav-link nav-item  title-step {{status === 2 ? 'active' : ''}}" (click)="changetab(2)">Nhập dữ liệu </a>
+                            </nav>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-form card-noborder {{ status === 1 ? 'showform' : '' }}">
+                                <div class="card-body noborder-radius">
+                                    <div *ngIf="userInfo.lever === '0'" class="form-group">
+                                        <label id="label-no-botton">Chọn tổ chức <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_tochuc"></i></label>
+                                        <select class="form-control" id="exampleFormControlSelect1" (change)=" changeorganization_table($event.target.value)">
+                                            <option *ngFor="let item of organization_arr" value="{{item.value}}">
+                                                {{item.label}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div>Chọn cửa hàng <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_cuahang"></i> </div>
+                                    <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class=" text-select vung-kich select_cus_table location-_select">
+                                        <span>&nbsp; {{location}} <i style="font-size:9px;float: right;padding: 4px 0 4px 0"> ▼</i></span>
+                                    </div>
+                                    <!-- Chọn địa điểm/ khu vực -->
+                                    <div [hidden]="!siteSelectionDisplay" class="khung-location-location block" (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                                        <div id="khung-location-scroll">
+                                            <div style="position: relative;width: 100%;" class="inputgroup">
+                                                <input (keyup)="search_menu($event.target.value)" style="border:none !important;padding-left: 7px" type="text" class="form-control" placeholder="Tìm kiếm địa điểm/ khu vực">
+                                                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search" aria-hidden="true"></i>
+                                            </div>
+                                            <ul style="padding-left: 0;">
+                                                <li *ngFor="let item of menu_tree" (click)="changeitem(item)" class="menu-{{item.alevel}} {{item.site_name === location ? 'active' : ''}} ">
+                                                    {{item.site_name}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <label id="label-no-botton">Thời gian <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_thoigian"></i></label>
+                                        <div id="reportrangefba" class="time_input">
+                                            <span style="font-size: 12px;"></span> <i style="float:right;margin-right:5px" class="fa fa-caret-down"></i>
+                                            <input type="hidden" id="startDateReportTemp">
+                                            <input type="hidden" id="endDateReportTemp">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label id="label-no-botton">Chọn chỉ số <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_chiso"></i></label>
+                                        <ng-multiselect-dropdown class="multi_2" style="min-width: 35%;width:auto" [placeholder]="' &nbsp; '" [data]="dropdownList" [(ngModel)]="destinationSelectedItems" (onSelect)="destinationOnSelect($event)" (onDeSelect)="destinationOnDeSelect($event)" (onSelectAll)="destinationOnSelectAll($event)" (onDeSelectAll)="destinationOnDeSelectAll($event)" [settings]="destinationIndexOptionSettings">
+                                        </ng-multiselect-dropdown>
+                                    </div>
+                                    <a *ngIf="store ==1" style="color:blue;cursor: pointer;" (click)='download_file_example()'><i class="icons  cui-cloud-download"></i> <span style=" text-decoration:underline;"> Tải file mẫu</span> </a>
+                                    <a *ngIf="store !=1" style="color:blue;cursor: pointer;opacity: 0.5;" (click)='push_alert()'><i class="icons  cui-cloud-download"></i> <span style=" text-decoration:underline;"> Tải file mẫu</span> </a>
+                                </div>
+                            </div>
+                            <div class="card card-form card-noborder {{ status === 2 ? 'showform' : '' }}">
+                                <div class="card-body noborder-radius">
+                                    <form (ngSubmit)="import_data(pos_sale)" #pos_sale="ngForm">
+                                        <div *ngIf="userInfo.lever === '0'" class="form-group">
+                                            <label id="label-no-botton">Chọn tổ chức <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_tochuc"></i></label>
+                                            <select class="form-control" id="exampleFormControlSelect1" (change)=" changeorganization_table($event.target.value)">
+                                                <option *ngFor="let item of organization_arr" value="{{item.value}}">
+                                                    {{item.label}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <input #myInput style="margin-top:2px;" type="file" name="file" (change)="upload_file($event.target.files)"><i class="fa fa-question-circle icon-tooltip" [tooltip]="content_file"></i>
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-weight:bold;font-style:italic" id="label-no-botton">Ghi đè: <i class="fa fa-question-circle icon-tooltip" [tooltip]="content_ghide"></i></label>
+                                            <ul class="list-check">
+                                                <li> <label><input type="checkbox" name="num_to_enter" [ngModel]="num_to_enter" id="num_to_enter"> Enters</label></li>
+                                                <li> <label><input type="checkbox" name="num_to_exit" [ngModel]="num_to_exit" id="num_to_exit"> Visits</label></li>
+                                                <li> <label><input type="checkbox" name="avg_time" [ngModel]="avg_time" id="avg_time">Time_spent</label></li>
+                                                <li> <label><input type="checkbox" name="passer_by" [ngModel]="passer_by" id="passer_by">Passer_by</label></li>
+                                                <li> <label><input type="checkbox" name="staff" [ngModel]="staff" id="staff">Staff</label></li>
+                                                <li> <label><input type="checkbox" name="staff_traffic" [ngModel]="staff_traffic" id="staff_traffic">Staff_traffic</label></li>
+                                                <li> <label><input type="checkbox" name="transactions" [ngModel]="transactions" id="transactions">Transactions</label></li>
+                                                <li> <label><input type="checkbox" name="sales" [ngModel]="sales" id="sales"> Sales</label></li>
+                                                <li> <label><input type="checkbox" name="items" [ngModel]="items" id="items"> Items</label></li>
+                                                <li> <label><input type="checkbox" name="kids_visits" [ngModel]="kids_visits" id="kids_visits">Kids_visits</label></li>
+                                                <li> <label><input type="checkbox" name="loyal_visits" [ngModel]="loyal_visits" id="loyal_visits">Loyal_visits</label></li>
+                                                <li> <label><input type="checkbox" name="loyal_purchased" [ngModel]="loyal_purchased" id="loyal_purchased">Loyal_purchased</label></li>
+                                                <!-- <li> <label><input type="checkbox" name="cx_index" [ngModel]="cx_index" id="cx_index">CX_index</label></li>
+                                                <li> <label><input type="checkbox" name="nps_index" [ngModel]="nps_index" id="nps_index">NPS_index</label></li> -->
+                                            </ul>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <br>
+                                        <!-- <a (click)="show_dialog_(item,password)"> Nhập dữ liệu</a> -->
+                                        <button [hidden]="button" class="btn btn-custom-huy" [disabled]="pos_sale.invalid"> Nhập dữ liệu</button>
+                                        <button *ngIf="loading" class="btn btn-custom-huy" [disabled]="pos_sale.invalid"> <i class="fa fa-refresh fa-spin"></i> Đang xử lý</button>
+                                    </form>
+                                    <br>
+                                    <div style="width: 100%;" *ngIf="counter > 0">
+                                        <span style="font-size:11px;float: right;">Đã cập nhật thành công {{counter}} bản ghi <span *ngIf="counter_fail > 0"> và {{counter_fail}} bản ghi cập nhật bị lỗi </span> vào {{time_generate_report | date:
+                                            'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template #content_tochuc>Vui lòng chọn tổ chức phù hợp! </ng-template>
+    <ng-template #content_cuahang>Vui lòng chọn cửa hàng phù hợp! </ng-template>
+    <ng-template #content_thoigian>Vui lòng chọn thời gian bắt đầu, thời gian kết thúc cần nhập dữ liệu! </ng-template>
+    <ng-template #content_chiso>Vui lòng chọn các chỉ số phù hợp! </ng-template>
+    <ng-template #content_chiso>Vui lòng chọn các chỉ số phù hợp! </ng-template>
+    <ng-template #content_file>Vui lòng chọn file phù hợp!<br> Ưu tiên file mẫu để tối ưu tốc độ nhập dữ liệu! </ng-template>
+    <ng-template #content_ghide>Vui lòng chọn chính xác chỉ số cần ghi đè! <br> Chỉ số mới sẽ đè lên chỉ số cũ với cùng block thời gian!</ng-template>
+    <!-- Modal warning  -->
+    <ng-template #password>
+        <div class="modal-header" style="background: #ff9739; color: #fff; padding: 15px;">
+            <h6 class="modal-title pull-left">Nhập dữ liệu! Bạn có chắc chắn muốn nhập?</h6>
+            <button type="button" class="close pull-right" aria-label="Close" style="color:#fff" (click)="modalRef.hide()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+                Bỏ qua</a>
+            <button class="btn btn-primary" (click)="modalRef.hide()">Chấp nhận</button>
+        </div>
+    </ng-template>
+    <notifier-container></notifier-container>
+    <block-ui></block-ui>
+</main>

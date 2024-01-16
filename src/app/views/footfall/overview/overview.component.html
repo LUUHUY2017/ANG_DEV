@@ -1,0 +1,298 @@
+<block-ui></block-ui>
+<div class="row">
+  <div class="container-fluid">
+    <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+    <div class="animated fadeIn">
+      <div class="card card-parent">
+        <div class="card-body card-body-bottom">
+          <div class="row">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card text-white bg-primary shadow">
+                <ng-container *ngFor="let item of chart_1_session">
+                  <div style="font-size:10px;padding: 3px 7px;">
+                    <span> {{item.site_label}}</span> &nbsp;
+                    <span>{{item.time_label}}</span>
+                    <a style="cursor:pointer;float: right;" (click)="show_config(config, 1)"> <i class="icon-settings"
+                        aria-hidden="true"></i></a>
+                  </div>
+                </ng-container>
+                <div class="card-body pb-0">
+                  <div [hidden]="selected_show1 === indexess.avg_time" class="text-value">
+                    {{ data_show1 ? (data_show1 | number: "1.0-2") : "0" }} <span
+                      style="font-size: 15px;">{{suffix1}}</span> </div>
+                  <div [hidden]="selected_show1 !== indexess.avg_time" class="text-value">
+                    {{ data_show1 ? toHHMMSS(data_show1) : "00:00:00" }}</div>
+                  <div>{{title_index_name1}}</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <ng-container *ngIf="is_column_chart_box(selected_show1) && show_error1 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1"
+                      [options]="barChartOptions12" [colors]="barChartColours1" [legend]="barChartLegend1"
+                      [chartType]="barChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf=" selected_show1 === indexess.avg_time && show_error1 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1"
+                      [options]="barChartOptions11" [colors]="lineChartColours1" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="is_line_chart_box(selected_show1) && show_error1 != true">
+                    <canvas baseChart class="chart" [datasets]="lineChartData1" [labels]="lineChartLabels1"
+                      [options]="lineChartOptions1" [colors]="lineChartColours1" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="show_error1">
+                    <span class="show_info_error14"> <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                      <br>
+                      {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                        (click)="get_data_chart1()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                    </span>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+            <div class="col-sm-6 col-lg-3">
+              <div class="card text-white bg-info shadow">
+                <ng-container *ngFor="let item of chart_2_session">
+                  <div style="font-size:10px;padding: 3px 7px;">
+                    <span> {{item.site_label}}</span> &nbsp;
+                    <span>{{item.time_label}}</span>
+                    <a style="cursor:pointer;float: right;" (click)="show_config(config, 2)"> <i class="icon-settings"
+                        aria-hidden="true"></i></a>
+                  </div>
+                </ng-container>
+                <div class="card-body pb-0">
+                  <div [hidden]="selected_show2 === indexess.avg_time" class="text-value">
+                    {{ data_show2 ? (data_show2 | number: "1.0-2") : "0" }} <span
+                      style="font-size: 15px;">{{suffix2}}</span> </div>
+                  <div [hidden]="selected_show2 !== indexess.avg_time" class="text-value">
+                    {{ data_show2 ? toHHMMSS(data_show2) : "00:00:00" }}</div>
+                  <div>{{title_index_name2}}</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <ng-container *ngIf="is_column_chart_box(selected_show2) && show_error2 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2"
+                      [options]="barChartOptions12" [colors]="barChartColours2" [legend]="barChartLegend1"
+                      [chartType]="barChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf=" selected_show2 === indexess.avg_time && show_error2 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2"
+                      [options]="barChartOptions11" [colors]="lineChartColours2" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="is_line_chart_box(selected_show2) && show_error2 != true">
+                    <canvas baseChart class="chart" [datasets]="lineChartData2" [labels]="lineChartLabels2"
+                      [options]="lineChartOptions1" [colors]="lineChartColours2" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="show_error2">
+                    <span class="show_info_error14"> <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                      <br>
+                      {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                        (click)="get_data_chart2()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                    </span>
+                  </ng-container>
+                </div>
+
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card text-white bg-warning shadow">
+                <ng-container *ngFor="let item of chart_3_session">
+                  <div style="font-size:10px;padding: 3px 7px;">
+                    <span> {{item.site_label}}</span> &nbsp;
+                    <span>{{item.time_label}}</span>
+                    <a style="cursor:pointer;float: right;" (click)="show_config(config, 3)"> <i class="icon-settings"
+                        aria-hidden="true"></i></a>
+                  </div>
+                </ng-container>
+                <div class="card-body pb-0">
+                  <div [hidden]="selected_show3 === indexess.avg_time" class="text-value">
+                    {{ data_show3 ? (data_show3 | number: "1.0-2") : "0" }} <span
+                      style="font-size: 15px;">{{suffix3}}</span> </div>
+                  <div [hidden]="selected_show3 !== indexess.avg_time" class="text-value">
+                    {{ data_show3 ? toHHMMSS(data_show3) : "00:00:00" }}</div>
+                  <div>{{title_index_name3}}</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <ng-container *ngIf=" is_column_chart_box(selected_show3) && show_error3 != true">
+                    <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3"
+                      [options]="barChartOptions12" [colors]="barChartColours3" [legend]="barChartLegend1"
+                      [chartType]="barChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf=" selected_show3 === indexess.avg_time && show_error3 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3"
+                      [options]="barChartOptions11" [colors]="lineChartColours3" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="is_line_chart_box(selected_show3) && show_error3 != true">
+                    <canvas baseChart class="chart" [datasets]="lineChartData3" [labels]="lineChartLabels3"
+                      [options]="lineChartOptions1" [colors]="lineChartColours3" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="show_error3">
+                    <span class="show_info_error14"> <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                      <br>
+                      {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                        (click)="get_data_chart3()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                    </span>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+            <div class="col-sm-6 col-lg-3">
+              <div class="card text-white bg-danger shadow">
+                <ng-container *ngFor="let item of chart_4_session">
+                  <div style="font-size:10px;padding: 3px 7px;">
+                    <span> {{item.site_label}}</span> &nbsp;
+                    <span>{{item.time_label}}</span>
+                    <a style="cursor:pointer;float: right;" (click)="show_config(config, 4)"> <i class="icon-settings"
+                        aria-hidden="true"></i></a>
+                  </div>
+                </ng-container>
+                <div class="card-body pb-0">
+                  <div [hidden]="selected_show4 === indexess.avg_time" class="text-value">
+                    {{ data_show4 ? (data_show4 | number: "1.0-2") : "0" }} <span
+                      style="font-size: 15px;">{{suffix4}}</span> </div>
+                  <div [hidden]="selected_show4 !== indexess.avg_time" class="text-value">
+                    {{ data_show4 ? toHHMMSS(data_show4) : "00:00:00" }}</div>
+                  <div>{{title_index_name4}}</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <ng-container *ngIf="is_column_chart_box(selected_show4) && show_error4 != true">
+                    <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="barChartLabels4"
+                      [options]="barChartOptions12" [colors]="barChartColours4" [legend]="barChartLegend1"
+                      [chartType]="barChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf=" selected_show4 === indexess.avg_time && show_error4 != true ">
+                    <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="lineChartLabels4"
+                      [options]="barChartOptions11" [colors]="lineChartColours4" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="is_line_chart_box(selected_show4) && show_error4 != true">
+                    <canvas baseChart class="chart" [datasets]="lineChartData4" [labels]="lineChartLabels4"
+                      [options]="lineChartOptions1" [colors]="lineChartColours4" [legend]="lineChartLegend1"
+                      [chartType]="lineChartType1"></canvas>
+                  </ng-container>
+                  <ng-container *ngIf="show_error4">
+                    <span class="show_info_error14"> <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                      <br>
+                      {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                        (click)="get_data_chart4()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                    </span>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-child">
+            <div class="card-header">
+              <span style="font-weight: bold;"><i class="fa fa-line-chart"></i> {{language.hieu_qua_hoat_dong}}</span>
+              <span class="float-right pointer" (click)="show_config(config,5)"><i class="fa fa-cog"></i></span>
+            </div>
+            <div style="min-height:350px;" class="card-body">
+              <div #container1></div>
+              <ng-container *ngIf="show_error5">
+                <div class="show_info_error">
+                  <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}. {{language.vui_long}}<a (click)="get_data_chart5();"
+                    style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}} </div>
+              </ng-container>
+            </div>
+          </div>
+          <div id="divbaocao" style="float: right; font-size: 11px"> {{language.bao_cao_duoc_tao}}
+            {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}}
+            -
+            <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #config>
+  <div class="modal-header">
+    <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body bg-modal-body">
+    <ng-container *ngIf="userinfo.organization_id === '0'">
+      <ng-select class="bootstrap selecttimeview ng-select0" [items]="organization_array" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="organization_id" (change)="change_organization()">
+      </ng-select>
+    </ng-container>
+    <!-- Textbox chọn -->
+    <div class="config-text-dashboard">
+      <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+        (click)="displaylocation = !displaylocation" class="text-select vung-kich">
+        <span>&nbsp;{{ site_label }} <i class="icon-down"> ▼ </i></span>
+      </div>
+    </div>
+    <!-- Chọn địa điểm/ khu vực -->
+    <div [hidden]="!displaylocation" class=" khung-location-dashboard block" (clickOutside)="displaylocation = false"
+      [exclude]="'.vung-kich'">
+      <div id="khung-location-scroll">
+        <div style="position: relative;width: 100%;" class="inputgroup">
+          <input (keyup)="search_menu()" [(ngModel)]="search_key" style="border:none !important;padding-left: 7px"
+            type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+          <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+            aria-hidden="true"></i>
+        </div>
+        <ul style="padding-left: 0;">
+          <li *ngFor="let item of menu_tree" (click)="  item.enables == 1 ? changemenu(item) : ''"
+            class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+            {{ item.site_name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="config-text-dashboard">
+      <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+        (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+        <span>&nbsp;{{ time_label }} <i class="icon-down"> ▼ </i></span>
+      </div>
+    </div>
+    <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+      class=" khung-location-dashboard block">
+      <div id="khung-location-scroll">
+        <ul id="ul-time-dashboard">
+          <li *ngFor="let item of time_array" (click)="change_time(item)"
+            class="{{ item.label === time_period2 ? 'active' : '' }}"> {{ item.label }} </li>
+        </ul>
+      </div>
+    </div>
+
+    <ng-select class="bootstrap selecttimeview  ng-select1" [items]="start_time_list" bindLabel="label"
+      bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+    <ng-select class="bootstrap selecttimeview  ng-select2" [items]="end_time_list" bindLabel="label" bindValue="value"
+      [clearable]=false [(ngModel)]="end_time"></ng-select>
+    <ng-select *ngIf="status != 5" class="bootstrap selecttimeview ng-select3" [items]="select_visit_option"
+      bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="selected_show"></ng-select>
+  </div>
+  <!-- *ngIf="status != 5" -->
+  <div class="modal-footer">
+    <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+    <button class="btn  btn-primary" (click)="get_apply_event()">
+      {{language.ap_dung}}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{language.Thong_bao}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+        {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>
+  </div>
+</ng-template>

@@ -1,0 +1,78 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { SuperAdminGuard } from '../../../shared/superadmin.guard';
+
+const routes: Routes = [
+    {
+        path: '',
+        // redirectTo: '/general/companies',
+        // loadChildren: './companies/companies.module#GeneralCompaniesModule',
+        data: {
+            title: 'Feedback Any Where'
+        },
+        children: [
+            {
+                path: 'companies',
+                loadChildren: './companies/companies.module#GeneralCompaniesModule'
+            },
+            {
+                path: 'folders',
+                loadChildren: './administration/administration.module#GeneralAdministrationModule'
+            },
+            {
+                path: 'users',
+                loadChildren: './users/users.module#GeneralUserModule'
+            },
+            {
+                path: 'users/:id',
+                loadChildren: './users/users.module#GeneralUserModule'
+            },
+            {
+                path: 'group',
+                loadChildren: './group/group.module#GeneralGroupModule'
+            },
+            {
+                canActivate: [SuperAdminGuard],
+                path: 'pagepermission',
+                loadChildren: './pagepermission/pagepermission.module#GeneralPagePermissionModule'
+            },
+            {
+                path: 'role',
+                loadChildren: './role/role.module#GeneralRoleModule'
+            },
+            {
+                path: 'locations',
+                loadChildren: './location/location.module#GeneralLocationModule'
+            },
+            {
+                path: 'categories',
+                loadChildren: './categories/categories.module#GeneralCategoriesModule'
+            },
+            {
+                path: 'feedback',
+                loadChildren: './feedback/adminfeedback.module#AdminFeedbackModule'
+            },
+            {
+                canActivate: [SuperAdminGuard],
+                path: 'vipcustomer',
+                loadChildren: './vipcustomermanager/vipcustomermanager.module#VipCustomerManagerModule'
+            },
+            {
+                canActivate: [SuperAdminGuard],
+                path: 'blacklist',
+                loadChildren: './blacklistmanager/blacklistmanager.module#BlacklistManagerModule'
+            },
+            {
+                canActivate: [SuperAdminGuard],
+                path: 'staffupload',
+                loadChildren: './staffuploadmanager/staffuploadmanager.module#StaffUploadManagerModule'
+            },
+        ]
+    }
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
+})
+export class  GeneralRoutingModule { }

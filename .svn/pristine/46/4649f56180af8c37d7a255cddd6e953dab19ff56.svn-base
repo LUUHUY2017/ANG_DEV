@@ -1,0 +1,433 @@
+import { IOption } from 'ng-select';   // select option <option>
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// tree node
+import { TreeNode } from 'primeng/components/common/treenode';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+
+import { GeneralMenuComponent } from './../../../viewchild/generalmenu/generalmenu.component';
+import { log } from 'util';
+@Component({
+  templateUrl: './administration.component.html',
+  styleUrls: ['./administration.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+@ViewChild(GeneralMenuComponent)
+export class AdministrationComponent implements OnInit {
+  page_id = '\'' + environment.Pages.general.sites + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  // @ViewChild(GeneralMenuComponent)
+  @BlockUI() blockUI: NgBlockUI;
+  site_array: any[];
+  can_add: boolean;
+  can_update: boolean;
+  can_delete: boolean;
+  style_store: boolean;
+  location_insert: string;
+
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private modalService: BsModalService,
+    private appservice: AppService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  datatree: any;
+  siteTreeList: any; // khai báo site tree list
+  site_name: any;
+  site_id = 0;
+  siteNodeSelected: TreeNode;
+  user_organization: any;
+  organization_arr_option: Array<IOption>;
+  // thay đổi theo sự kiện click
+  organization_arr: Array<IOption>;
+  category: Array<IOption>;
+  org_selected: string;
+  org_selectedform: string;
+  tu_khoa: string;
+  data_insert: any;
+  data_update: any;
+  modalRef: BsModalRef;
+  menu_tree: any; snap_menu_tree: any;
+  location_add_name: string; location_add_description: string;
+  siteSelectionDisplay = false; location: string; location_update_name: string;
+  site_add_id: string;
+  parent_id: string;
+  site_cols = [
+    // { field: 'id', header: 'ID' },
+    // { field: 'site_code', header: 'Site Code' },
+    { field: 'site_name', header: 'Tên' },
+    { field: 'site_shortname', header: 'Viết Tắt' },
+    { field: 'site_code', header: 'Mã địa điểm' },
+  ];
+  parent_id_default = 0;
+  category_id_default = '0';
+  store_default = false;
+  is_admin_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  ngOnInit(): void {
+    this.get_crud_on_page();
+    this.get_location_time();
+  }
+
+  // Lấy thông tin tổ chức lên ng-select
+  get_location_time() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        this.organization_arr = param.organization_arr;
+        this.org_selected = String(param.organization_arr[0].value);
+        this.loadSite(this.org_selected);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+    );
+  }
+
+  //  thay đổi tổ chức
+  thaydoitochuc(event) {
+    if (!environment.production) {
+      console.log('id', event.value);
+    }
+    this.loadSite(event.value);
+  }
+  // thay đổi tổ chức bảng
+  changeorganization_table(event) {
+    this.org_selected = event;
+    this.loadSite(event);
+  }
+
+  get_data() {
+    const id_or = this.org_selected;
+    this.loadSite(id_or);
+  }
+  findSiteSelected(siteList) {
+    siteList.forEach(element => {
+      if (Number(element.site_id) === this.site_id) {
+        this.site_name = element.site_name;
+      }
+    });
+  }
+  siteTreeNodeSelect(event) {
+    if (!environment.production) {
+      console.log('nodeSelect', event);
+    }
+  }
+
+  siteTreeNodeUnselect(event) {
+    if (!environment.production) {
+      console.log('nodeUnselect', event);
+    }
+  }
+  loadSite(organization_id) {
+    this.blockUI.start('Đang tải dữ liệu...');
+    // this.appservice.get_sites_tree(organization_id).then(res => {
+    //   if (!environment.production) {
+    //     console.log('tất cả site', res);
+    //   }
+    //   this.findSiteSelected(res);
+    //   this.siteTreeList = this.appservice.convert_sites_tree_ng_dropdown(res);
+    //   if (!environment.production) {
+    //     console.log('all site tree', this.siteTreeList);
+    //   }
+    //   this.blockUI.stop();
+    // }).catch(err => {
+    //   this.blockUI.stop();
+    // });
+    const url = environment.API.sites + '_get_site_with_permission';
+    const agrument = {
+      organization_id: organization_id
+    };
+    this.appservice.post(agrument, url).subscribe(res => {
+      if (!environment.production) {
+        console.log('tất cả site', res);
+      }
+      this.findSiteSelected(res.site_array);
+      this.site_array = [];
+      this.ham_dequy(res.site_array);
+      // console.log(this.site_array);
+      this.siteTreeList = this.appservice.convert_sites_tree_ng_dropdown(this.site_array);
+      if (!environment.production) {
+        console.log('all site tree', this.siteTreeList);
+      }
+      this.blockUI.stop();
+    },
+      (error) => {
+        this.blockUI.stop();
+        if (!environment.production) {
+          console.log(error);
+        }
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+  get_crud_on_page() {
+    const data = {
+      page_id: this.page_id
+    };
+    const url = environment.FBA.ADMIN.get_crud_page;
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      res.crud_page_array.forEach(element => {
+        const permission_name = element.permission_name.toLowerCase();
+        if (permission_name === 'add') {
+          this.can_add = true;
+        }
+        if (permission_name === 'update') {
+          this.can_update = true;
+        }
+        if (permission_name === 'update') {
+          this.can_delete = true;
+        }
+      });
+    });
+  }
+  ham_dequy(array: any[], id = 0, space = 0) {
+    array.forEach(element => {
+      if (Number(element.parent_id) === id) {
+        // tslint:disable-next-line:no-shadowed-variable
+        const id = Number(element.id);
+        const string = String(space);
+        if (Number(element.store) === 1) {
+          this.style_store = true;
+        } else {
+          this.style_store = false;
+        }
+        this.site_array.push({
+          site_id: element.id,
+          site_name: element.site_name,
+          site_code: element.site_code,
+          site_shortname: element.site_shortname,
+          alevel: string,
+          site_description: element.site_description,
+          parent_id: element.parent_id,
+          enables: element.enables,
+          category_id: element.category_id,
+          organization_id: element.organization_id,
+          store: this.style_store,
+          open_hour: element.open_hour,
+          close_hour: element.close_hour,
+        });
+        const scope = space + 1;
+        this.ham_dequy(array, id, scope);
+      }
+    });
+  }
+  // mở modal thêm mới default dữ liệu
+  open_modal_them_moi(modal_default: TemplateRef<any>) {
+    this.reset_to_zero('st_name', 'site_code', 'site_shortname', 'location_insert');
+    this.category_id_default = '0';
+    this.parent_id_default = 0;
+    this.changeorganization(this.org_selected);
+    this.changeitem(this.org_selected, 0);
+    this.modalRef = this.modalService.show(modal_default, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  // truyền dữ liệu cho model tương ứng với từng địa điểm khi sửa
+  open_popup_update(item, templates: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('a', item);
+    }
+    this.data_update = Object.assign({}, item);
+    this.parent_id = item.parent_id;
+    this.site_id = Number(item.parent_id);
+    this.changeorganization(item.organization_id);
+    this.changeitem(item.organization_id, item.id);
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // Tìm Parent id cha của địa địa điểm đã chọn
+  find_parent_name(menutree: any[]) {
+    menutree.forEach(element => {
+      if (Number(element.id) === this.site_id) {
+        this.location_update_name = element.site_name;
+      }
+    });
+  }
+  // Thực hiện cập nhật địa điểm
+  updateform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.update_site).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.get_data();
+        // this.router.navigate(['/admin/admin']);
+      }, (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      }, () => {
+        this.blockUI.stop();
+      });
+  }
+  // Thay đổi tổ chức thì menu tree thay đổi
+  changeorganization(organization_id) {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.fba_get_org_tree(organization_id)
+      .then(res => {
+        if (!environment.production) {
+          console.log('get_sitetree', res);
+        }
+        this.menu_tree = res;
+        this.snap_menu_tree = res;
+        this.find_parent_name(this.menu_tree);
+        if (this.menu_tree.length > 1) {
+          this.location = this.menu_tree[1].site_name;
+          this.site_add_id = this.menu_tree[1].id;
+        } else {
+          this.location = this.menu_tree[0].site_name;
+          this.site_add_id = this.menu_tree[0].id;
+        }
+        this.blockUI.stop();
+      })
+      .catch(error => {
+        this.blockUI.stop();
+      });
+  }
+  // Mở modal thêm địa điểm
+  open_popup_insert(item, template: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data click', item);
+    }
+    this.reset_to_zero('st_name', 'site_code', 'site_shortname');
+    this.data_insert = item;
+    this.changeitem(item.organization_id, item.id);
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  //  Lấy danh mục category
+  changeitem(organization_id, site_id) {
+    const data = {
+      organization_id: organization_id,
+      site_id: site_id,
+    };
+    if (!environment.production) {
+      console.log('id', data);
+    }
+    this.appservice.post(data, environment.FBA.API.get_category).subscribe(
+      respo => {
+        if (!environment.production) {
+          console.log('data_category', respo);
+        }
+        this.category = respo.categories_admin;
+      });
+  }
+
+  // Chọn địa điểm thay đổi
+  change_menu_tree(organization_id, id, site_name, parent_id) {
+    if (!environment.production) {
+      console.log('id', id);
+    }
+    // if (id !== 0) {
+    this.parent_id = id;
+    this.location = site_name;
+    this.location_update_name = site_name;
+    this.siteSelectionDisplay = false;
+    this.changeitem(organization_id, id);
+    // }
+  }
+  // Chọn địa điểm thay đổi
+  change_menu_tree_default(organization_id, id, site_name, parent_id) {
+    if (!environment.production) {
+      console.log('id', id);
+    }
+    this.parent_id_default = id;
+    this.location_insert = site_name;
+    this.siteSelectionDisplay = false;
+    this.changeitem(organization_id, id);
+  }
+  // Thực hiện thêm địa điểm
+  insertform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.insert_site).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.get_data();
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  reset_to_zero(...array) {
+    array.forEach(element => {
+      this[element] = '';
+    });
+  }
+  // Thực hiện xóa địa điểm
+  delete_site(id: number) {
+    const c = confirm('Bạn đồng ý xóa?');
+    const data = { id: id }; // , deleted: 1
+    if (c) {
+      if (!environment.production) {
+        console.log(data);
+      }
+      this.blockUI.start('Đang xử lý dữ liệu...');
+      this.appservice.post(data, environment.FBA.Administration.delete_site).subscribe(
+        param => {
+          this.get_data();
+        },
+        (error) => {
+          if (!environment.production) {
+            console.log(error);
+          }
+          this.blockUI.stop();
+        },
+        () => {
+          this.blockUI.stop();
+        }
+      );
+    }
+  }
+}

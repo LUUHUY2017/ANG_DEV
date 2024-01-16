@@ -1,0 +1,610 @@
+import { IOption } from 'ng-select';   // select option <option>
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { NotifierService } from 'angular-notifier';
+// import viewchild
+import { FootfallSettingMenuComponent } from '../../../viewchild/footfallsettingmenu/footfallsettingmenu.component';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+@ViewChild(FootfallSettingMenuComponent)
+@Component({
+  templateUrl: './poc_brickstream_terminal.component.html',
+  styleUrls: ['./poc_brickstream_terminal.component.scss'],
+  // encapsulation: ViewEncapsulation.None
+})
+export class PocbrickstreamterminalComponent implements OnInit, OnDestroy {
+  @BlockUI() blockUI: NgBlockUI;
+  device_array = [];
+  public modalRef: BsModalRef;
+  userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+  organization_array: Array<IOption>;
+  selected_organization: string;
+  location_array: any[];
+  selected_location: string;
+  data_update: any[];
+  hidden_select_organization: boolean;
+  id_status: number;
+  interval;
+  site_array: any[];
+  selected_site: string;
+  menu_site = [];
+  snap_location_array: any[];
+  siteSelectionDisplay: boolean;
+  private readonly notifier: NotifierService;
+  brick_array: any[];
+  is_searching = false;
+  snap_device_array: any[];
+  search_key: string;
+  organization_id: any;
+  search_organization_array: any[];
+  selected_search_organization: string;
+  rowsOnPage = 15;
+  page_id = environment.Pages.footfall.brickstream_terminals;
+  can_delete = false;
+  can_update = false;
+  can_add = false;
+  selected_organization_id: string;
+  deleted = 0;
+  constructor(private router: Router
+    , private route: ActivatedRoute
+    , private appservice: AppService
+    , private modalService: BsModalService
+    , notifierService: NotifierService) {
+    this.notifier = notifierService;
+  }
+  ngOnInit(): void {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.delete_data_permission();
+    this.get_crud_on_page();
+    this.get_data();
+  }
+  delete_data_permission() {
+    const is_admin_of_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+    if (!environment.production) {
+      // console.log(is_admin_of_organization);
+    }
+    if (is_admin_of_organization.length > 0 || Number(this.userInfo.lever) === 0) {
+      this.can_delete = true;
+    }
+  }
+  get_crud_on_page() {
+    const data = {
+      page_id: '\'' + this.page_id + '\''
+    };
+    const url = environment.FBA.ADMIN.get_crud_page;
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        // console.log(res);
+      }
+      res.crud_page_array.forEach(element => {
+        const permission_name = element.permission_name.toLowerCase();
+        if (permission_name === 'add') {
+          this.can_add = true;
+        }
+        if (permission_name === 'update') {
+          this.can_update = true;
+        }
+      });
+    },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  search_organization(event: any) {
+    this.search_key = '';
+    this.is_searching = false;
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.get_data();
+  }
+  get_data() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    const data = {
+      organization_id: this.organization_id ? this.organization_id : null
+      , deleted: this.deleted
+    };
+    if (!environment.production) {
+      // console.log(data);
+    }
+    this.appservice.post(data, environment.POC.get_brickstream_terminals).subscribe(
+      para => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', para);
+        }
+        if (para.message) {
+          this.got_error(() => {
+            this.blockUI.stop();
+          });
+          return;
+        }
+        if (this.is_searching) {
+          if (this.device_array.length === 0) {
+            return;
+          } else {
+            const device_array = this.clone_array(this.device_array);
+            this.device_array = [];
+            device_array.forEach(element => {
+              this.device_array.push(para.brick_array.find(item => item.serial_number === element.serial_number));
+            });
+          }
+        } else {
+          this.device_array = para.brick_array;
+          this.snap_device_array = this.clone_array(this.device_array);
+        }
+        if (para.organization_array) {
+          this.search_organization_array = para.organization_array;
+          this.organization_id = para.organization_array[0].value;
+        }
+        this.setInterval();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  change_organization(value: any) {
+    const old_data = this.set_old_data(
+      'location_array'
+      , 'menu_site'
+      , 'selected_location'
+      , 'selected_site');
+    const old_organization_id = this.data_update[0].organization_id;
+    this.data_update[0].organization_id = value;
+    if (!environment.production) {
+      // console.log('old data', old_organization_id);
+      // console.log('new data', this.data_update[0].organization_id);
+    }
+    this.blockUI.start('Đang tải dữ liệu...');
+    const uri = environment.POC.get_brickstream_terminals + '_change_organization/' + this.data_update[0].organization_id;
+    this.appservice.get(uri).subscribe(
+      para => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', para);
+        }
+        if (para.message) {
+          this.notifier.notify('error', 'Có lỗi xảy ra');
+          this.data_update[0].organization_id = old_organization_id;
+          this.blockUI.stop();
+          return;
+        }
+        this.location_array = [];
+        this.menu_site = [];
+        this.selected_location = null;
+        this.selected_site = null;
+        if (para.site_array.length > 0) {
+          this.dequy_menu(para.site_array);
+          this.selected_site = para.site_array[0].label;
+          if (para.location_array.length > 0) {
+            this.location_array = para.location_array;
+            this.selected_location = this.location_array[0].value;
+          }
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.get_old_data([
+            'location_array'
+            , 'menu_site'
+            , 'selected_location'
+            , 'selected_site'], old_data);
+          this.data_update[0].organization_id = old_organization_id;
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  change_organization_add(value: any) {
+    const old_data = this.set_old_data(
+      'location_array'
+      , 'menu_site'
+      , 'selected_location'
+      , 'selected_site');
+    const old_organization_id = this.selected_organization_id;
+    this.selected_organization_id = value;
+    if (!environment.production) {
+      // console.log('old data', old_organization_id);
+      // console.log('new data', this.selected_organization_id);
+    }
+    this.blockUI.start('Đang tải dữ liệu...');
+    const uri = environment.POC.get_brickstream_terminals + '_change_organization/' + this.selected_organization_id;
+    this.appservice.get(uri).subscribe(
+      para => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', para);
+        }
+        if (para.message) {
+          this.notifier.notify('error', 'Có lỗi xảy ra');
+          this.selected_organization_id = old_organization_id;
+          this.blockUI.stop();
+          return;
+        }
+        this.location_array = [];
+        this.menu_site = [];
+        this.selected_location = null;
+        this.selected_site = null;
+        if (para.site_array.length > 0) {
+          this.dequy_menu(para.site_array);
+          this.selected_site = para.site_array[0].label;
+          if (para.location_array.length > 0) {
+            this.location_array = para.location_array;
+            this.selected_location = this.location_array[0].value;
+          }
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.get_old_data([
+            'location_array'
+            , 'menu_site'
+            , 'selected_location'
+            , 'selected_site'], old_data);
+          this.selected_organization_id = old_organization_id;
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  change_site(event) {
+    this.siteSelectionDisplay = false;
+    const old_data = this.set_old_data('location_array', 'selected_location', 'selected_site');
+    const url = environment.POC.get_brickstream_terminals + '_change_site';
+    this.blockUI.start('Đang tải dữ liệu...');
+    const data = {
+      site_id: event.id
+      , organization_id: event.organization_id
+    };
+    // console.log(data);
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        // console.log(res);
+      }
+      this.selected_location = null;
+      this.set_to_empty_array('location_array');
+      if (res.location_array.length > 0) {
+        this.location_array = res.location_array;
+        this.selected_location = this.location_array[0].value;
+      }
+      this.selected_site = event.name;
+    }, (error) => {
+      if (!environment.production) {
+        // console.log(error);
+      }
+      this.got_error(() => {
+        // console.log('old_data', old_data);
+        this.get_old_data(['location_array', 'selected_location', 'selected_site'], old_data);
+        this.selected_site = old_data.selected_site;
+        this.blockUI.stop();
+      });
+    }, () => {
+      this.blockUI.stop();
+    });
+  }
+  show_update(update_template: TemplateRef<any>, id: number) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const uri = environment.POC.get_brickstream_terminals + '_get_update/' + id;
+    this.id_status = id;
+    this.appservice.get(uri).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu update', res);
+        }
+        if (res.message) {
+          this.got_error(() => {
+            this.blockUI.stop();
+          });
+          return;
+        }
+        this.set_to_empty_array('organization_array', 'location_array', 'menu_site');
+        this.selected_location = null;
+        this.selected_site = null;
+        if (res.terminal_array.length > 0) {
+          this.data_update = res.terminal_array;
+          if (res.organization_array) {
+            this.organization_array = res.organization_array;
+          }
+          this.location_array = res.location_array;
+          this.selected_location = this.data_update[0].location_id;
+          this.dequy_menu(res.site_array);
+          console.log(this.menu_site);
+          this.selected_site = this.menu_site.find(element =>
+            Number(element.id) === Number(this.location_array.find(item => Number(item.value) === Number(this.selected_location)).site_id)
+          ).name;
+          // console.log(this.mi);
+          this.openModal(update_template);
+        } else {
+          this.got_error(() => {
+            this.blockUI.stop();
+          }, 'Thiết bị không tồn tại');
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  show_insert(insert_template: TemplateRef<any>) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const uri = environment.POC.get_brickstream_terminals + '_get_add';
+    this.appservice.get(uri).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu insert', res);
+        }
+        if (res.message) {
+          this.got_error(() => {
+            this.blockUI.stop();
+          });
+          return;
+        }
+        this.set_to_empty_array('organization_array', 'location_array', 'menu_site');
+        this.selected_location = null;
+        this.selected_site = null;
+        if (res.organization_array) {
+          this.organization_array = res.organization_array;
+          this.selected_organization_id = this.organization_array[0].value;
+        }
+        this.dequy_menu(res.site_array);
+        // console.log('menu_site', this.menu_site);
+        // this.selected_site = this.menu_site.filter(item => Number(item.store) === 1 && Number(item.enables) === 1)[0].name;
+        this.openModal(insert_template);
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  updateform(item) {
+    this.crud_form(item, environment.POC.get_brickstream_terminals + '_post_update/' + this.id_status);
+  }
+  insertform(item) {
+    this.crud_form(item, environment.POC.get_brickstream_terminals + '_post_add');
+  }
+
+  crud_form(item, uri) {
+    if (!environment.production) {
+      // console.log('submited form', item);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const data = item.value;
+    this.appservice.post(data, uri).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', res);
+        }
+        if (res.message !== 1) {
+          this.got_error(() => {
+            this.blockUI.stop();
+          });
+        } else {
+          this.get_data();
+        }
+        this.modalRef.hide();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.modalRef.hide();
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  setInterval() {
+    this.interval = setInterval(() => {
+      this.get_data();
+    }, 60000);
+  }
+
+  log_all(...array: any[]) {
+    array.forEach(element => {
+      // console.log(element, this[element]);
+    });
+  }
+  search_device() {
+    this.is_searching = true;
+    const string = this.search_key ? this.search_key.toLowerCase() : '';
+    if (string === '') {
+      this.device_array = this.clone_array(this.snap_device_array);
+      this.is_searching = false;
+      if (this.interval) {
+        clearInterval(this.interval);
+        this.setInterval();
+      }
+      // console.log('done search');
+    } else {
+      this.device_array = this.snap_device_array.filter(x => {
+        const expression = x.serial_number.toLowerCase().indexOf(string) !== -1
+          || x.device_name.toLowerCase().indexOf(string) !== -1;
+        return expression;
+      });
+      if (this.device_array.length === 0) {
+        if (this.interval) {
+          clearInterval(this.interval);
+        }
+      }
+    }
+  }
+  set_to_empty_array(...array: any[]) {
+    array.forEach(element => {
+      this[element] = [];
+    });
+  }
+  get_empty_array(...array: any[]) {
+    array.forEach(element => {
+      // console.log(element, this[element]);
+    });
+  }
+  show_delete(delete_templates: TemplateRef<any>, id: number) {
+    this.id_status = id;
+    this.openModal(delete_templates);
+  }
+  rollbackData(rollbackTemplates: TemplateRef<any>, id: number) {
+    this.id_status = id;
+    this.openModal(rollbackTemplates);
+  }
+  delete_method() {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const data = {
+      serial_number: this.id_status
+      , deleted: this.deleted === 0 ? 1 : 0
+    };
+    const uri = environment.POC.get_brickstream_terminals + '_delete';
+    this.appservice.post(data, uri).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', res);
+        }
+        if (res.message !== 1) {
+          this.got_error(() => {
+            this.blockUI.stop();
+          });
+        } else {
+          this.got_success('Quá trình diễn ra thành công!');
+          this.get_data();
+        }
+        this.modalRef.hide();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.got_error(() => {
+          this.modalRef.hide();
+          this.blockUI.stop();
+        });
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  // giám sát thiết bị
+  got_error(callback: Function = null, message: string = null) {
+    let e = 'Có lỗi xảy ra';
+    if (message) {
+      e = message;
+    }
+    this.notifier.notify('error', e);
+    if (callback) {
+      callback();
+    }
+  }
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  is_same_date(start_date: Date, end_date: Date) {
+    return (start_date.getFullYear() === end_date.getFullYear()
+      && start_date.getMonth() === end_date.getMonth()
+      && start_date.getDate() === end_date.getDate());
+  }
+  to_minutes(minutes: number) {
+    return minutes * 60;
+  }
+  set_old_data(...array: any[]) {
+    // tslint:disable-next-line:prefer-const
+    let data: { [k: string]: any } = {};
+    array.forEach(element => {
+      data[element] = this[element];
+    });
+    return data;
+  }
+  get_old_data(array: any[], object: { [k: string]: any }) {
+    array.forEach(element => {
+      this[element] = object[element];
+    });
+  }
+  clone_array(array) {
+    return array.slice(0);
+  }
+  // sort_data(array: any[]) {
+  //   array.sort((item1, item2) => {
+  //     if (item1.online > item2.online) {
+  //       return -1;
+  //     }
+  //   });
+  //   return array;
+  // }
+  dequy_menu(array: any[], id = 0, space = 0) {
+    array.forEach(element => {
+      if (Number(element.parent_id) === id) {
+        const id_parent = Number(element.value);
+        this.menu_site.push({
+          id: element.value
+          , name: element.label
+          , space: space
+          , parent_id: element.parent_id
+          , organization_id: element.organization_id
+          , enables: element.enables
+          , store: element.store
+        });
+        const scope = space + 5;
+        this.dequy_menu(array, id_parent, scope);
+      }
+    });
+  }
+  open(url) {
+    // console.log(url);
+    window.open(url, '_blank');
+  }
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
+}
+
+
+

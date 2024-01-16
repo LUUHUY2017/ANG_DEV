@@ -1,0 +1,260 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row" style="border-radius: 5px; border: 1px">
+      <ul id="age-ana-head">
+        <li>
+          <label for="">Địa điểm/ khu vực </label>
+          <!-- Nút chọn tổ chức -->
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+              <i class="fa fa-map-marker location" aria-hidden="true"></i>
+              <span>&nbsp;{{location}}</span>&nbsp;
+              <i class="fa fa-caret-down"></i> &nbsp;
+            </div>
+            <i style="padding-top:5px;cursor: pointer;font-size: 14px;color: rgb(185, 58, 58);" (click)="locationSelectionDisplay=!locationSelectionDisplay" [hidden]="hidden_menu_location" class="fa fa-dot-circle-o ngoai-tru" aria-hidden="true"></i>
+          </div>
+          <!-- Chọn option tổ chức -->
+          <div style="height: auto;overflow: unset;border-radius: 10px;" [hidden]="!locationSelectionDisplay" class=" khung-location block">
+            <!-- (clickOutside)="locationSelectionDisplay=false" [exclude]="'.ngoai-tru'" -->
+            <div style="margin-bottom: 0" class="card">
+              <div class="card-header">
+                <span>Chọn địa điểm</span>
+              </div>
+              <div class="card-body">
+                <!-- <ng-select class="bootstrap selectimeview" [options]="organization_arr_option" [allowClear]="false"
+                  (selected)="changeorganization($event)" [(ngModel)]="organization_id"></ng-select> -->
+                <ng-select class="bootstrap selectimeview" (change)="changeorganization($event)" [items]="organization_arr_option" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="organization_id"></ng-select>
+              </div>
+              <div class="card-footer">
+                <div style="float: right;  padding: 0 8px;">
+                  <button type="button" class="btn btn-secondary" (click)="locationSelectionDisplay=!locationSelectionDisplay">Đóng
+                    cửa sổ</button>
+                </div>
+              </div>
+            </div> <!-- card -->
+          </div>
+          <!--  Chọn địa điểm/ khu vực  -->
+          <div [hidden]="!siteSelectionDisplay" class=" khung-location block" (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+              <div style="position: relative;width: 100%;" class="inputgroup">
+                <input (keyup)="search_menu($event.target.value)" style="border:none !important;padding-left: 7px;" type="text" class="form-control" placeholder="Tìm kiếm địa điểm/khu vực">
+                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search" aria-hidden="true"></i>
+              </div>
+              <ul style="padding-left: 0;">
+                <li (click)="changeitem(item.organization_id, item.id, item.site_name)" *ngFor="let item of menu_tree" class="menu-{{item.alevel}}  {{item.site_name === location ? 'li_active' : ''}}">
+                  {{item.site_name}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li>
+          <label for="">Thời kỳ</label>
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay2=!siteSelectionDisplay2" class="text-select vung-kich2">
+              <i class="fa fa-calendar-minus-o location" aria-hidden="true"></i>
+              <span>&nbsp;{{time_period}}</span>
+              <i class="fa fa-caret-down"></i>
+            </div>
+          </div>
+          <!-- popup -->
+          <div [hidden]="!siteSelectionDisplay2" (clickOutside)="siteSelectionDisplay2=false" [exclude]="'.vung-kich2'" class=" khung-time block">
+            <div id="khung-time-scroll">
+              <ul id="ul-time">
+                <li class="active">
+                  <span>Chọn thời kỳ</span>
+                  <div id="reportrangefba" style="  margin-top: 2px; cursor: pointer; width: 100%">
+                    <i class="fa fa-calendar"></i>&nbsp;
+                    <span style="font-size: 12px;"></span> <i class="fa fa-caret-down"></i>
+                    <input type="hidden" id="startDateReportTemp">
+                    <input type="hidden" id="endDateReportTemp">
+                  </div>
+                </li>
+                <li *ngFor=" let item of fba_time_period_overview" (click)="chonthoigian(item)">
+                  <!-- class="{{item.label === time_period ? 'li_active' : ''}}" -->
+                  {{item.label}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <!-- kết thúc li thứ  3 -->
+      </ul>
+    </div>
+  </div><!-- Kết thúc card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="fbametrics_headmapmenu_2">
+                  <li>
+                    <!-- <ng-select class="bootstrap selectimeview " [options]="indexOption" [allowClear]="false"
+                      [(ngModel)]="indexOptionSelected" (selected)="thaydoichart($event)"></ng-select> -->
+                  </li> <!-- li-visit -->
+                  <li>
+                    <button type="button" class="btn btn-primary float-right btnapdung" (click)="time_change()">
+                      Áp dụng
+                    </button>
+                    <div class="btn-group btn-group-toggle float-right ml" data-toggle="buttons">
+                      <!-- <ng-select class="bootstrap selecttimeview nonml" [options]="startTimeOption" [allowClear]="false"  [(ngModel)]="startTime"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview nonml" [items]="startTimeOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="startTime"></ng-select>
+                      <span style="padding: 4px 0px;">-</span>
+                      <!-- <ng-select class="bootstrap selecttimeview " [options]="endTimeOption" [allowClear]="false"
+                        [(ngModel)]="endTime"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview" [items]="endTimeOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="endTime"></ng-select>
+                    </div>
+                  </li><!-- Kết thúc li thứ 2 -->
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button style="display:none" dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnchiase">
+                          Chia Sẻ
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right " role="menu">
+                          <li role="menuitem"><a class="dropdown-item btn-brand btn-facebook" href="https:www.facebook.com"><i class="fa fa-facebook"></i>Facebook</a></li>
+                          <li role="menuitem"><a class="dropdown-item btn-brand btn-google-plus" href="https:www.plus.google.com"><i class="fa fa-google-plus"></i>G+</a></li>
+                          <!-- <li role="menuitem"><a class="dropdown-item  " href="#">Email</a></li> -->
+                        </ul>
+                      </div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnxuat">
+                          Xuất
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item float-right cursor-pointer">Xuất
+                              ra Excel</a>
+                          </li>
+                          <li style="display:none" role="menuitem"><a class="dropdown-item  float-right cursor-pointer" href="#">Xuất
+                              ra PDF</a>
+                          </li>
+                          <li style="display:none" role="menuitem"><a class="dropdown-item  float-right cursor-pointer">Other</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li> <!-- Kết thúc li thứ 3-->
+                </ul>
+              </div> <!-- Kết thúc row-header -->
+            </div> <!-- Kết thúc-card-header con -->
+
+            <div class="card-body card-body-bottom">
+              <div class="row">
+                <div class="col-sm-12 col-md-7">
+                </div>
+                <div class="col-sm-12 col-md-5 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()" btnRadio="Hour">Giờ</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()" btnRadio="Day">Ngày</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()" btnRadio="Week">Tuần</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()" btnRadio="Month">Tháng</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()" btnRadio="Year">Năm</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row  age-title-show">
+                <span class="title-show1 ">
+                  <!-- <i style="color: #1a1a1a;" aria-hidden="true" class="fa fa-map-marker"></i> -->
+                  {{title_location}}</span> &nbsp;&nbsp;
+                <span class="title-show3">
+                  <!-- <i class="fa fa-clock-o i-black"></i> -->
+                  {{ startt }}
+                </span>
+                <span> &nbsp;&minus;&nbsp; </span>
+                <span class="title-show3">
+                  <!-- <i class="fa fa-clock-o i-black"></i> -->
+                  {{ endt }}
+                </span>&nbsp;&nbsp;
+                <span class="title-show3">
+                  <!-- <i style="color: #1a1a1a;" class="fa fa-calendar-minus-o " aria-hidden="true"></i> -->
+                  {{title_time_period }}: {{ time_period2}}, </span>
+                &nbsp;&nbsp;
+                <span class="title-show3">
+                  <!-- <i class="fa fa-eye i-black"></i> -->
+                  xem theo {{ view }}
+                </span>
+              </div>
+              <div class="row">
+                <div style="border-bottom:1px  dotted #a7a4a4" class="fba-body-body">
+                  <div style="width:98%;" #container> </div>
+                </div>
+              </div>
+              <br>
+              <div class="row">
+                <div class="fba-body-body notop">
+                  <div class="table-responsive">
+                    <table style="width: 100%;min-width: 900px" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th style="width: 140px;">Thời gian</th>
+                          <th style="width: 130px"></th>
+                          <th style="width: 130px">Nữ - Female</th>
+                          <th style="width: 130px">Nam - Male</th>
+                          <th style="width: 130px">Không xác định</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <div>{{total_gender | number:'1.0-2'}} <span id="percent">
+                                (100%)</span></div>
+                            <span id="text"> trong tổng số {{total_gender | number:'1.0-2'}} </span>
+                          </td>
+                          <td>
+                            <div>{{female}} <span id="percent">
+                                ({{go_number(female,total_gender) | number:'1.0-2'}}%)</span></div>
+                            <span id="text"> trong tổng số {{total_gender | number:'1.0-2'}} </span>
+                          </td>
+                          <td>
+                            <div>{{male | number:'1.0-2'}}
+                              <span id="percent">({{go_number(male,total_gender) | number:'1.0-2'}}%)</span>
+                            </div>
+                            <span> trong tổng số {{total_gender | number:'1.0-2'}}</span>
+                          </td>
+                          <td>
+                            <div>{{unknown | number:'1.0-2'}}
+                              <span id="percent">({{go_number(unknown,total_gender) | number:'1.0-2'}}%)</span>
+                            </div>
+                            <span> trong tổng số {{total_gender | number:'1.0-2'}}</span>
+                          </td>
+                        </tr>
+                        <tr *ngFor="let item of data">
+                          <td style="padding-left:1rem;text-align:left">{{item.time_period}}</td>
+                          <td>
+                            {{go_total_row_age(item.female,item.male,item.unknown) | number:'1.0-2'}}
+                            <span class="spancell">({{go_number(go_total_row_age(item.female,item.male,item.unknown),total_gender) | number:'1.0-2'}}%)</span>
+                          </td>
+                          <td>{{item.female | number:'1.0-2'}}
+                            <span class="spancell">({{go_number(item.female,total_gender) | number:'1.0-2'}}%)</span>
+                          </td>
+                          <td>{{item.male | number:'1.0-2'}}
+                            <span class="spancell">({{go_number(item.male,total_gender) | number:'1.0-2'}}%)</span>
+                          </td>
+                          <td>{{item.unknown | number:'1.0-2'}}
+                            <span class="spancell">({{go_number(item.unknown,total_gender) | number:'1.0-2'}}%)</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div style="border-bottom:1px  dotted #a7a4a4" class="fba-body-body">
+                  <div style="width:98%;" #container2> </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: right;width: 100%;font-size: 11px;">Báo cáo này đã được tạo
+      vào {{time_generate_report | date: 'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span (click)="reset_session()" style=" color: blue; cursor: pointer;">làm mới báo cáo</span>
+    </div>
+  </div>
+</div>

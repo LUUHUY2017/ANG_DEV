@@ -1,0 +1,104 @@
+.khungthemmoi
+{
+    /* font-weight: bold; */
+    font-family: Roboto, sans-serif;
+}
+
+.card
+{
+    border-radius: 0px;
+}
+.body-breadcumb
+{
+    padding: 10px 30px 10px 30px;
+}
+.khungthemmoi ul
+{
+    width: 100%;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
+}
+.khungthemmoi li
+{
+    list-style: none;
+}
+.khungthemmoi li>a
+{
+    color: #20a8d8;
+    cursor: pointer;
+}
+.khungthemmoi li>a:hover
+{
+    text-decoration: underline;
+}
+.khungthemmoi li:nth-child(1)
+{
+    float: left;
+}
+.khungthemmoi li:nth-child(2)
+{
+    float: right;
+}
+
+.step-group
+{
+    padding: 10px 25px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: #ddd;
+    font-family: Roboto, sans-serif;
+}
+.step-group.active
+{
+    background: #17a2b8;
+    color: white;
+}
+
+.step-group p
+{
+    margin-bottom: 0px;
+    font-size: 20px;
+}
+
+.group-content
+{
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 15px 0px;
+    /* opacity: 0; */
+    /* visibility: hidden; */
+    /* display: none; */
+    transition: 0.5s;
+}
+.group-content.show
+{
+    transition: 0.5s;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+}
+.edit-button
+{
+    border-radius: 0px;
+    color: #fff!important;
+}
+
+.finish-message-group img
+{
+    width: 100%;
+}
+
+
+
+.error-message
+{
+    font-style: italic;
+    color: crimson;
+}
+
+input.ng-invalid.ng-touched
+{
+    border: 2px solid crimson;
+    box-shadow: unset;
+}

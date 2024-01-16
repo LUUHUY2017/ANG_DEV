@@ -1,0 +1,83 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import viewchild
+import { AdminstratorMenuComponent } from '../../../viewchild/adminstratormenu/adminstratormenu.component';
+@ViewChild(AdminstratorMenuComponent)
+
+
+@Component({
+  templateUrl: './websmileys.component.html',
+  styleUrls: ['./websmileys.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class WebsmileysComponent implements OnInit {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  constructor(private router: Router, private route: ActivatedRoute, private appservice: AppService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  user_organization: any;
+
+  ngOnInit(): void {
+    this.get_data();
+  }
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get(environment.FBA.Administration.user_organization).subscribe(res => {
+      // console.log(res);
+      this.user_organization = res;
+    },
+      (error) => {
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+        this.blockUI.stop();
+        if (!environment.production) {
+          console.log(error);
+        }
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+
+  submitform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    this.appservice.post(data, environment.FBA.ADMIN.insert_question).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+}
+
+
+

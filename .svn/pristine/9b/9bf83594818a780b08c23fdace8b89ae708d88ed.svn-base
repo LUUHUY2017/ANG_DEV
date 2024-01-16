@@ -1,0 +1,4 @@
+<ul class="header-administration" style="overflow-x: auto;">
+    <li routerLinkActive="active"> <a [routerLink]="['/footfall/setting/terminals']"> Thiết bị brickstream </a> </li>
+    <li routerLinkActive="active"> <a [routerLink]="['/footfall/setting/user-mail']"> Cấu hình mail báo cáo </a> </li>
+</ul> 

@@ -1,0 +1,52 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div class="card-body">
+          <ng-container *ngIf="!isOnload && errorMess == null">
+              <div class="row mb-3" *ngIf="isSuperAdmin">
+                <div class="col-md-2">
+                  <ng-select class="bootstrap selectimeview" required [options]="orgArray" [ngModel]="organizationId"
+                    [allowClear]="false" (selected)="changeOrg($event)">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="row p-2">
+                <div class="col-md-6 tab-component p-2 {{pageNumber == 1 ? 'active' : null}}"
+                  (click)="changePageNumber(1)">
+                  {{language.cau_hinh}}</div>
+                <div class="col-md-6 tab-component p-2 {{pageNumber == 2 ? 'active' : null}}"
+                  (click)="changePageNumber(2)">
+                  {{language.dang_ky_su_kien}}
+                  <small *ngIf="!showPageEvent">({{language.ban_chua_cau_hinh_oa_zalo}})</small>
+                </div>
+              </div>
+              <app-oaconfig *ngIf="pageNumber == 1" [organizationId]="organizationId" (showPage)="showPage($event)">
+              </app-oaconfig>
+              <ng-container *ngIf="pageNumber == 2">
+                <ng-container *ngIf="!showPageEvent">
+                  <div class="text-center">{{language.ban_chua_cau_hinh_oa_zalo}}</div>
+                </ng-container>
+                <ng-container *ngIf="showPageEvent">
+                  <app-oaevent [organizationId]="organizationId"></app-oaevent>
+                </ng-container>
+              </ng-container>
+          </ng-container>
+          <ng-container *ngIf="!isOnload && errorMess != null">
+            <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. {{language.vui_long}}<a
+                style="color: #f3b21c; cursor: pointer;"
+                (click)="ngOnInit()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <notifier-container></notifier-container>
+</main>

@@ -1,0 +1,6 @@
+export class Version {
+    static version = '862';
+    static version_api = '664';
+    static version_service = '112';
+    static version_socketio = '41';
+}

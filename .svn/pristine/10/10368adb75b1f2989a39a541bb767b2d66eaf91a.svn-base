@@ -1,0 +1,721 @@
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, HostBinding } from '@angular/core';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+} from '@angular/animations';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+import * as io from 'socket.io-client';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+import { NgForm } from '@angular/forms';
+import { NotifierService } from 'angular-notifier';
+@Component({
+  templateUrl: './staffuploadmanager.component.html',
+  styleUrls: ['./staffuploadmanager.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('openClose', [
+      state('open', style({
+        opacity: 1,
+      })),
+      state('closed', style({
+        opacity: 0,
+      })),
+      transition('open => closed', [
+        animate('0.5s')
+      ]),
+      transition('closed => open', [
+        animate('0.3s')
+      ]),
+    ]),
+    trigger('openCloseDropdown', [
+      state('open', style({
+        opacity: 1,
+        visibility: 'visible',
+        transform: 'translateY(0px)'
+      })),
+      state('closed', style({
+        opacity: 0,
+        visibility: 'hidden',
+        transform: 'translateY(25px)'
+      })),
+      transition('open => closed', [
+        animate('0.15s')
+      ]),
+      transition('closed => open', [
+        animate('0.15s ease-in')
+      ]),
+    ]),
+  ]
+})
+@ViewChild(GeneralMenuComponent)
+export class StaffUploadManagerComponent implements OnInit {
+  @ViewChild('update_staff_avatar') update_staff_avatar: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  private readonly notifier: NotifierService;
+  private socket: SocketIOClient.Socket;
+  staff: any;
+  public modalRef: BsModalRef;
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  library: any;
+  active_record: any;
+  staff_id: any;
+  load_delete: boolean;
+  upload_data: any;
+  id_delete: any;
+  countdown: number;
+  timeout: number;
+  interval;
+  intervalDelete;
+  intervalUpdate;
+  isOpen = true;
+  can_add = false;
+  can_get_data = true;
+  organization_arr_filter: any;
+  organization_id_filter: any;
+  error_message: boolean;
+  userlogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  page_id = '\'' + environment.Pages.general.roles + '\'';
+  onLoad: boolean;
+  error_popup_message: boolean;
+  onloadPopup: boolean;
+  dropdownList_site: any;
+  organization_id: number;
+  site_id: number;
+  location_insert: any;
+  siteSelectionDisplay = false;
+  urlImage = environment.apiUrl + 'images/staff_info/';
+  image_source: string | Blob;
+  ImageUrll1: string | ArrayBuffer;
+  data_update: any;
+  organization_update: any;
+  search_key: string;
+  snapStaff: any;
+  siteFilter: any;
+  siteFilterModel: any;
+  siteFilterDisplay = false;
+  can_search = false;
+  staff_name: any;
+  organization_arr_insert: any;
+  constructor(private router: Router
+    , notifierService: NotifierService
+    , private route: ActivatedRoute
+    , private appservice: AppService
+    , private modalService: BsModalService) {
+    this.socket = io(environment.UrlSocket);
+    this.notifier = notifierService;
+    // const self = this;
+    // this.socket.on('connect', function() {
+    //   alert('Không thể kết nối với hệ thống máy chủ');
+    //   this.socket.close();
+    // });
+  }
+  ngOnInit(): void {
+    this.get_page_param();
+    const self = this;
+    this.can_get_data = false;
+    this.socket.on('admin_staff_vip_backlist_get_image_response_from_server_to_web', function (dataFromIo) {
+      clearInterval(self.interval);
+      if (self.can_get_data) {
+        console.log('response', dataFromIo);
+        if (dataFromIo.message.toLowerCase() !== 'success') {
+          self.error_popup_message = true;
+        } else {
+          // console.log(dataFromIo);
+          if ('images' in dataFromIo) {
+            if (dataFromIo.images.length > 0) {
+              self.library = dataFromIo.images;
+              self.active_record = self.library[0];
+            } else {
+              self.library = [];
+              self.active_record = null;
+            }
+          } else {
+            self.library = [];
+            self.active_record = null;
+          }
+        }
+        self.onloadPopup = false;
+        self.can_get_data = false;
+      }
+    });
+    this.socket.on('admin_staff_vip_backlist_add_image_response_from_server_to_web', function (dataFromIo) {
+      clearInterval(self.intervalUpdate);
+      if (self.can_get_data) {
+        console.log('response', dataFromIo);
+        if (!dataFromIo.status) {
+          alert('Kết quả so sánh với ảnh gốc là: Không phù hợp');
+          self.can_get_data = false;
+        } else {
+          if (dataFromIo.type === 'staff_img') {
+            const dataEmit = {
+              socket_id: self.socket.id
+              , id: self.staff_id
+              , organization_id: self.organization_id
+              , site_id: self.site_id
+              , type: 'staff_img'
+            };
+            self.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', dataEmit);
+          }
+        }
+      }
+      self.blockUI.reset();
+    });
+    this.socket.on('admin_staff_vip_backlist_delete_image_response_from_server_to_web', function (dataServer) {
+      clearInterval(self.intervalDelete);
+      if (self.can_get_data) {
+        if (dataServer.status) {
+          // self.library.splice(self.library.findIndex(item => item.id === self.id_delete), 1);
+          // if (self.library.length > 0) {
+          //   self.library.sort();
+          //   self.active_record = self.library[0];
+          // } else if (self.library.length === 0) {
+          //   self.active_record = null;
+          // }
+          const dataEmit = {
+            socket_id: self.socket.id
+            , id: self.staff_id
+            , organization_id: self.organization_id
+            , site_id: self.site_id
+            , type: 'staff_img'
+          };
+          self.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', dataEmit);
+        } else {
+          alert('Xử lý dữ liệu không thành công');
+          self.can_get_data = false;
+        }
+      }
+      self.blockUI.reset();
+    });
+  }
+  get_page_param() {
+    this.error_message = false;
+    this.onLoad = true;
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        const lever = Number(this.userlogged.lever);
+        const organization_id = Number(this.userlogged.organization_id);
+        // Nếu lấy được thông tin tổ chức thì xử lý tiếp
+        if (param.organization_arr.length > 0) {
+          if (lever === 0) {
+            this.organization_arr_filter = param.organization_arr.slice(0);
+            this.organization_id_filter = this.organization_arr_filter[0].value;
+          } else {
+            this.organization_arr_filter = param.organization_arr.filter(
+              item => Number(item.value) === Number(organization_id));
+            this.organization_id_filter = this.organization_arr_filter[0].value;
+          }
+          // Lấy danh sách site tree
+          this.getSiteTree();
+        } else { // Nếu không lấy được thì báo lỗi, và dừng việc lấy dữ liệu luôn
+          this.error_message = true;
+          this.onLoad = false;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error + '');
+        }
+        // Nếu không lấy được thì báo lỗi, và dừng việc lấy dữ liệu luôn
+        this.error_message = true;
+        this.onLoad = false;
+      }
+    );
+  }
+  getSiteTree() {
+    const data = {
+      organization_id: this.organization_id_filter
+    };
+    this.siteFilter = [];
+    const url = environment.API.sites + '_get_site_for_report';
+    this.appservice.post(data, url).subscribe(res => {
+      console.log(res);
+      // Nếu có dữ liệu về site array thì xử lý tiếp.
+      if (res.site_array.length > 0) {
+        this.get_data();
+        this.recusive_menu_filter(res.site_array);
+        this.siteFilter[0].site_name = 'Tất cả';
+        this.siteFilterModel = this.siteFilter[0];
+      } else {
+        // Nếu không có dữ liệu thì dừng lại luôn
+        this.staff = [];
+        this.onLoad = false;
+      }
+      // console.log(this.dropdownList_site);
+    }, (error) => {
+      // Quá trình xử lý mà lỗi là dừng lại luôn
+      this.error_message = true;
+      this.onLoad = false;
+    });
+  }
+  show_insert(template: TemplateRef<any>) {
+    this.error_popup_message = false;
+    this.blockUI.start('Đang tải dữ liệu');
+    // Đưa trạng thái tìm kiếm về ban đầu
+    this.search_key = '';
+    this.staff = this.snapStaff;
+    // và khởi tạo lại danh sách staff
+    const url = environment.API.sites + '_get_site_for_report';
+    const data = {
+      organization_id: this.organization_id_filter
+    };
+    this.organization_arr_insert = this.organization_arr_filter.filter(item => item.value === this.organization_id_filter);
+    this.dropdownList_site = [];
+    this.appservice.post(data, url).subscribe(res => {
+      // console.log(res);
+      if (res.site_array.length > 0) {
+        this.openModal(template);
+        this.recusive_menu(res.site_array);
+        this.dropdownList_site.splice(0, 1);
+        this.location_insert = this.dropdownList_site.filter(item => Number(item.store) !== 0)[0];
+      } else {
+        this.customize_error('Có lỗi xảy ra');
+      }
+      // console.log(this.dropdownList_site);
+    }, (error) => {
+      this.customize_error('Truy cập dữ liệu có lỗi xảy ra');
+    }).add(() => {
+      this.blockUI.stop();
+    });
+  }
+  got_error(message, callback: Function = null) {
+    let default_message = 'Có lỗi xảy ra';
+    if (this.userlogged.lever === '0') {
+      default_message = message;
+    }
+    this.notifier.notify('error', default_message);
+    if (callback) {
+      callback();
+    }
+  }
+  customize_error(message, callback: Function = null) {
+    this.notifier.notify('error', message);
+    if (callback) {
+      callback();
+    }
+  }
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  show_update(item: any, template: TemplateRef<any>) {
+    this.staff_id = item.id;
+    this.error_popup_message = false;
+    this.blockUI.start('Đang tải dữ liệu');
+    const url = environment.API.staff_upload_get + '_update_staff';
+    const data = {
+      organization_id: this.organization_id_filter
+      , staff_id: this.staff_id
+    };
+    this.dropdownList_site = [];
+    this.appservice.post(data, url).subscribe(res => {
+      console.log(res);
+      if (res.data_update.length === 0 || res.site_array.length === 0) {
+        this.customize_error('Có lỗi xảy ra');
+        return;
+      }
+      this.data_update = res.data_update[0];
+      this.openModal(template);
+      this.recusive_menu(res.site_array);
+      this.dropdownList_site.splice(0, 1);
+      this.location_insert = this.dropdownList_site.find(item3 => item3.id === this.data_update.site_id);
+      console.log('dropdownList_site', this.dropdownList_site);
+      // console.log(this.dropdownList_site);
+    }, (error) => {
+      this.customize_error('Truy cập dữ liệu có lỗi xảy ra');
+    }).add(() => {
+      this.blockUI.stop();
+    });
+    this.organization_update = this.organization_arr_filter.filter(item2 => item2.value === this.organization_id_filter);
+    console.log(this.organization_update);
+  }
+  // Hàm đệ quy menu
+  recusive_menu(array: any[], id = null, space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.dropdownList_site.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables
+          , store: element.store
+        });
+        const scope = space + 1;
+        this.recusive_menu(array, a_id, scope);
+      }
+    });
+  }
+  recusive_menu_filter(array: any[], id = null, space = 0) {
+    array.forEach(element => {
+      if (element.parent_id === id) {
+        const a_id = element.id;
+        this.siteFilter.push({
+          id: element.id
+          , site_name: element.site_name
+          , parent_id: element.parent_id
+          , alevel: space
+          , enables: element.enables
+        });
+        const scope = space + 1;
+        this.recusive_menu_filter(array, a_id, scope);
+      }
+    });
+  }
+  get_item_to_insert(item: any) {
+    this.location_insert = item;
+    this.siteSelectionDisplay = false;
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  InsertUpload(event) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.image_source = file;
+      reader.onload = (target) => {
+        this.ImageUrll1 = reader.result;
+      };
+      event.target.value = '';
+    }
+  }
+  UpdateUpload(event, update_staff_avatar) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.image_source = file;
+      reader.onload = (target) => {
+        update_staff_avatar.src = reader.result;
+      };
+      event.target.value = '';
+    }
+  }
+  insertform(form: NgForm) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const formData = new FormData();
+    if (form.value.organization_id) {
+      formData.append('organization_id', form.value.organization_id);
+    }
+    formData.append('site_id', this.location_insert.id);
+    formData.append('staff_name', form.value.staff_name);
+    formData.append('staff_avatar', this.image_source);
+    const url = environment.API.staff_upload_get + '_insert_staff';
+    this.appservice.post(formData, url).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if (para.message !== 1) {
+          this.error_popup_message = true;
+        } else {
+          this.got_success('Thêm nhân viên thành công');
+          this.get_data();
+          this.modalRef.hide();
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.error_popup_message = true;
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    // xét các giá trị về mặc định
+    this.can_get_data = true;
+    this.onloadPopup = true;
+    this.active_record = null;
+    this.error_popup_message = false;
+    this.library = [];
+    this.staff_name = item.staff_name;
+    // Hiển thị popup
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    // trong 20 giây mà dữ liệu không về thì không lấy dữ liệu nữa
+    this.countdown = 20;
+    this.interval = setInterval(() => {
+      this.countdown = this.countdown - 1;
+      if (this.countdown === 0) {
+        this.can_get_data = false;
+        this.onloadPopup = false;
+        this.error_popup_message = true;
+        clearInterval(this.interval);
+        alert('Quá trình xử lý vượt quá thời gian quy định');
+      }
+    }, 1000);
+    // quá trình gửi dữ liệu
+    const data = {
+      socket_id: this.socket.id
+      , id: item.id
+      , organization_id: item.organization_id
+      , site_id: item.site_id
+      , type: 'staff_img'
+    };
+    // xét vào để sự kiện on socket có thể xử lý tiếp được
+    this.staff_id = item.id;
+    this.organization_id = item.organization_id;
+    this.site_id = item.site_id;
+    // emit sự kiện để lấy dữ liệu ảnh về
+    this.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', data);
+  }
+  get_data() {
+    this.error_message = false;
+    const data = {
+      organization_id: this.organization_id_filter
+    };
+    this.isOpen = false;
+    this.can_add = false;
+    this.can_search = false;
+    this.appservice.post(data, environment.API.staff_upload_get).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.snapStaff = para.data.slice(0);
+        this.can_add = true;
+        if (para.data.length > 0) {
+          if (this.search_key) {
+            const string = this.search_key.toLowerCase();
+            this.search_staff_in_site_with_ngModel(para.data);
+            this.staff = this.staff.filter(x => x.staff_name.toLowerCase().indexOf(this.search_key) !== -1);
+          } else {
+            this.search_staff_in_site_with_ngModel(para.data);
+          }
+        } else {
+          this.staff = [];
+        }
+        if (this.staff.length > 0) {
+          this.can_search = true;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.error_message = true;
+      }).add(() => {
+        // Load xong sẽ dừng con quay lại
+        this.isOpen = true;
+        this.onLoad = false;
+      });
+  }
+  updateform(form: NgForm) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const formData = new FormData();
+    formData.append('staff_id', this.staff_id);
+    if (form.value.organization_id) {
+      formData.append('organization_id', form.value.organization_id);
+    }
+    formData.append('site_id', this.location_insert.id);
+    formData.append('staff_name', form.value.staff_name);
+    formData.append('staff_avatar', this.image_source);
+    const url = environment.API.staff_upload_get + '_post_update_staff';
+    this.appservice.post(formData, url).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if (para.message !== 1) {
+          this.error_popup_message = true;
+        } else {
+          this.got_success('Chỉnh sửa dữ liệu thành công');
+          this.get_data();
+          this.modalRef.hide();
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.error_popup_message = true;
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  search_staff_in_site_with_ngModel(dataReturn: any[]) {
+    const site_id = Number(this.siteFilterModel.id);
+    console.log('site_id', site_id);
+    if (site_id !== 0) {
+      this.staff = dataReturn.filter(item => Number(item.site_id) === site_id);
+    } else {
+      this.staff = dataReturn;
+    }
+  }
+  search_staff_in_site(item: any) {
+    const id = Number(item.id);
+    this.siteFilterModel = item;
+    this.siteFilterDisplay = false;
+    if (id === 0) {
+      this.staff = this.snapStaff;
+    } else {
+      this.staff = this.snapStaff.filter(x => Number(x.site_id) === id);
+      if (this.staff.length === 0) {
+        this.can_search = false;
+      } else {
+        this.can_search = true;
+      }
+    }
+  }
+  search_staff() {
+    // chuyển giá trị truyền vào về chữ thường để so sánh
+    const string = this.search_key !== undefined ? this.search_key.toLowerCase() : '';
+    if (string !== '') {
+      console.log(this.staff);
+      this.staff = this.staff.filter(x => x.staff_name.toLowerCase().indexOf(string) !== -1);
+    } else {
+      if (Number(this.siteFilterModel.id) === 0) {
+        this.staff = this.snapStaff;
+      } else {
+        this.staff = this.snapStaff.filter(x => x.site_id === this.siteFilterModel.id);
+      }
+    }
+  }
+  delete_staff(item: any) {
+    const c = confirm('Bạn đồng ý xóa nhân viên?');
+    if (c) {
+      this.blockUI.start('Đang xử lý dữ liệu');
+      const data = {
+        staff_id: item.id
+      };
+      const url = environment.API.staff_upload_get + '_delete_staff';
+      this.appservice.post(data, url).subscribe(
+        para => {
+          if (!environment.production) {
+            console.log('dữ liệu gửi về', para);
+          }
+          if (para.message !== 1) {
+            this.customize_error('Xóa nhân viên không thành công!');
+          } else {
+            this.got_success('Xóa nhân viên thành công!');
+            const dataEmit = {
+              socket_id: this.socket.id
+              , id: item.id // staff id
+              , organization_id: item.organization_id
+              , site_id: item.site_id
+              , type: 'staff'
+            };
+            this.socket.emit('admin_staff_vip_backlist_delete_request_from_web_to_server', dataEmit);
+            this.get_data();
+          }
+        },
+        (error) => {
+          if (!environment.production) {
+            console.log(error);
+          }
+          this.customize_error('Truy cập dữ liệu không thành công!');
+        }).add(() => {
+          this.blockUI.stop();
+        });
+    }
+  }
+  trigger_click(upload) {
+    const event: Event = new Event('click');
+    upload.click();
+    clearInterval(this.interval);
+  }
+  getUploadData(event) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.can_get_data = true;
+      reader.onload = (target) => {
+        this.countdown = 20;
+        this.blockUI.start('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+        this.intervalUpdate = setInterval(() => {
+          this.countdown = this.countdown - 1;
+          this.blockUI.update('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+          if (this.countdown === 0) {
+            this.can_get_data = false;
+            clearInterval(this.intervalUpdate);
+            this.blockUI.stop();
+            alert('Quá trình xử lý vượt quá thời gian quy định');
+          }
+        }, 1000);
+        console.log(this.staff_id);
+        this.upload_data = {
+          socket_id: this.socket.id
+          , organization_id: this.organization_id
+          , site_id: this.site_id
+          , id: this.staff_id
+          , type: 'staff_img'
+          , list_image_face: [{
+            id: '00000000-0000-0000-0000-000000000000'
+            , image_base64: String(reader.result).replace('data:image/jpeg;base64,', '')
+          }]
+          , access_token: localStorage.getItem(environment.access_token)
+          , tocken_type: environment.Bearer
+        };
+        // console.log(this.upload_data);
+        this.socket.emit('admin_staff_vip_backlist_add_image_request_from_web_to_serve', this.upload_data);
+      };
+      event.target.value = '';
+    }
+  }
+  delete_item(active_record: any, uploadform) {
+    const c = confirm('Bạn đồng ý xóa?');
+    if (c) {
+      clearInterval(this.intervalDelete);
+      this.can_get_data = true;
+      // console.log(id);
+      // console.log(this.library);
+      // console.log();
+      // return;
+      this.id_delete = active_record.id;
+      this.load_delete = true;
+      const url = environment.API.staff_upload_get + '_delete/' + this.id_delete;
+      const data = {
+        socket_id: this.socket.id
+        , id: this.id_delete
+        , type: 'staff_img'
+        , access_token: localStorage.getItem(environment.access_token)
+        , tocken_type: environment.Bearer
+      };
+      this.countdown = 20;
+      this.blockUI.start('Đang xử lý dữ liệu trong ' + this.countdown + ' giây');
+      this.socket.emit('admin_staff_vip_backlist_delete_image_request_from_web_to_server', data);
+      this.intervalDelete = setInterval(() => {
+        this.countdown = this.countdown - 1;
+        this.blockUI.update('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+        if (this.countdown === 0) {
+          this.can_get_data = false;
+          clearInterval(this.intervalDelete);
+          this.blockUI.stop();
+          alert('Quá trình xử lý vượt quá thời gian quy định');
+        }
+      }, 1000);
+    }
+  }
+
+}
+
+
+

@@ -1,0 +1,29 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminEditSettingComponent } from './editsetting.component';
+import { AdminEditSettingRoutingModule } from './editsetting-routing.module';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SettingService } from '../setting.service';
+import { BlockUIModule } from 'ng-block-ui';
+import { FbaMenuModule } from '../../../viewchild/fbamenu/fbamenu.module';
+
+@NgModule({
+    declarations: [
+        AdminEditSettingComponent
+    ],
+    imports: [
+        CommonModule,
+        AdminEditSettingRoutingModule,
+        FormsModule,
+        RouterModule,
+        BlockUIModule,
+        FbaMenuModule
+    ],
+    exports: [],
+    // providers: [],
+    providers: [SettingService],
+})
+export class AdminEditSettingModule {
+    constructor() {}
+ }

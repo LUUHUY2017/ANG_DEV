@@ -1,0 +1,364 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <block-ui></block-ui>
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"> <i class="cui-layers"
+              aria-hidden="true"></i>{{language.danh_sach_vi_tri}}</span>
+          <button *ngIf="can_add" (click)="open_modal_them_moi(templates)" style="float:right"
+            class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>{{language.them}}</button>
+        </div>
+        <div class="card-body card-table table-fba-tablet">
+          <div class="row fba-location_filter_table">
+            <ul>
+              <li id="showrow">
+                <!-- <span class="font-span-table">Số dòng: &nbsp;</span>
+                        <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                           <option [ngValue]="15">15</option>
+                           <option [ngValue]="30">30</option>
+                           <option [ngValue]="50">50</option>
+                           <option [ngValue]="100">100</option>
+                        </select> -->
+                <select style="margin-left:10px;" class="input-sm select_cus_table"
+                  (change)="changeorganization_table($event.target.value)">
+                  <option *ngFor="let item of organization_arr" value="{{item.value}}">{{item.label}}</option>
+                </select>
+                <select style="margin-left:10px;" class="input-sm select_cus_table"
+                  (change)="change_module($event.target.value)">
+                  <option *ngFor="let item of select_module" value="{{item.value}}">{{item.label}}</option>
+                </select>
+              </li>
+              <li><span class="font-span-table">{{language.tim_kiem_}} &nbsp;</span><input type="text"
+                  class="input_filter_table" [(ngModel)]="tu_khoa" (ngModelChange)="search_table($event)"></li>
+            </ul>
+          </div>
+          <div class="table-responsive">
+            <table [mfData]="data_filter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+              style="width: 100%;min-width: 900px" class="table table-striped fba-location_table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">{{language.STT}}</th>
+                  <!-- <th [hidden]="hidden_select_organization"
+                              style="width: 120px;text-align: left;text-indent: 1rem;">{{language.to_chuc}}</th> -->
+                  <th style="width: 120px;text-align: left;text-indent: 1rem;">{{language.dia_diem}}</th>
+                  <th style="width: 150px;text-align: left;text-indent: 1rem;">{{language.vi_tri}}</th>
+                  <th style="width: 150px;text-align: left;text-indent: 1rem;">{{language.ma_vi_tri}}</th>
+                  <th style="width: 80px;text-align: left;text-indent: 1rem;">{{language.trang_thai}}</th>
+                  <th style="width: 150px;text-align: left;text-indent: 1rem;">{{language.mo_ta}}</th>
+                  <th style="width: 90px;">{{language.xu_ly}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let items of mf.data;let i = index">
+                  <td>{{i + 1}}</td>
+                  <!-- <td [hidden]="hidden_select_organization" style="text-align: left;text-indent: 1rem;">
+                              {{items.organization_name ? items.organization_name : '-'}}</td> -->
+                  <td style="text-align: left;text-indent: 1rem;">{{items.site_name ? items.site_name : '-'}}
+                  </td>
+                  <td style="text-align: left;text-indent: 1rem;">{{items.location_name}}</td>
+                  <td style="text-align: left;text-indent: 1rem;">{{items.location_code}}</td>
+                  <td class="text-center">
+                    <span *ngIf="items.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                        class="fa fa-check"></i></span>
+                    <span *ngIf="items.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                        class="fa fa-remove"></i></span>
+                  </td>
+                  <td style="text-align: left;text-indent: 1rem;">{{items.location_description ?
+                              items.location_description : '-'}}</td>
+                  <td style="width: 100px;">
+                    <a (click)="show_update(items,template)" class="icon-blue" title="Sửa vị trí">
+                      <i class="cui-note" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="can_delete" (click)="show_delete(items,dialog)" class="icon-red" title="Xóa vị trí">
+                      <i class="cui-circle-x" aria-hidden="true"></i>
+                    </a>&nbsp;
+                  </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                  <td colspan="8" *ngIf="data_filter?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot class="fba-tablet-list-tfoot">
+                <tr>
+                  <td colspan="8">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <notifier-container></notifier-container>
+  <!-- Model hỏi xóa -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_location()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #template>
+    <form (ngSubmit)="update_location(location_update)" #location_update="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_vi_tri}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">Id {{language.vi_tri}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="number" [ngModel]="data_update.id" name="id"
+              (change)="preventChange()">
+          </div>
+        </div>
+        <!-- <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.to_chuc}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [ngModel]="data_update.organization_id" name="organization_id" [allowClear]="false">
+                  </ng-select>
+               </div>
+            </div> -->
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.dia_diem}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-location">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{siteSelected ? siteSelected.site_name : language.chua_chon}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <!-- <div style="position: relative;width: 100%;" class="inputgroup">
+                           <input (keyup)="search_menu($event.target.value)"
+                              style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                              placeholder="Tìm kiếm địa điểm/ khu vực">
+                           <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                              class="fa fa-search" aria-hidden="true"></i>
+                        </div> -->
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of menu_tree" (click)="changesite(item)"
+                    class="menu-{{item.alevel}} {{item.site_name === siteSelected?.site_name ? 'active' : ''}} {{item.enables == 1 && item.store == 1 ? null : 'disabledMenuItem'}}">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.vi_tri}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" name="location_name" type="text" #txtlocation_name="ngModel" required
+              [ngModel]="data_update.location_name" minlength="3" maxlength="30">
+            <small *ngIf="txtlocation_name.touched && txtlocation_name.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_vi_tri}}
+            </small>
+            <small *ngIf="txtlocation_name.touched && txtlocation_name.errors?.minlength" class="error-message">
+              {{language.vi_tri_co_it_nhat_3_ki_tu}}
+            </small>
+            <small *ngIf="txtlocation_name.touched && txtlocation_name.errors?.maxlength" class="error-message">
+              {{language.vi_tri_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_vi_tri}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" readonly type="text" [value]="data_update.location_code">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.mo_ta}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <textarea name="location_description" class="form-control" cols="30" rows="10"
+              [ngModel]="data_update.location_description"></textarea>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" value=1 [ngModel]="data_update.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" value=0 [ngModel]="data_update.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom" hidden>
+          <label class="col-md-3 col-3 col-form-label lh-label">Module</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" [ngModel]="data_update.module" #txtmodule="ngModel"
+              (selected)="preventChange()" [options]="select_module" name="module" [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="location_update.invalid"> {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+
+  <!-- Modal thêm mới  -->
+  <ng-template #templates>
+    <form (ngSubmit)="insert_location(location_insert)" #location_insert="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_vi_tri}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom" hidden>
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.to_chuc}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+              [ngModel]="organization_id" (selected)="changeorganization($event.value)" name="organization_id"
+              [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.dia_diem}}<small
+              class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-location">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{siteSelected ? siteSelected.site_name : language.chua_chon}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <!-- <div style="position: relative;width: 100%;" class="inputgroup">
+                           <input (keyup)="search_menu($event.target.value)"
+                              style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                              placeholder="Tìm kiếm địa điểm/ khu vực">
+                           <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                              class="fa fa-search" aria-hidden="true"></i>
+                        </div> -->
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of menu_tree" (click)="changesite(item)"
+                    class="menu-{{item.alevel}} {{item.site_name === siteSelected?.site_name ? 'active' : ''}} {{item.enables == 1 && item.store == 1 ? null : 'disabledMenuItem'}}">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.vi_tri}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtloca="ngModel" required name="location_name"
+              minlength="3" maxlength="40">
+            <small *ngIf="txtloca.touched && txtloca.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_vi_tri}}
+            </small>
+            <small *ngIf="txtloca.touched && txtloca.errors?.minlength" class="error-message">
+              {{language.vi_tri_co_it_nhat_3_ki_tu}}
+            </small>
+            <small *ngIf="txtloca.touched && txtloca.errors?.maxlength" class="error-message">
+              {{language.vi_tri_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <!-- <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_vi_tri}} <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" type="text" #txtlo_code="ngModel" required name="location_code"
+                     minlength="3" maxlength="40" ngModel>
+                  <small *ngIf="txtlo_code.touched && txtlo_code.errors?.required" class="error-message">
+                     Bạn chưa nhập {{language.ma_vi_tri}}
+                  </small>
+                  <small *ngIf="txtlo_code.touched && txtloca.errors?.minlength" class="error-message">
+                    {{language.vi_tri_co_it_nhat_3_ki_tu}}
+                  </small>
+                  <small *ngIf="txtlo_code.touched && txtloca.errors?.maxlength" class="error-message">
+                     {{language.vi_tri_co_nhieu_nhat_50_ki_tu}}
+                  </small>
+               </div>
+            </div> -->
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.mo_ta}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <textarea class="form-control" cols="30" rows="10" ngModel name="location_description"></textarea>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom" hidden>
+          <label class="col-md-3 col-3 col-form-label lh-label">Module</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" [ngModel]="module_id" #txtmodule="ngModel" required
+              [options]="module_update" name="module" [allowClear]="true">
+            </ng-select>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn  btn-primary" [disabled]="location_insert.invalid || !siteSelected">{{language.them}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal thêm mới -->
+</main>

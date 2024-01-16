@@ -1,0 +1,462 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset" class="card card-administration">
+            <block-ui></block-ui>
+            <div class="card-body " style=" padding-top: 0px;">
+               <div class="row">
+                  <div class="col-lg-3 col-4">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi">Tổ
+                           chức</label>
+                        <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                           [(ngModel)]="org_selectedform" name="organization_id" [allowClear]="true"
+                           (selected)="thaydoitochuc($event)" placeholder="Chọn tổ chức">
+                        </ng-select>
+
+                     </div>
+                  </div>
+                  <div class="col-lg-3 col-4" *ngIf="userlogged.organization_id == 0 && userlogged.lever == 0">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi" for="txtSearchUser">Tùy chọn</label>
+                        <select class="form-control boxShadow noBorderRadius" [(ngModel)]="option_delete"
+                           (ngModelChange)="get_data()">
+                           <option [ngValue]=0>Chưa xóa</option>
+                           <option [ngValue]=1>Đã xóa</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="col-lg-3 col-4">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi" for="txtSearchUser">Từ khóa</label>
+                        <input class="form-control select-white nofocus" [(ngModel)]="tu_khoa" name="tu_khoa"
+                           type="text" id="txtSearchUser" placeholder="Tìm kiếm theo email..." autocomplete="off">
+                     </div>
+                  </div>
+                  <div class="col-lg-3 col-4">
+                     <div style="width: 110px;" class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi">&nbsp;</label>
+                        <button *ngIf="can_search" (click)="search_user()"
+                           class="btn btn-them form-control buton-search ">
+                           Tìm Kiếm</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px;"><i class="cui-layers" aria-hidden="true"></i> Danh sách người
+                  dùng</span>
+               <button style="float:right;" type="button" class="btn btn-them buton-search"
+                  (click)="get_insert(template)" *ngIf="can_add"><i class="cui-user-follow">&nbsp;</i>Thêm
+                  tài khoản</button>
+            </div>
+            <div class="card-body table-users">
+               <div class="table-responsive">
+                  <table [mfData]="user_organization" #mf="mfDataTable" [mfRowsOnPage]="15" class="table table-hover"
+                     style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px;text-align: center">STT</th>
+                           <th style="width: 150px">Họ và tên</th>
+                           <th style="width: 150px">Email</th>
+                           <th style="width: 150px">Ngày cập nhật</th>
+                           <th style="width: 100px" class="text-center">Tình trạng</th>
+                           <!-- <th style="width: 130px">Quyền</th> -->
+                           <th style="width: 100px;text-align: center;">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <!-- [@openClose]="item.state" -->
+                        <tr *ngFor="let item of mf.data; let i = index">
+                           <td style="width: 50px;text-align: center">{{i +1}}</td>
+                           <td>{{item.name}}</td>
+                           <td>{{item.email}}</td>
+                           <td>{{item.updated_at}}</td>
+                           <td class="text-center">
+                              <span *ngIf="item.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                                    class="fa fa-check"></i></span>
+                              <span *ngIf="item.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                                    class="fa fa-remove"></i></span>
+                           </td>
+                           <td style="width: 100px;text-align: justify">
+                              <a *ngIf="item.deleted == 0 && item.id != userlogged.id" (click)="chinhsuaquyen(item,Roletemplate)" class="icon-blue"
+                                 title="Chỉnh sửa quyền {{item.name}}">
+                                 <i class="icon-settings" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a (click)="dulieuthaydoi(item,templates)" class="icon-blue"
+                                 title="Sửa tài khoản {{item.name}}">
+                                 <i class="cui-note" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="userlogged.lever == 0 && userlogged.organization_id == 0 || is_admin_of_organization.length > 0 && item.id != userlogged.id"
+                                 class="icon-black" title="Gửi mật khẩu mới">
+                                 <i (click)="show_dialog_(item,password)" class="icon-lock-open" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.id != userlogged.id && item.deleted == 0"
+                                 (click)="show_dialog(dialog, item)" class="icon-red" title="Xóa tài khoản">
+                                 <i class="cui-circle-x" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.deleted == 1" (click)="show_dialog(dialog, item)" class="icon-green"
+                                 title="Khôi phục tài khoản {{item.name}}">
+                                 <i class="fa fa-reply" aria-hidden="true"></i>
+                              </a>&nbsp;
+                           </td>
+                        </tr>
+                        <tr>
+                           <td colspan="7" *ngIf="user_organization.length === 0"
+                              style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                              <span>Không có dữ liệu</span>
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot>
+                        <tr>
+                           <td colspan="7">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <ng-template #content_email>Các email cùng nhận được mật khẩu, ngăn cách nhau dấu phẩy! </ng-template>
+   <!-- Modal delete dialog -->
+   <ng-template #dialog>
+      <div class="modal-body box-shadow">
+         <div class="row">
+            <div class="col-md-12 mb-3">
+               <div id="border-remove">
+                  <i class="fa fa-remove fa-3x"></i>
+               </div>
+            </div>
+            <div class="col-md-12 text-center">
+               <h3>Bạn có chắc chắn muốn xóa?</h3>
+               <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+            </div>
+            <div class="col-md-12 text-center">
+               <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_users()"
+                  style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+               <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                  Đóng</button>
+            </div>
+         </div>
+      </div>
+   </ng-template>
+   <!-- End -->
+   <!-- Modal  thêm mới  -->
+   <ng-template #template>
+      <form (ngSubmit)="insertform(user_submit)" #user_submit="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Thêm tài khoản</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <ng-container *ngFor="let item of error_array">
+               <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <strong>{{item}}</strong>
+               </div>
+            </ng-container>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Họ và tên</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf3" type="text" ngModel required name="name" autocomplete="off"
+                     #txtname="ngModel" placeholder="Họ tên người dùng" minlength="5" maxlength="100">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Vui lòng nhập họ tên
+                  </small>
+                  <small *ngIf="txtname.touched && txtname.errors?.minlength" class="error-message">
+                     Vui lòng nhập họ tên ít nhất 5 kí tự
+                  </small>
+                  <small *ngIf="txtname.touched && txtname.errors?.maxlength" class="error-message">
+                     Vui lòng nhập họ tên nhiều nhất 100 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Email</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf-email" required type="email" email ngModel #txtemail="ngModel"
+                     name="email" autocomplete="off" placeholder="Email người dùng" minlength="10">
+                  <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">
+                     Vui lòng nhập email
+                  </small>
+                  <small *ngIf="txtemail.touched && txtemail.errors?.email" class="error-message">
+                     Vui lòng nhập email hợp lệ
+                  </small>
+                  <div *ngIf="txtemail.touched && txtemail.errors?.minlength">
+                     <small class="error-message">
+                        Vui lòng nhập email ít nhất 10 kí tự
+                     </small>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" [hidden]="!showSelectCrud">
+               <label class="col-md-4 col-4 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     name="organization_id" [ngModel]="org_selectedform" [allowClear]="true">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Mật khẩu</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" type="password" required name="password" #txtpassword="ngModel" ngModel
+                     autocomplete="off" placeholder="Mật khẩu người dùng">
+                  <small *ngIf="txtpassword.touched && txtpassword.errors?.required" class="error-message">
+                     Vui lòng nhập mật khẩu
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Nhập lại mật khẩu</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" type="password" name="confirmPassword" #txtconfirm="ngModel"
+                     autocomplete="off" ngModel placeholder="Nhập lại mật khẩu">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-primary" [disabled]="user_submit.invalid">Cập nhật</button>
+            <!-- [disabled]="form.invalid" -->
+         </div>
+      </form>
+   </ng-template>
+
+   <!-- Modal cập nhật -->
+   <ng-template #templates>
+      <form (ngSubmit)="updateform(user_update)" #user_update="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Cập nhật tài khoản</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <ng-container *ngFor="let item of error_array">
+               <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <strong>{{item}}</strong>
+               </div>
+            </ng-container>
+            <div hidden class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mã người dùng</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="id"
+                     (ngModelChange)="preventChange()">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Họ và tên</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" #txtname="ngModel" required [ngModel]="data2.name"
+                     name="name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Bạn chưa nhập họ tên
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Email</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf-email" #txtemail="ngModel" required type="email" email
+                     [ngModel]="data2.email" name="email">
+                  <li *ngIf="txtemail.invalid && (txtemail.dirty || txtemail.touched)">
+                     <small *ngIf=" txtemail.errors.required" class="error-message">
+                        Vui lòng nhập email
+                     </small>
+                     <small *ngIf=" txtemail.errors.email" class="error-message">
+                        Email chưa đúng
+                     </small>
+                  </li>
+               </div>
+            </div>
+            <!-- <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [ngModel]="data2.organization_id" name="organization_id" [allowClear]="true">
+                  </ng-select>
+               </div>
+            </div> -->
+            <div class="form-group row form-no-marbottom">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">Hoạt động</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value="1" [ngModel]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-t-ac">Có</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value="0" [ngModel]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-f-ac">Không</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-primary" [disabled]="user_update.invalid">Cập nhật</button>
+            <!-- [disabled]="user_update.invalid" -->
+         </div>
+      </form>
+   </ng-template>
+
+   <!-- Modal cập nhật role -->
+   <ng-template #Roletemplate>
+      <form (ngSubmit)="updaterole(role_update)" #role_update="ngForm">
+         <div class="modal-header">
+            <h5 class="modal-title pull-left">Cập nhật quyền sử dụng cho <b>{{data2.username}}</b></h5>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <ng-container *ngFor="let item of error_array">
+               <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <strong>{{item}}</strong>
+               </div>
+            </ng-container>
+            <div hidden class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Mã quyền</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="role_id"
+                     (change)="preventChange()">
+               </div>
+            </div>
+            <div hidden class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Mã người dùng</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [ngModel]="data2.user_id" name="user_id"
+                     (change)="preventChange()">
+               </div>
+            </div>
+            <div hidden class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Mã tổ chức</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [ngModel]="data2.organization_id"
+                     name="organization_id" (change)="preventChange()">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Mô tả nhóm quyền</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [value]="data2.role_description" readonly>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4" for="selectRoleType" style="align-items: center;
+               display: flex;">Nhóm người dùng</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <select name="role_type" id="selectRoleType" class="form-control" [ngModel]="data2.role_type">
+                     <option [ngValue]="0">Admin</option>
+                     <!-- <option value="1">Member</option> -->
+                     <option [ngValue]="2">Report Viewer</option>
+                  </select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Thuộc Site <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8">
+                  <div class="row mt-2" style="padding: 0px 15px">
+                     <div class="col-md-12"
+                        style="max-height:180px; overflow: auto;border:1px solid #ddd; border-radius: 3px;padding: 5px 10px;">
+                        <ng-container *ngIf="site_recusive_array?.length > 0">
+                           <div class="custom-control custom-checkbox site-{{item.alevel}} mt-2"
+                              *ngFor="let item of site_recusive_array; let i = index">
+                              <input type="checkbox" class="custom-control-input" id="checkbox{{i}}"
+                                 [ngModel]="item.enables == 1 ? item.id : null" (ngModelChange)="log(item)"
+                                 #check_item="ngModel" name="checkbox{{i}}" [disabled]="item.disabled">
+                              <label class="custom-control-label" for="checkbox{{i}}">{{item.site_name}} <small
+                                    *ngIf="item.store == 1" class="require-field">(cửa hàng)</small></label>
+                           </div>
+                        </ng-container>
+                        <ng-container *ngIf="site_recusive_array?.length === 0">
+                           <h6>Chưa có dữ liệu</h6>
+                        </ng-container>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Người cập nhật</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [value]="data2.name" readonly>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Ngày cập nhật</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" id="nf" type="text" [value]="data2.updated_at" readonly>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-success" [disabled]="role_update.invalid">Cập nhật quyền</button>
+            <!-- [disabled]="user_update.invalid" -->
+         </div>
+      </form>
+   </ng-template>
+   <!-- Modal password  -->
+   <ng-template #password>
+      <form (ngSubmit)="send_password_for_user(user_update)" #user_update="ngForm">
+         <div class="modal-header" style="background: #20a8d8; color: #fff; padding: 15px;">
+            <h6 class="modal-title pull-left">Gửi mật khẩu mới! Bạn có chắc chắn muốn gửi?</h6>
+            <button type="button" class="close pull-right" aria-label="Close" style="color:#fff"
+               (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <p>{{data2.email}}</p>
+            <div hidden class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">id,Họ và tên, email</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="id"
+                     (ngModelChange)="preventChange()">
+                  <input class="form-control" id="nf" type="text" #txtname="ngModel" [ngModel]="data2.name" name="name"
+                     (ngModelChange)="preventChange()">
+                  <input class="form-control" id="nf-email" #txtemail="ngModel" type="email" email
+                     [ngModel]="data2.email" name="email" (ngModelChange)="preventChange()">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label [tooltip]="content_email" style="padding-top: 6px;"
+                  class="col-md-3 col-3col-form-label lh-label">Email khác <i
+                     class="fa fa-question-circle icon-tooltip"></i></label>
+               <div class="col-md-6 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="email" [(ngModel)]="new_email" name="new_email">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-primary">Gửi mật khẩu mới</button>
+         </div>
+      </form>
+   </ng-template>
+   <notifier-container></notifier-container>
+</main>

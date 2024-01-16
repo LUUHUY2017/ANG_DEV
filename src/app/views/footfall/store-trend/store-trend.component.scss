@@ -1,0 +1,132 @@
+/**
+- update 02/11/2018
+ */
+:host ::ng-deep {
+  .starttime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .endtime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .select-visits {
+    width: fit-content !important;
+    > div {
+      width: 130px;
+      min-width: 130px;
+    }
+  }
+}
+.d-md-block {
+  margin-bottom: 5px;
+}
+ng-select > div {
+  height: 29px;
+}
+#headmapmenu-store {
+  width: 100%;
+  padding-left: 1px;
+}
+#headmapmenu-store {
+  margin: 0;
+}
+#headmapmenu-store li {
+  list-style: none;
+}
+ul#headmapmenu-store li:nth-child(1) {
+  float: left;
+}
+#headmapmenu-store li input {
+  padding-left: 5px;
+}
+ul#headmapmenu-store li:nth-child(2) {
+  float: right;
+}
+ul#headmapmenu-store li label {
+  padding: 0 6px;
+}
+#headmapmenu-store li:nth-child(2) {
+  float: right;
+}
+
+#store-comparison-header > div > app-menutree {
+  width: fit-content;
+  display: inline-block;
+  position: relative;
+}
+#store-comparison-header app-timeperiod {
+  float: right;
+}
+@media only screen and (max-width: 768px) {
+  .d-md-block {
+    display: block !important;
+  }
+  .btn-group > .btn.active {
+    z-index: 0;
+  }
+  #store-comparison-header app-timeperiod {
+    float: left;
+  }
+}
+
+@media only screen and (max-width: 510px) {
+  ul#headmapmenu-store li:nth-child(2) {
+    float: left;
+  }
+}
+
+@media only screen and (max-width: 414px) {
+  .d-md-block {
+    margin-left: 15px;
+  }
+  .d-md-block label {
+    font-size: 3vw;
+  }
+}
+
+@media only screen and (max-width: 395px) {
+  .d-md-block {
+    margin-left: 15px;
+  }
+}
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.fa-caret-down {
+  color: red !important;
+  float: left;
+  font-size: 13px;
+  line-height: 20px;
+}
+.fa-caret-up {
+  color: green !important;
+  float: left;
+  font-size: 13px;
+  line-height: 20px;
+}
+.fa-sort {
+  color: #c8ced3 !important;
+  float: left;
+  font-size: 11px;
+  line-height: 20px;
+}

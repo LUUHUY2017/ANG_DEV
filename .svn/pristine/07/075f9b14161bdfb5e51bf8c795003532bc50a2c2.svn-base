@@ -1,0 +1,61 @@
+<block-ui></block-ui>
+<app-fbamenu></app-fbamenu>
+<div class="card body-content">
+    <div class="card-header">
+        <span>
+            <i class="fa fa-list-alt" aria-hidden="true">&nbsp;</i><span>Application Setting</span>
+        </span>
+        <button class="btn btn-primary edit-button float-right" [routerLink]="['/fba/setting/add']"><i
+                class="fa fa-plus"></i>&nbsp;{{language.them_moi}}</button>
+    </div>
+    <div class="card-body">
+        <div class="row khungthemmoi">
+            <ul style="padding: 0px 10px;">
+                <!-- <li id="showphantu">
+                    <span>{{language.so_dong}}&nbsp;</span>
+                    <select (change)="pagination_number = $event.target.value">
+                        <option value="15">15</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </li> -->
+                <li class="float-right"><span>{{language.tim_kiem}}&nbsp;</span><input type="text" class="input-text"
+                        (input)="dt.filterGlobal($event.target.value, 'contains')"></li>
+            </ul>
+        </div>
+        <div class="row no-margin" style="padding-top: 20px;">
+            <div class="col-md-12" *ngIf="message">
+                <div *ngFor="let item of message" class="alert alert-{{item.alert}} alert-dismissible edit-alert"
+                    role="alert">
+                    <strong>{{item.message_info}}</strong>
+                </div>
+            </div>
+            <div class="table-prime">
+                <p-table #dt [columns]="cols" [scrollable]="true" [value]="app_setting" [paginator]="true"
+                    [rows]="pagination_number" [globalFilterFields]="['organization_name']">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let col of cols" [pSortableColumn]="col.field">{{col.header}}
+                                <p-sortIcon [field]="col.field"></p-sortIcon>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-app_setting>
+                        <tr>
+                            <td>{{app_setting.order}}</td>
+                            <td><a
+                                    routerLink="/fba/setting/edit/{{app_setting.id}}">{{app_setting.organization_name}}</a>
+                            </td>
+                            <td class="text-center"><img src="{{url_img + app_setting.company_logo}}" style="width:50%">
+                            </td>
+                            <td class="text-center"><img src="{{url_img + app_setting.application_logo}}"
+                                    style="width:50%"></td>
+                            <td *ngIf="can_delete"><i style="cursor:pointer;" class="fa fa-remove"
+                                    (click)="delete_data(app_setting.id)"></i></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>

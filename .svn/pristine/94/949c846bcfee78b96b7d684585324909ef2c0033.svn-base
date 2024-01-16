@@ -1,0 +1,894 @@
+import { IOption } from 'ng-select';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { AppService } from '../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import Highcharts from 'highcharts';
+import { navItems } from '../../../_nav';
+// treenode
+import { MenutreeComponent } from '../../viewchild/menutree/menutree.component';
+import { TimeperiodComponent } from '../../viewchild/timeperiod/timeperiod.component';
+@Component({
+    templateUrl: 'effect-store.component.html',
+    styleUrls: ['effect-store.component.scss'],
+    // encapsulation: ViewEncapsulation.None
+})
+export class FootfallEffectStoreComponent implements OnInit {
+    @ViewChild('MenuInput') MenuInput: MenutreeComponent;
+    @ViewChild('MenuInput_1') MenuInput_1: MenutreeComponent;
+    @ViewChild(TimeperiodComponent) TimeInput: TimeperiodComponent;
+    @ViewChild('container', { read: ElementRef }) container: ElementRef;
+    @BlockUI() blockUI: NgBlockUI;
+    page_id = environment.Pages.footfall.performance_store;
+    public userinfo: any = JSON.parse(localStorage.getItem(environment.UserLoged));
+    public navItems = navItems;
+    public sidebarMinimized = true;
+    protected changes: MutationObserver;
+    public element: HTMLElement = document.body;
+    organization_array = [];
+    organization_id: any;
+    organization_id_compare: any;
+    siteSelectionDisplay = false;
+    site_id: any;
+    site_id_compare: any;
+    start_time: string;
+    end_time: string;
+    start_date: any;
+    end_date: any;
+    startTimeOption: Array<IOption>;
+    endTimeOption: Array<IOption>;
+    indexOption: Array<IOption>;
+    indexOptionSelected: string;
+    viewDataBy: string;
+    total_num_to_enter = 0;
+    total_traffic = 0;
+    time_period_array: any;
+    site_name: any;
+    site_name_compare: any;
+    btnApplyValid = false;
+    organization_array_compare: any;
+    time_value: any = '';
+    menu_tree: any[];
+    total_traffic_compare: number;
+    total_num_to_enter_compare: number;
+    all_data: any[];
+    all_data_compare: any[];
+    show_table: number;
+    time_generate_report = new Date();
+    title_start_date: string;
+    title_end_date: string;
+    time_period: string;
+    title_time_period: string;
+    title_index: string;
+    starttime: string;
+    endtime: string;
+    view: string;
+    operator = 'SUM';
+    order: number;
+    total_passer_by = 0;
+    total_shopper_visits = 0;
+    total_passer_by_compare = 0;
+    total_shopper_visits_compare = 0;
+    total_kids = 0;
+    total_turn_rate = 0;
+    total_kids_compare = 0;
+    total_turn_rate_compare = 0;
+    total_avg_time_compare = 0;
+    total_avg_time = 0;
+    valueSuffix: string;
+    tt_conver = 0;
+    tt_atv = 0;
+    tt_avg_item = 0;
+    tt_sales_yeild = 0;
+    tt_transactions = 0;
+    tt_sales = 0;
+    tt_missed_sales = 0;
+    tt_loyal_visits = 0;
+    tt_loy_tran = 0;
+    tt_loy_conver = 0;
+    tt_cx_index = 0;
+    tt_nps_index = 0;
+    tt_conver_compare = 0;
+    tt_atv_compare = 0;
+    tt_avg_item_compare = 0;
+    tt_sales_yeild_compare = 0;
+    tt_transactions_compare = 0;
+    tt_missed_sales_compare = 0;
+    tt_loyal_visits_compare = 0;
+    tt_loy_tran_compare = 0;
+    tt_cx_index_compare = 0;
+    tt_turn_rate = 0;
+    tt_turn_rate_compare = 0;
+    tt_loy_conver_compare = 0;
+    tt_nps_index_compare = 0;
+    tt_sales_compare = 0;
+    tt_missed_loyal = 0;
+    tt_missed_loyal_compare = 0;
+    type: string;
+    tt_sales_hour_compare = 0;
+    tt_shopper_on_sh_compare = 0;
+    tt_sales_hour = 0;
+    tt_shopper_on_sh = 0;
+    tt_sales_on_sh = 0;
+    tt_sales_on_sh_compare = 0;
+
+    constructor(protected router: Router, protected appservice: AppService) {
+        // thêm mới
+        this.changes = new MutationObserver((mutations) => {
+            this.sidebarMinimized = document.body.classList.contains('sidebar-minimized');
+        });
+        this.changes.observe(<Element>this.element, {
+            attributes: true
+        });
+    }
+    url_api = environment.apiUrl + 'exports/';
+    name_of_excel: any;
+
+    ngOnInit() {
+        this.get_page_param();
+    }
+    get_page_param() {
+        const userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+        this.blockUI.start('Đang tải cấu hình...');
+        this.appservice.get_user_page_parametter(this.page_id).subscribe(
+            param => {
+                try {
+                    if (!environment.production) {
+                        console.log('get_user_page_parametter', param);
+                    }
+                    let para = null;
+                    if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
+                        // console.log('trong if');
+                        para = param.user_page_parametter;
+                    } else {
+                        // console.log('ngoai if');
+                        para = this.set_default();
+                    }
+                    if (!environment.production) {
+                        console.log(para);
+                    }
+                    this.indexOption = param.performance_index_group;
+                    this.time_period_array = param.fba_time_period_metrics;
+                    this.organization_array = param.organization_arr;
+                    this.organization_array_compare = param.organization_arr;
+                    this.startTimeOption = param.start_time_list;
+                    this.endTimeOption = param.end_time_list;
+                    this.organization_id = para.organization_id;
+                    this.organization_id_compare = para.organization_id_compare;
+                    if ('site_id' in para) {
+                        this.site_id = para.site_id;
+                    }
+                    if ('site_id_compare' in para) {
+                        this.site_id_compare = para.site_id_compare;
+                    }
+                    this.start_time = para.start_time;
+                    this.end_time = para.end_time;
+                    if (para.time_value) {
+                        this.get_date(para.time_value);
+                    } else if (para.start_date && para.end_date) {
+                        this.start_date = para.start_date;
+                        this.end_date = para.end_date;
+                        this.start_time = this.start_time.replace(/[']/g, '');
+                        this.end_time = this.end_time.replace(/[']/g, '');
+                    }
+                    this.viewDataBy = para.view_by;
+                    this.indexOptionSelected = para.indexOptionSelected;
+                    this.TimeInput.get_data(para, this.time_period_array);
+                } catch (error) {
+                    this.blockUI.stop();
+                }
+            },
+            (error) => {
+                if (!environment.production) {
+                    console.log(error);
+                }
+                this.blockUI.stop();
+            },
+            () => {
+                this.get_sitetree().then(res => {
+                    return this.get_sitetree_compare();
+                }).then(res => {
+                    this.get_data();
+                });
+                // this.get_sitetree();
+                // this.get_sitetree_compare();
+                // this.get_data();
+            }
+        );
+    }
+    get_date(time) {
+        const time_array = this.TimeInput.get_time(time);
+        this.start_date = this.appservice.convert_date_tostring(time_array.ngaybatdau);
+        this.end_date = this.appservice.convert_date_tostring(time_array.ngayketthuc);
+        this.time_value = time;
+        this.order = Number(time_array.order);
+        if (!environment.production) {
+            console.log(' this.order', this.order);
+        }
+    }
+    set_default() {
+        const organization_id = this.userinfo.organization_id === '0' ? 6 : Number(this.userinfo.organization_id);
+        return {
+            organization_id: organization_id
+            , organization_id_compare: organization_id
+            // , site_id: 0
+            // , site_id_compare: 0
+            , start_time: '00:00'
+            , end_time: '23:59'
+            , time_value: 'today'
+            , view_by: 'Hour'
+            , indexOptionSelected: 'Visits'
+        };
+    }
+    reset_session() {
+        const data = [];
+        this.appservice.save_user_page_parametter_by_nghia(this.page_id, JSON.stringify(data)).subscribe(res => {
+            this.get_page_param();
+        });
+    }
+    get_emit_menu(event) {
+        if (event.organization_id) {
+            this.blockUI.start('Đang tải thông tin tổ chức...');
+            const agrument = {
+                organization_id: event.organization_id
+            };
+            const url = environment.API.sites + '_get_site_for_report';
+            this.appservice.post(agrument, url).subscribe(res => {
+                // console.log(res);
+                this.menu_tree = res.site_array.slice(0);
+                this.organization_id = event.organization_id;
+                this.site_id = this.menu_tree[0].id;
+                this.site_name = this.menu_tree[0].name;
+                this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+                this.get_data();
+            }, (error) => {
+                this.blockUI.stop();
+                if (!environment.production) {
+                    console.log(error);
+                }
+            }, () => {
+                this.blockUI.stop();
+            });
+        } else if (event.site_id || event.site_id === 0) {
+            this.site_id = event.site_id;
+        }
+    }
+    get_emit_menu_compare(event) {
+        if (event.organization_id) {
+            this.blockUI.start('Đang tải thông tin tổ chức...');
+            const agrument = {
+                organization_id: event.organization_id
+            };
+            const url = environment.API.sites + '_get_site_for_report';
+            this.appservice.post(agrument, url).subscribe(res => {
+                // console.log(res);
+                this.menu_tree = res.site_array.slice(0);
+                this.organization_id_compare = event.organization_id;
+                this.site_id_compare = this.menu_tree[0].id;
+                this.site_name_compare = this.menu_tree[0].name;
+                this.MenuInput_1.get_data(this.menu_tree
+                    , this.site_id_compare
+                    , this.organization_array_compare
+                    , this.organization_id_compare);
+                this.get_data();
+            }, (error) => {
+                this.blockUI.stop();
+                if (!environment.production) {
+                    console.log(error);
+                }
+            }, () => {
+                this.blockUI.stop();
+            });
+        } else if (event.site_id || event.site_id === 0) {
+            this.site_id_compare = event.site_id;
+        }
+    }
+    // Huy thêm hàm lấy số dương
+    get_number_int(number) {
+        if (number !== 0) {
+            return Math.abs(number);
+        }
+        return 0;
+    }
+    get_compar_per(number1: number, number2: number) {
+        let per = 0;
+        if (number2 !== 0) {
+            per = (Number(number1) / Number(number2));
+        }
+        return per.toFixed(2);
+    }
+    // Nghĩa thêm function ngày 28/12
+    Go_number(number, total) {
+        let tong = 0;
+        if (total !== 0) {
+            tong = ((Number(number) / total) * 100);
+            return tong.toFixed(2);
+        }
+        return tong;
+    }
+    get_sitetree() {
+        this.blockUI.start('Đang tải thông tin tổ chức...');
+        const url = environment.API.sites + '_get_site_for_report';
+        const agrument = {
+            organization_id: this.organization_id
+        };
+        return new Promise(resolve => {
+            this.appservice.post(agrument, url).subscribe(res => {
+                if (!environment.production) {
+                    console.log(res);
+                }
+                this.menu_tree = res.site_array.slice(0);
+                const element = this.menu_tree.find(item => Number(item.enables) === 1);
+                if (!this.site_id) {
+                    this.site_id = element.id;
+                }
+                this.site_name = element.name;
+                this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+            },
+                (error) => {
+                    this.blockUI.stop();
+                    if (!environment.production) {
+                        console.log(error);
+                    }
+                },
+                () => {
+                    this.blockUI.stop();
+                    resolve();
+                }
+            );
+        });
+    }
+    get_sitetree_compare() {
+        this.blockUI.start('Đang tải thông tin tổ chức...');
+        const url = environment.API.sites + '_get_site_for_report';
+        const agrument = {
+            organization_id: this.organization_id_compare
+        };
+        return new Promise(resolve => {
+            this.appservice.post(agrument, url).subscribe(res => {
+                if (!environment.production) {
+                    console.log(res);
+                }
+                this.menu_tree = res.site_array.slice(0);
+                const element = this.menu_tree.find(item => Number(item.enables) === 1);
+                if (!this.site_id_compare) {
+                    this.site_id_compare = element.id;
+                }
+                this.site_name_compare = element.name;
+                this.MenuInput_1.get_data(
+                    this.menu_tree
+                    , this.site_id_compare
+                    , this.organization_array_compare
+                    , this.organization_id_compare);
+            },
+                (error) => {
+                    this.blockUI.stop();
+                    if (!environment.production) {
+                        console.log(error);
+                    }
+                },
+                () => {
+                    this.blockUI.stop();
+                    resolve();
+                }
+            );
+        });
+    }
+    get_date_from_emit(event) {
+        if (event[0].start_date && event[0].end_date) {
+            this.start_date = event[0].start_date;
+            this.end_date = event[0].end_date;
+            this.time_value = '';
+        } else if (event[0].time_value) {
+            this.time_value = event[0].time_value;
+            this.get_date(this.time_value);
+        }
+    }
+    get_data() {
+        this.all_data = [];
+        this.blockUI.start('Đang tải dữ liệu...'); // Start blocking
+        const data = {
+            organization_id: this.organization_id
+            , site_id: this.site_id
+            , start_time: '\'' + this.start_time + '\''
+            , end_time: '\'' + this.end_time + '\''
+            , start_date: this.start_date
+            , end_date: this.end_date
+            , view_by: this.viewDataBy
+            , organization_id_compare: this.organization_id_compare
+            , site_id_compare: this.site_id_compare
+            , indexOptionSelected: this.indexOptionSelected
+            , operator: this.operator
+        };
+        if (!environment.production) {
+            console.log('data', data);
+        }
+        this.starttime = this.startTimeOption.find(item => item.value === this.start_time).label;
+        this.endtime = this.endTimeOption.find(item => item.value === this.end_time).label;
+        this.title_index = this.indexOptionSelected;
+        // tslint:disable-next-line:max-line-length
+        this.view = this.viewDataBy === 'Day' ? 'Ngày' : this.viewDataBy === 'Week' ? 'Tuần' : this.viewDataBy === 'Month' ? 'Tháng' : this.viewDataBy === 'Year' ? 'Năm' : 'Giờ';
+        this.time_generate_report = new Date();
+        this.appservice.post(data, environment.PERFORMANCE.API.sp_footfall_performance + '_store_comparison').subscribe(
+            res => {
+                if (!environment.production) {
+                    console.log('store_comparison', res);
+                    // console.log(this.MenuInput.menu_tree,this.MenuInput_1.menu_tree);  console.log(this.site_id, this.site_id_compar);
+                }
+                this.site_name = this.MenuInput.menu_tree.find(item => item.id === this.site_id).site_name;
+
+                const start_d = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+                const end_d = new Date(this.end_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+                this.title_start_date = this.appservice.convert_date_tostringdate_by_nghia(start_d, false);
+                this.title_end_date = this.appservice.convert_date_tostringdate_by_nghia(end_d, false);
+                if (this.start_date !== this.end_date) {
+                    this.time_period = this.title_start_date + ' - ' + this.title_end_date;
+                } else { this.time_period = this.title_start_date; }
+
+                this.title_time_period = 'Ngày';
+                this.site_name_compare = this.MenuInput_1.menu_tree.find(item => item.id === this.site_id_compare).site_name;
+                let color = environment.POC.colors.visits;
+                const color_ = environment.POC.colors;
+                const chart_xAxis = [];
+                const chart_data = [];
+                const chart_data_compare = [];
+                this.set_to_zero(
+                    'total_num_to_enter', 'total_num_to_enter_compare'
+                    , 'total_traffic', 'total_traffic_compare'
+                    , 'total_shopper_visits', 'total_shopper_visits_compare'
+                    , 'total_passer_by', 'total_passer_by_compare'
+                    , 'total_kids', 'total_kids_compare'
+                    , 'total_turn_rate', 'total_turn_rate_compare'
+                    , 'total_avg_time', 'total_avg_time_compare'
+                    , 'tt_conver', 'tt_conver_compare'
+                    , 'tt_atv', 'tt_atv_compare'
+                    , 'tt_sales_yeild', 'tt_sales_yeild_compare'
+                    , 'tt_transactions', 'tt_transactions_compare'
+                    , 'tt_avg_item', 'tt_avg_item_compare'
+                    , 'tt_sales', 'tt_sales_compare'
+                    , 'tt_missed_sales', 'tt_missed_sales_compare'
+                    , 'tt_loyal_visits', 'tt_loyal_visits_compare'
+                    , 'tt_loy_tran', 'tt_loy_tran_compare'
+                    , 'tt_loy_conver', 'tt_loy_conver_compare'
+                    , 'tt_cx_index', 'tt_cx_index_compare'
+                    , 'tt_nps_index', 'tt_nps_index_compare'
+                    , 'tt_missed_loyal', 'tt_missed_loyal_compare'
+                    , 'tt_sales_hour', 'tt_sales_hour_compare'
+                    , 'tt_shopper_on_sh', 'tt_shopper_on_sh_compare'
+                    , 'tt_sales_on_sh', 'tt_sales_on_sh_compare'
+                );
+                res.data.forEach(element => {
+                    this.total_passer_by += Number(element.passer_by);
+                    this.total_num_to_enter += Number(element.num_to_enter);
+                    this.total_shopper_visits += Number(element.shopper_visits);
+                    this.total_turn_rate += Number(element.turn_in_rate);
+                    this.total_avg_time += Number(element.avg_time);
+                    this.total_kids += Number(element.kids_visits);
+                    this.total_traffic += Number(element.traffic);
+
+                    this.tt_conver += Number(element.conversion);
+                    this.tt_atv += Number(element.atv);
+                    this.tt_avg_item += Number(element.avg_item);
+                    this.tt_sales_yeild += Number(element.sales_yield);
+                    this.tt_transactions += Number(element.transactions);
+                    this.tt_sales += Number(element.sales);
+                    this.tt_missed_sales += Number(element.missed_sales);
+                    this.tt_loyal_visits += Number(element.loyal_visits);
+                    this.tt_loy_tran += Number(element.loyal_transactions);
+                    this.tt_loy_conver += Number(element.loyal_conversion);
+                    this.tt_cx_index += Number(element.cx_index);
+                    this.tt_nps_index += Number(element.nps_index);
+                    this.tt_sales_hour += Number(element.sales_hour);
+                    this.tt_shopper_on_sh += Number(element.shopper_on_s_h);
+                    this.tt_sales_on_sh += Number(element.sales_on_s_h);
+                });
+                res.data_compare.forEach(element => {
+                    this.total_passer_by_compare += Number(element.passer_by);
+                    this.total_num_to_enter_compare += Number(element.num_to_enter);
+                    this.total_shopper_visits_compare += Number(element.shopper_visits);
+                    this.total_turn_rate_compare += Number(element.turn_in_rate);
+                    this.total_avg_time_compare += Number(element.avg_time);
+                    this.total_kids_compare += Number(element.kids_visits);
+                    this.total_traffic_compare += Number(element.traffic);
+
+                    this.tt_conver_compare += Number(element.conversion);
+                    this.tt_atv_compare += Number(element.atv);
+                    this.tt_avg_item_compare += Number(element.avg_item);
+                    this.tt_sales_yeild_compare += Number(element.sales_yield);
+                    this.tt_transactions_compare += Number(element.transactions);
+                    this.tt_sales_compare += Number(element.sales);
+                    this.tt_missed_sales_compare += Number(element.missed_sales);
+                    this.tt_loyal_visits_compare += Number(element.loyal_visits);
+                    this.tt_loy_tran_compare += Number(element.loyal_transactions);
+                    this.tt_loy_conver_compare += Number(element.loyal_conversion);
+                    this.tt_cx_index_compare += Number(element.cx_index);
+                    this.tt_nps_index_compare += Number(element.nps_index);
+                    this.tt_sales_hour_compare += Number(element.sales_hour);
+                    this.tt_shopper_on_sh_compare += Number(element.shopper_on_s_h);
+                    this.tt_sales_on_sh_compare += Number(element.sales_on_s_h);
+                });
+                const row = Number(res.data.length);
+                this.total_avg_time = Number((this.total_avg_time * 60 / row).toFixed(0));
+                this.total_turn_rate = Number((this.total_turn_rate / row).toFixed(2));
+                this.tt_atv = Number((this.tt_atv / row).toFixed(2));
+                this.tt_loy_conver = Number((this.tt_loy_conver / row).toFixed(2));
+                this.tt_missed_loyal = Number(this.tt_loy_conver) > 0 ? 100 - Number(this.tt_loy_conver) : 0;
+                this.tt_conver = Number((this.tt_conver / row).toFixed(2));
+                this.tt_avg_item = Number((this.tt_avg_item / row).toFixed(2));
+                this.tt_loyal_visits = Number((this.tt_loyal_visits / row).toFixed(2));
+                this.tt_loy_tran = Number((this.tt_loy_tran / row).toFixed(2));
+                this.tt_cx_index = Number((this.tt_cx_index / row).toFixed(2));
+                this.tt_nps_index = Number((this.tt_nps_index / row).toFixed(2));
+                this.tt_sales_hour = Number((this.tt_sales_hour / row).toFixed(2));
+                this.tt_shopper_on_sh = Number((this.tt_shopper_on_sh / row).toFixed(2));
+                this.tt_sales_on_sh = Number((this.tt_sales_on_sh / row).toFixed(2));
+
+
+                this.total_avg_time_compare = Number((this.total_avg_time_compare * 60 / row).toFixed(0));
+                this.total_turn_rate_compare = Number((this.total_turn_rate_compare / row).toFixed(2));
+                this.tt_atv_compare = Number((this.tt_atv_compare / row).toFixed(2));
+                this.tt_loy_conver_compare = Number((this.tt_loy_conver_compare / row).toFixed(2));
+                this.tt_missed_loyal_compare = Number(this.tt_loy_conver_compare) > 0 ? 100 - Number(this.tt_loy_conver_compare) : 0;
+                this.tt_conver_compare = Number((this.tt_conver_compare / row).toFixed(2));
+                this.tt_avg_item_compare = Number((this.tt_avg_item_compare / row).toFixed(2));
+                this.tt_loyal_visits_compare = Number((this.tt_loyal_visits_compare / row).toFixed(2));
+                this.tt_loy_tran_compare = Number((this.tt_loy_tran_compare / row).toFixed(2));
+                this.tt_sales_hour_compare = Number((this.tt_sales_hour_compare / row).toFixed(2));
+                this.tt_shopper_on_sh_compare = Number((this.tt_shopper_on_sh_compare / row).toFixed(2));
+                this.tt_sales_on_sh_compare = Number((this.tt_sales_on_sh_compare / row).toFixed(2));
+
+                this.tt_cx_index_compare = Number((this.tt_cx_index_compare / row).toFixed(2));
+                this.tt_nps_index_compare = Number((this.tt_nps_index_compare / row).toFixed(2));
+
+                res.data.forEach(element => { chart_xAxis.push(element.time_period); });
+                if (this.indexOptionSelected === 'PasserBy') {
+                    color = color_.passer_by;
+                    res.data.forEach(element => { chart_data.push(Number(element.passer_by)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.passer_by)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_passer_by, this.total_passer_by_compare);
+                } else if (this.indexOptionSelected === 'Shopper Visits') {
+                    color = color_.shopper_visits;
+                    res.data.forEach(element => { chart_data.push(Number(element.shopper_visits)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.shopper_visits)); });
+                    // tslint:disable-next-line:max-line-length
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_shopper_visits, this.total_shopper_visits_compare);
+                } else if (this.indexOptionSelected === 'Traffic Flow') {
+                    color = color_.traffic_flow;
+                    res.data.forEach(element => { chart_data.push(Number(element.traffic)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.traffic)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_traffic, this.total_traffic_compare);
+                } else if (this.indexOptionSelected === 'Kids Visits') {
+                    color = color_.kids_visits;
+                    res.data.forEach(element => { chart_data.push(Number(element.kids_visits)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.kids_visits)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_kids, this.total_kids_compare);
+                } else if (this.indexOptionSelected === 'Turn in rate') {
+                    color = color_.turn_in_rate;
+                    res.data.forEach(element => { chart_data.push(Number(element.turn_in_rate)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.turn_in_rate)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_turn_rate, this.total_turn_rate_compare);
+                } else if (this.indexOptionSelected === 'Avg Time') {
+                    color = color_.avg_time;
+                    res.data.forEach(element => { chart_data.push((Number(element.avg_time))); });
+                    res.data_compare.forEach(element => { chart_data_compare.push((Number(element.avg_time))); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_avg_time, this.total_avg_time_compare);
+                } else if (this.indexOptionSelected === 'Visits') {
+                    color = color_.visits;
+                    res.data.forEach(element => { chart_data.push(Number(element.num_to_enter)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.num_to_enter)); });
+                    // tslint:disable-next-line:max-line-length
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.total_num_to_enter, this.total_num_to_enter_compare);
+                } else if (this.indexOptionSelected === 'Conversion rate') {
+                    color = color_.conversion;
+                    res.data.forEach(element => { chart_data.push(Number(element.conversion)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.conversion)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_conver, this.tt_conver_compare);
+                } else if (this.indexOptionSelected === 'ATV') {
+                    color = color_.atv;
+                    res.data.forEach(element => { chart_data.push(Number(element.atv)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.atv)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_atv, this.tt_atv_compare);
+                } else if (this.indexOptionSelected === 'Avg Items') {
+                    color = color_.items;
+                    res.data.forEach(element => { chart_data.push(Number(element.avg_item)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.avg_item)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_avg_item, this.tt_avg_item_compare);
+                } else if (this.indexOptionSelected === 'Sales Yield') {
+                    color = color_.sales_yield;
+                    res.data.forEach(element => { chart_data.push(Number(element.sales_yield)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.sales_yield)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_sales_yeild, this.tt_sales_yeild_compare);
+                } else if (this.indexOptionSelected === 'Transactions') {
+                    color = color_.customers;
+                    res.data.forEach(element => { chart_data.push(Number(element.transactions)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.transactions)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_transactions, this.tt_transactions_compare);
+                } else if (this.indexOptionSelected === 'Sales') {
+                    color = color_.sales;
+                    res.data.forEach(element => { chart_data.push(Number(element.sales)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.sales)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_sales, this.tt_sales_compare);
+                } else if (this.indexOptionSelected === 'Missed Sales Opportunity') {
+                    color = color_.missed_sales;
+                    res.data.forEach(element => { chart_data.push(Number(element.missed_sales)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.missed_sales)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_missed_sales, this.tt_missed_sales_compare);
+                } else if (this.indexOptionSelected === 'Loyal Visits') {
+                    color = color_.loyal_visits;
+                    res.data.forEach(element => { chart_data.push(Number(element.loyal_visits)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.loyal_visits)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_loyal_visits, this.tt_loyal_visits_compare);
+                } else if (this.indexOptionSelected === 'Loyal Transactions') {
+                    color = color_.loyal_transactions;
+                    res.data.forEach(element => { chart_data.push(Number(element.loyal_transactions)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.loyal_transactions)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_loy_tran, this.tt_loy_tran_compare);
+                } else if (this.indexOptionSelected === 'Loyal Conversion rate') {
+                    color = color_.loyal_conversion;
+                    res.data.forEach(element => { chart_data.push(Number(element.loyal_conversion)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.loyal_conversion)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_loy_conver, this.tt_loy_conver_compare);
+                } else if (this.indexOptionSelected === 'CX index') {
+                    color = color_.cxindex;
+                    res.data.forEach(element => { chart_data.push(Number(element.cx_index)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.cx_index)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_cx_index, this.tt_cx_index_compare);
+                } else if (this.indexOptionSelected === 'NPS index') {
+                    color = color_.npsindex;
+                    res.data.forEach(element => { chart_data.push(Number(element.nps_index)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.nps_index)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_nps_index, this.tt_nps_index_compare);
+                } else if (this.indexOptionSelected === 'Sales hours') {
+                    color = color_.sales_hour;
+                    res.data.forEach(element => { chart_data.push(Number(element.sales_hour)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.sales_hour)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_sales_hour, this.tt_sales_hour_compare);
+                } else if (this.indexOptionSelected === 'Shoppers on sales hour') {
+                    color = color_.shopper_on_sh;
+                    res.data.forEach(element => { chart_data.push(Number(element.shopper_on_s_h)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.shopper_on_s_h)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_shopper_on_sh, this.tt_shopper_on_sh_compare);
+                } else if (this.indexOptionSelected === 'Sales on sales hour') {
+                    color = color_.sales_on_s_h;
+                    res.data.forEach(element => { chart_data.push(Number(element.sales_on_s_h)); });
+                    res.data_compare.forEach(element => { chart_data_compare.push(Number(element.sales_on_s_h)); });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_sales_on_sh, this.tt_sales_on_sh_compare);
+                } else if (this.indexOptionSelected === 'Missed Loyal rate') {
+                    color = color_.missed_loyal;
+                    res.data.forEach(element => {
+                        const missed = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
+                        chart_data.push(missed);
+                    });
+                    res.data_compare.forEach(element => {
+                        const missed_compare = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
+                        chart_data_compare.push(missed_compare);
+                    });
+                    this.get_table_data(chart_data, chart_data_compare, chart_xAxis, this.tt_missed_loyal, this.tt_missed_loyal_compare);
+                }
+                this.load_highchart(chart_xAxis, color, chart_data, chart_data_compare);
+            },
+            (error) => {
+                // console.log(error);
+                this.blockUI.stop(); // Stop blocking
+            },
+            () => {
+                // lưu thông số vào DB
+                let save_data;
+                if (this.time_value !== '') {
+                    const data_2 = {
+                        organization_id: this.organization_id
+                        , site_id: this.site_id
+                        , start_time: this.start_time
+                        , end_time: this.end_time
+                        , time_value: this.time_value
+                        , view_by: this.viewDataBy
+                        , organization_id_compare: this.organization_id_compare
+                        , site_id_compare: this.site_id_compare
+                        , indexOptionSelected: this.indexOptionSelected
+                    };
+                    save_data = data_2;
+                } else {
+                    save_data = data;
+                }
+                this.appservice.save_user_page_parametter(this.page_id, JSON.stringify(save_data));
+                this.blockUI.stop(); // Stop blocking
+            }
+        );
+    }
+    get_chart_data(data, chart) {
+        data.forEach(element => {
+            if (this.indexOptionSelected === 'Traffic Flow') {
+                chart.push(Number(element.traffic));
+            } else if (this.indexOptionSelected === 'Avg time') {
+                chart.push(Number(element.avg_time_seconds));
+            } else if (this.indexOptionSelected === 'Visits') {
+                chart.push(Number(element.num_to_enter));
+            } else if (this.indexOptionSelected === 'Items') {
+                chart.push(Number(element.items));
+            } else if (this.indexOptionSelected === 'Sales') {
+                chart.push(Number(element.sales));
+            } else if (this.indexOptionSelected === 'Customers') {
+                chart.push(Number(element.customers));
+            } else if (this.indexOptionSelected === 'Conversion rate') {
+                chart.push(Number(element.conversion));
+            } else if (this.indexOptionSelected === 'ATV') {
+                chart.push(Number(element.atv));
+            }
+        });
+    }
+    toHHMMSS(totalSeconds) {
+        const hh = Math.floor(totalSeconds / 3600).toFixed(0);
+        totalSeconds %= 3600;
+        const mm = Math.floor(totalSeconds / 60).toFixed(0);
+        const sc = (totalSeconds % 60).toFixed(0);
+        const m = String(mm).padStart(2, '00');
+        const h = String(hh).padStart(2, '00');
+        const s = String(sc).padStart(2, '00');
+        return h + ':' + m + ':' + s;
+    }
+    toMM = (secs) => {
+        const minutes = Math.floor(secs / 60);
+        return minutes;
+    }
+    exportExcel(): void {
+        const data = {
+            organization_id: this.organization_id
+            , site_id: this.site_id
+            , start_time: '\'' + this.start_time + '\''
+            , end_time: '\'' + this.end_time + '\''
+            , start_date: this.start_date
+            , end_date: this.end_date
+            , view_by: this.viewDataBy
+            , organization_id_compare: this.organization_id_compare
+            , site_id_compare: this.site_id_compare
+            , indexOptionSelected: this.indexOptionSelected
+            , operation: this.operator
+            , export: 'sosanh'
+        };
+        this.blockUI.start('Đang xuất báo cáo...');
+        // tslint:disable-next-line:max-line-length
+        this.appservice.post(data, environment.PERFORMANCE.API.sp_footfall_performance + '_store_comparison_export_excel').subscribe(fileData => {
+            window.open(this.url_api + fileData);
+            this.name_of_excel = fileData;
+            if (!environment.production) {
+                console.log('Successed');
+            }
+        }, (error) => {
+            this.blockUI.stop();
+        }, () => {
+            this.blockUI.stop();
+            const data2 = { name_of_excel: this.name_of_excel };
+            const url = environment.FBA.API.export_metrics_analytic + '_delete_excel';
+            this.appservice.post(data2, url).subscribe(res => {
+                if (!environment.production) {
+                    console.log('Deleted');
+                }
+            });
+        }
+        );
+    }
+    get_table_data(chart_data: any[], chart_data_compare: any[], chart_xAxis: any[], total: number, total_compare: number) {
+        chart_data.forEach((element: number, index: number) => {
+            this.all_data.push({
+                time_period: chart_xAxis[index]
+                , data: element
+                , data_compare: 0
+                , number_compare: 0
+                , data_percent: 0
+                , data_compare_percent: 0
+            });
+        });
+        chart_data_compare.forEach((element: number, index: number) => {
+            this.all_data[index].data_compare = element;
+            this.all_data[index].number_compare = element - this.all_data[index].data;
+            this.all_data[index].data_percent = this.Go_number(this.all_data[index].data, total);
+            this.all_data[index].data_compare_percent = this.Go_number(this.all_data[index].data_compare, total_compare);
+        });
+    }
+    set_to_zero(...property) {
+        property.forEach((element, index) => {
+            this[property[index]] = 0;
+        });
+    }
+    log_all(...property) {
+        property.forEach((element, index) => {
+            // console.log(property[index], this[property[index]]);
+        });
+    }
+    value_Suffix() {
+        this.valueSuffix = '';
+        if (this.indexOptionSelected === 'Turn in rate'
+            || this.indexOptionSelected === 'Conversion rate' || this.indexOptionSelected === 'Loyal Visits'
+            || this.indexOptionSelected === 'Loyal Transactions' || this.indexOptionSelected === 'Loyal Conversion rate'
+            || this.indexOptionSelected === 'Missed Loyal rate' || this.indexOptionSelected === 'CX index'
+            || this.indexOptionSelected === 'NPS index') {
+            this.valueSuffix = ' (%)';
+        } else if (this.indexOptionSelected === 'Avg Time') {
+            this.valueSuffix = ' (min)';
+        }
+        return this.valueSuffix;
+    }
+    type_chart() {
+        if (this.indexOptionSelected === 'Turn in rate' || this.indexOptionSelected === 'Conversion rate'
+            || this.indexOptionSelected === 'Avg Time' || this.indexOptionSelected === 'Loyal Visits' || this.indexOptionSelected === 'ATV'
+            || this.indexOptionSelected === 'Avg Items' || this.indexOptionSelected === 'Loyal Transactions'
+            || this.indexOptionSelected === 'Loyal Conversion rate' || this.indexOptionSelected === 'Missed Loyal rate'
+            || this.indexOptionSelected === 'CX index' || this.indexOptionSelected === 'NPS index'
+            || this.indexOptionSelected === 'Sales hours' || this.indexOptionSelected === 'Shoppers on sales hour') {
+            this.type = 'spline';
+        } else {
+            this.type = 'column';
+        }
+        return this.type;
+    }
+    load_highchart(...data) {
+        const selft = this;
+        const select = this.indexOptionSelected;
+        Highcharts.setOptions({
+            lang: { decimalPoint: '.', thousandsSep: ' ' }
+        });
+        Highcharts.chart(this.container.nativeElement, {
+            chart: { height: 500, style: { fontFamily: '"Lucida Grande", "Lucida Sans Unicode", sans-serif !important;', } },
+            title: { text: '' },
+            subtitle: {
+                useHTML: true, align: 'left', y: 0,
+                // tslint:disable-next-line:max-line-length
+                text: '  '
+            },
+            xAxis: [{
+                labels: { rotation: -45, style: { fontSize: '90%', fontFamily: 'Roboto, sans-serif' } },
+                categories: data[0], crosshair: true
+            }],
+            tooltip: { shared: true, distance: 80, padding: 10, },
+            legend: { enabled: true, itemStyle: { fontSize: '80%', } },
+            plotOptions: { series: { events: {} }, column: { borderRadius: 2.5, minPointLength: 0 } },
+            navigation: { buttonOptions: { align: 'right', verticalAlign: 'bottom', y: -8 } },
+            yAxis: [{
+                // tslint:disable-next-line:max-line-length
+                labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: data[1] } },
+                allowDecimals: false, maxPadding: 0, minPadding: 0, min: this.indexOptionSelected === 'NPS index' ? null : 0,
+                title: { text: this.indexOptionSelected + selft.value_Suffix(), style: { color: data[1], fontWeight: 'bold' } },
+
+            }],
+            series: [
+                {
+                    name: this.site_name, color: data[1], type: selft.type_chart(), yAxis: 0, data: data[2],
+                    tooltip: {
+                        // tslint:disable-next-line:max-line-length
+                        pointFormatter() { const point = this; return '<span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': <b>' + point.y.toLocaleString('en-us', { maximumFractionDigits: 2 }) + '</b><br/>'; }
+                    }, visible: this.indexOptionSelected !== 'Avg Time', showInLegend: this.indexOptionSelected !== 'Avg Time',
+                }, {
+                    name: this.site_name_compare, color: environment.POC.colors.compare, type: selft.type_chart(), yAxis: 0, data: data[3],
+                    tooltip: {
+                        // tslint:disable-next-line:max-line-length
+                        pointFormatter() { const point = this; return '<span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': <b>' + point.y.toLocaleString('en-us', { maximumFractionDigits: 2 }) + '</b><br/>'; }
+                    }, visible: this.indexOptionSelected !== 'Avg Time', showInLegend: this.indexOptionSelected !== 'Avg Time',
+                }, {
+                    name: this.site_name, color: data[1], type: selft.type_chart(), yAxis: 0, data: data[2],
+                    tooltip: {
+                        // tslint:disable-next-line:max-line-length
+                        pointFormatter() { const point = this; return '<span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': <b>' + selft.toHHMMSS(point.y * 60) + '</b><br/>'; }
+                    }, visible: this.indexOptionSelected === 'Avg Time', showInLegend: this.indexOptionSelected === 'Avg Time',
+                }, {
+                    name: this.site_name_compare, color: environment.POC.colors.compare, type: selft.type_chart(), yAxis: 0, data: data[3],
+                    tooltip: {
+                        // tslint:disable-next-line:max-line-length
+                        pointFormatter() { const point = this; return '<span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': <b>' + selft.toHHMMSS(point.y * 60) + '</b><br/>'; }
+                    }, visible: this.indexOptionSelected === 'Avg Time', showInLegend: this.indexOptionSelected === 'Avg Time',
+                }
+            ]
+        });
+    }
+    change_view() {
+        this.get_data();
+    }
+    check_suffix(indexOptionSelected) {
+        // let suffix_text = ' lượt';
+        // if (indexOptionSelected === 'Avg time') {
+        //     suffix_text = ' phút';
+        // }
+        // return suffix_text;
+    }
+}

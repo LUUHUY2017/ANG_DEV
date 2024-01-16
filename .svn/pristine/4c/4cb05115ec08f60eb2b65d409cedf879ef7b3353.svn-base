@@ -1,0 +1,591 @@
+<div class="row">
+  <div style="padding: .75rem 1rem;"></div>
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card text-white bg-primary">
+            <div style="font-size:10px;padding: 3px;">
+              <span> {{ box_location1 }}</span> &nbsp;
+              <span>{{ box_time_selected1  }}</span>
+              <a style="cursor:pointer;float: right;" (click)="openModal1(template1)">
+                <i class="icon-settings" aria-hidden="true"></i></a>
+            </div>
+            <div class="card-body pb-0">
+              <div [hidden]="value1 === indexes.avg_time" class="text-value">
+                {{ data_show1 ? (data_show1 | number: "1.0-2") : "0" }} <span
+                  style="font-size: 15px;">{{suffix1}}</span> </div>
+              <div [hidden]="value1 !== indexes.avg_time" class="text-value">
+                {{ data_show1 ? toHHMMSS(data_show1) : "00:00:00" }}</div>
+              <div>{{value1}}</div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <ng-container *ngIf=" is_column_chart_box(value1)">
+                <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1"
+                  [options]="barChartOptions12" [colors]="barChartColours1" [legend]="barChartLegend1"
+                  [chartType]="barChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf=" value1 === indexes.avg_time ">
+                <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1"
+                  [options]="barChartOptions11" [colors]="lineChartColours1" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="is_line_chart_box(value1)">
+                <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1"
+                  [options]="lineChartOptions1" [colors]="lineChartColours1" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card text-white bg-info">
+            <div style="font-size:10px;padding: 3px;">
+              <span>{{ box_location2 }}</span> &nbsp;
+              <span>{{ box_time_selected2 }}</span>
+              <a style="cursor:pointer;float: right;" (click)="openModal2(template2)">
+                <i class="icon-settings" aria-hidden="true"></i></a>
+            </div>
+            <div class="card-body pb-0">
+              <div [hidden]="value2 === indexes.avg_time" class="text-value">
+                {{ data_show2 ? (data_show2 | number: "1.0-2") : "0" }} <span
+                  style="font-size: 15px;">{{suffix2}}</span> </div>
+              <div [hidden]="value2 !== indexes.avg_time" class="text-value">
+                {{ data_show2 ? toHHMMSS(data_show2) : "00:00:00" }}</div>
+              <div>{{value2 }}</div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <ng-container *ngIf=" is_column_chart_box(value2)">
+                <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2"
+                  [options]="barChartOptions12" [colors]="barChartColours2" [legend]="barChartLegend1"
+                  [chartType]="barChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf=" value2 === indexes.avg_time ">
+                <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2"
+                  [options]="barChartOptions11" [colors]="lineChartColours2" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="is_line_chart_box(value2)">
+                <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2"
+                  [options]="lineChartOptions1" [colors]="lineChartColours2" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card text-white bg-warning">
+            <div style="font-size:10px;padding: 3px;">
+              <span>{{ box_location3 }}</span> &nbsp;
+              <span>{{ box_time_selected3 }}</span>
+              <a style="cursor:pointer;float: right;" (click)="openModal3(template3)">
+                <i class="icon-settings" aria-hidden="true"></i></a>
+            </div>
+            <div class="card-body pb-0">
+              <div [hidden]="value3 === indexes.avg_time" class="text-value">
+                {{ data_show3 ? (data_show3 | number: "1.0-2") : "0" }} <span
+                  style="font-size: 15px;">{{suffix3}}</span> </div>
+              <div [hidden]="value3 !== indexes.avg_time" class="text-value">
+                {{ data_show3 ? toHHMMSS(data_show3) : "00:00:00" }}</div>
+              <div>{{value3}}</div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <ng-container *ngIf=" is_column_chart_box(value3)">
+                <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3"
+                  [options]="barChartOptions12" [colors]="barChartColours3" [legend]="barChartLegend1"
+                  [chartType]="barChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="value3 === indexes.avg_time">
+                <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3"
+                  [options]="barChartOptions11" [colors]="lineChartColours3" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="is_line_chart_box(value3)">
+                <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3"
+                  [options]="lineChartOptions1" [colors]="lineChartColours3" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card text-white bg-danger">
+            <div style="font-size:10px;padding: 3px;">
+              <span>{{ box_location4 }}</span> &nbsp;
+              <span>{{ box_time_selected4 }}</span>
+              <a style="cursor:pointer;float: right;" (click)="openModal4(template4)">
+                <i class="icon-settings" aria-hidden="true"></i></a>
+            </div>
+            <div class="card-body pb-0">
+              <div [hidden]="value4 === indexes.avg_time" class="text-value">
+                {{ data_show4 ? (data_show4 | number: "1.0-2") : "0" }} <span
+                  style="font-size: 15px;">{{suffix4}}</span> </div>
+              <div [hidden]="value4 !== indexes.avg_time" class="text-value">
+                {{ data_show4 ? toHHMMSS(data_show4) : "00:00:00" }}</div>
+              <div>{{value4}}</div>
+            </div>
+            <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+              <ng-container *ngIf=" is_column_chart_box(value4)">
+                <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="barChartLabels4"
+                  [options]="barChartOptions12" [colors]="barChartColours4" [legend]="barChartLegend1"
+                  [chartType]="barChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="value4 === indexes.avg_time ">
+                <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="barChartLabels4"
+                  [options]="barChartOptions11" [colors]="lineChartColours4" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+              <ng-container *ngIf="is_line_chart_box(value4)">
+                <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="barChartLabels4"
+                  [options]="lineChartOptions1" [colors]="lineChartColours4" [legend]="lineChartLegend1"
+                  [chartType]="lineChartType1"></canvas>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <block-ui></block-ui>
+        <!--/.col-->
+      </div>
+      <!--/.row-->
+      <div class="card card-parent">
+        <div style="height: 40px;" class="card-header card-font">
+          <span style="line-height:20px;">
+            <i class="fa fa-list-alt" aria-hidden="true"></i>
+            {{language.bieu_do_phan_tich}}
+          </span>
+          <a style="float:right;line-height: 20px;color:black;cursor: pointer;" (click)="openModal5(template5)"><i
+              class="fa fa-cog" aria-hidden="true"></i></a>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-5"> </div>
+            <div class="col-sm-7 d-none d-md-block">
+              <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
+                <label class="btn btn-custom btn-outline-secondary" (click)="change_view_by_poc()"
+                  [(ngModel)]="view_by_data5" btnRadio="Hour">{{language.gio}}</label>
+                <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
+                  (click)="change_view_by_poc()" [(ngModel)]="view_by_data5" btnRadio="Day">{{language.ngay}}</label>
+                <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
+                  (click)="change_view_by_poc()" [(ngModel)]="view_by_data5" btnRadio="Week">{{language.tuan}}</label>
+                <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
+                  (click)="change_view_by_poc()" [(ngModel)]="view_by_data5" btnRadio="Month">{{language.thang}}</label>
+                <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
+                  (click)="change_view_by_poc()" [(ngModel)]="view_by_data5" btnRadio="Year">{{language.nam}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="row foot-title-show">
+            <div class="title-show1 ">
+              {{box_location5}} &nbsp;{{ starttime }}&minus; {{ endtime }} &nbsp; {{ title_time_period1 }}:
+              {{ box_time_selected5 }}, {{language.xem_theo}} {{ view5 }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-md-12 ">
+              <div class="chart-wrapper" style="min-height:350px;">
+                <div #container></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<notifier-container></notifier-container>
+<div class="row">
+  <div class="col-md-12 float-right">
+    <div style="text-align: right;width: 100%;font-size: 11px;">
+      {{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+  <!-- Modal 1  -->
+  <ng-template #template1>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+      <ng-container *ngIf="userinfo.organization_id === '0'">
+        <ng-select class="bootstrap selecttimeview  ng-select0" [items]="organization_array" bindLabel="label"
+          bindValue="value" [clearable]=false (change)="change_organization($event, 1)" [(ngModel)]="organization_id1">
+        </ng-select>
+      </ng-container>
+      <!-- Textbox chọn -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+          (click)="siteSelectionDisplay = !siteSelectionDisplay" class="text-select vung-kich">
+          <span>&nbsp;{{ location1 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <!-- Chọn địa điểm/ khu vực -->
+      <div [hidden]="!siteSelectionDisplay" class=" khung-location-dashboard block"
+        (clickOutside)="siteSelectionDisplay = false" [exclude]="'.vung-kich'">
+        <div id="khung-location-scroll">
+          <div style="position: relative;width: 100%;" class="inputgroup">
+            <input (keyup)="search_menu($event.target.value, 1)" style="border:none !important;padding-left: 7px"
+              type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+            <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+              aria-hidden="true"></i>
+          </div>
+          <ul id="ul-menutree" style="padding-left: 0;">
+            <li *ngFor="let item of menu_tree1"
+              (click)="item.enables == 1 ? changeitem(1, item.site_name, item.id) : ''"
+              class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+              {{ item.site_name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- Khung thời gian -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+          <span>&nbsp;{{ time_period1 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+        class=" khung-location-dashboard block">
+        <div id="khung-location-scroll">
+          <ul id="ul-time-dashboard">
+            <li *ngFor="let item of fba_time_period_overview" (click)="chonthoigian(1, item)"
+              class="{{ item.label === time_period1 ? 'active' : '' }} ">
+              {{ item.label }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-select class="bootstrap selecttimeview  ng-select1" [items]="startTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="startTime1"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select2" [items]="endTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="endTime1"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select3" [items]="select_visit_option" bindLabel="label"
+        groupBy="group" bindValue="value" [clearable]=false [(ngModel)]="selected_show1"></ng-select>
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+      <button class="btn  btn-primary" (click)="load_data_box1()">
+        {{language.ap_dung}}
+      </button>
+    </div>
+  </ng-template>
+  <!-- Modal 2  -->
+  <ng-template #template2>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+      <ng-container *ngIf="userinfo.organization_id === '0'">
+        <ng-select class="bootstrap selecttimeview  ng-select0" [items]="organization_array" bindLabel="label"
+          bindValue="value" [clearable]=false (change)="change_organization($event, 2)" [(ngModel)]="organization_id2">
+        </ng-select>
+      </ng-container>
+      <!-- Textbox chọn -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay = !siteSelectionDisplay" class="text-select vung-kich">
+          <span>&nbsp;{{ location2 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <!-- Chọn địa điểm/ khu vực -->
+      <div [hidden]="!siteSelectionDisplay" class=" khung-location-dashboard block"
+        (clickOutside)="siteSelectionDisplay = false" [exclude]="'.vung-kich'">
+        <div id="khung-location-scroll">
+          <div style="position: relative;width: 100%;" class="inputgroup">
+            <input (keyup)="search_menu($event.target.value, 2)" style="border:none !important;padding-left: 7px"
+              type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+            <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+              aria-hidden="true"></i>
+          </div>
+          <ul style="padding-left: 0;">
+            <li *ngFor="let item of menu_tree2"
+              (click)="item.enables == 1 ? changeitem(2, item.site_name, item.id) : ''"
+              class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+              {{ item.site_name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+          <span>&nbsp;{{ time_period2 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+        class=" khung-location-dashboard block">
+        <div id="khung-location-scroll">
+          <ul id="ul-time-dashboard">
+            <li *ngFor="let item of fba_time_period_overview" class="{{ item.label === time_period2 ? 'active' : '' }}"
+              (click)="chonthoigian(2, item)">
+              {{ item.label }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-select class="bootstrap selecttimeview  ng-select1" [items]="startTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="startTime2"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select2" [items]="endTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="endTime2"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select3" [items]="select_visit_option" bindLabel="label"
+        groupBy="group" bindValue="value" [clearable]=false [(ngModel)]="selected_show2"></ng-select>
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+      <button class="btn  btn-primary" (click)="load_data_box2()">
+        {{language.ap_dung}}
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Modal 3  -->
+  <ng-template #template3>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+      <ng-container *ngIf="userinfo.organization_id === '0'">
+        <ng-select class="bootstrap selecttimeview  ng-select0" [items]="organization_array" bindLabel="label"
+          bindValue="value" [clearable]=false (change)="change_organization($event, 3)" [(ngModel)]="organization_id3">
+        </ng-select>
+      </ng-container>
+      <!-- Textbox chọn -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay = !siteSelectionDisplay" class="text-select vung-kich">
+          <span>&nbsp;{{ location3 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <!-- Chọn địa điểm/ khu vực -->
+      <div [hidden]="!siteSelectionDisplay" class=" khung-location-dashboard block"
+        (clickOutside)="siteSelectionDisplay = false" [exclude]="'.vung-kich'">
+        <div id="khung-location-scroll">
+          <div style="position: relative;width: 100%;" class="inputgroup">
+            <input (keyup)="search_menu($event.target.value, 3)" style="border:none !important;padding-left: 7px"
+              type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+            <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+              aria-hidden="true"></i>
+          </div>
+          <ul style="padding-left: 0;">
+            <li *ngFor="let item of menu_tree3"
+              (click)="item.enables == 1 ? changeitem(3, item.site_name, item.id) : ''"
+              class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+              {{ item.site_name }}
+            </li>
+
+          </ul>
+        </div>
+      </div>
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+          <span>&nbsp;{{ time_period3 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+        class=" khung-location-dashboard block">
+        <div id="khung-location-scroll">
+          <ul id="ul-time-dashboard">
+            <li *ngFor="let item of fba_time_period_overview" class="{{ item.label === time_period3 ? 'active' : '' }}"
+              (click)="chonthoigian(3, item)">
+              {{ item.label }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-select class="bootstrap selecttimeview  ng-select1" [items]="startTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="startTime3"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select2" [items]="endTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="endTime3"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select3" [items]="select_visit_option" bindLabel="label"
+        groupBy="group" bindValue="value" [clearable]=false [(ngModel)]="selected_show3"></ng-select>
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+      <button class="btn  btn-primary" (click)="load_data_box3()">
+        {{language.ap_dung}}
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Modal 4  -->
+  <ng-template #template4>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+      <ng-container *ngIf="userinfo.organization_id === '0'">
+        <ng-select class="bootstrap selecttimeview  ng-select0" [items]="organization_array" bindLabel="label"
+          bindValue="value" [clearable]=false (change)="change_organization($event, 4)" [(ngModel)]="organization_id4">
+        </ng-select>
+      </ng-container>
+      <!-- Textbox chọn -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay = !siteSelectionDisplay" class="text-select vung-kich">
+          <span>&nbsp;{{ location4 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <!-- Chọn địa điểm/ khu vực -->
+      <div [hidden]="!siteSelectionDisplay" class=" khung-location-dashboard block"
+        (clickOutside)="siteSelectionDisplay = false" [exclude]="'.vung-kich'">
+        <div id="khung-location-scroll">
+          <div style="position: relative;width: 100%;" class="inputgroup">
+            <input (keyup)="search_menu($event.target.value, 4)" style="border:none !important;padding-left: 7px"
+              type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+            <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+              aria-hidden="true"></i>
+          </div>
+          <ul style="padding-left: 0;">
+            <li *ngFor="let item of menu_tree4"
+              (click)="item.enables == 1 ? changeitem(4, item.site_name, item.id) : ''"
+              class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+              {{ item.site_name }}
+            </li>
+
+          </ul>
+        </div>
+      </div>
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+          <span>&nbsp;{{ time_period4 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+        class=" khung-location-dashboard block">
+        <div id="khung-location-scroll">
+          <ul id="ul-time-dashboard">
+            <li *ngFor="let item of fba_time_period_overview" class=" {{ item.label === time_period4 ? 'active' : '' }}"
+              (click)="chonthoigian(4, item)">
+              {{ item.label }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-select class="bootstrap selecttimeview  ng-select1" [items]="startTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="startTime4"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select2" [items]="endTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="endTime4"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select3" [items]="select_visit_option" bindLabel="label"
+        groupBy="group" bindValue="value" [clearable]=false [(ngModel)]="selected_show4"></ng-select>
+
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+      <button class="btn  btn-primary" (click)="load_data_box4()">
+        {{language.ap_dung}}
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Modal body1  -->
+  <ng-template #template5>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> {{language.cau_hinh}}</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+      <ng-container *ngIf="userinfo.organization_id === '0'">
+        <ng-select class="bootstrap selecttimeview  ng-select0" [items]="organization_array" bindLabel="label"
+          bindValue="value" [clearable]=false (change)="change_organization($event, 5)" [(ngModel)]="organization_id5">
+        </ng-select>
+      </ng-container>
+      <!-- Textbox chọn -->
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay = !siteSelectionDisplay" class="text-select vung-kich">
+          <span>&nbsp;{{ location5 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <!-- Chọn địa điểm/ khu vực -->
+      <div [hidden]="!siteSelectionDisplay" class=" khung-location-dashboard block"
+        (clickOutside)="siteSelectionDisplay = false" [exclude]="'.vung-kich'">
+        <div id="khung-location-scroll">
+          <div style="position: relative;width: 100%;" class="inputgroup">
+            <input (keyup)="search_menu($event.target.value, 5)" style="border:none !important;padding-left: 7px"
+              type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}" />
+            <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+              aria-hidden="true"></i>
+          </div>
+          <ul style="padding-left: 0;">
+            <li *ngFor="let item of menu_tree5"
+              (click)="item.enables == 1 ? changeitem(5, item.site_name, item.id) : ''"
+              class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }} {{item.enables == '0' ? 'li_unlist' : ''}}">
+              {{ item.site_name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="config-text-dashboard">
+        <div style="display:block;border:1px solid #ddd; padding:5px;background:white;"
+          (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+          <span>&nbsp;{{ time_period5 }} <i class="icon-down"> ▼ </i></span>
+        </div>
+      </div>
+      <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'"
+        class=" khung-location-dashboard block">
+        <div id="khung-location-scroll">
+          <ul id="ul-time-dashboard">
+            <li *ngFor="let item of fba_time_period_overview" class="{{ item.label === time_period5 ? 'active' : '' }}"
+              (click)="chonthoigian(5, item)">
+              {{ item.label }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-select class="bootstrap selecttimeview  ng-select1" [items]="startTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="startTime5"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select2" [items]="endTimeOption" bindLabel="label"
+        bindValue="value" [clearable]=false [(ngModel)]="endTime5"></ng-select>
+      <ng-select class="bootstrap selecttimeview  ng-select3" [items]="dropdownList" bindLabel="label" bindValue="value"
+        groupBy="group" [multiple]="true" [closeOnSelect]="false" (change)="destinationOnSelect()"
+        (remove)="validate_source_destination_index()" [(ngModel)]="indexOption5">
+        <ng-template ng-optgroup-tmp let-item="item">
+          <span style="vertical-align: middle;">{{item.group}}</span>
+        </ng-template>
+      </ng-select>
+
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+      <button class="btn  btn-primary" (click)="load_data_highchart_poc()" [disabled]="btnApplyValid">
+        {{language.ap_dung}}
+      </button>
+    </div>
+  </ng-template>
+</div>
+
+<ng-template   #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông báo!</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Có lỗi xảy ra! Vui lòng nhấn<a style="color: blue; cursor: pointer;" (click)="reset_session()"> vào đây </a> để
+      tải lại</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">Tải lại</button>
+  </div>
+</ng-template>

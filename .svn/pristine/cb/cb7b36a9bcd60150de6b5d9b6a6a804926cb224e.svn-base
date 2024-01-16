@@ -1,0 +1,520 @@
+/* Đoạn Viewby CX_INDEX hoặc NPS_INDEX */
+
+#overview-index label {
+	/* font-family: Roboto, sans-serif; */
+	border: 1px solid #5ca6c4;
+	background-color: #ffff;
+	color: black;
+}
+
+#overview-index label.active {
+	background: #1b69a7;
+	border: none;
+	color: #fff;
+}
+
+#overview-index label.btn {
+	padding-top: 0.2rem;
+	padding-bottom: 0.2rem;
+	border-radius: unset;
+}
+
+#overview-index span {
+	background: #fac090;
+	padding: 10px;
+	cursor: pointer;
+	font-size: 11px;
+	margin-right: 2px;
+}
+
+/* End đoạn viewby */
+
+/* Đoạn giờ tốt nhất, ngày tốt nhất */
+
+.overview-thoidiem {
+	margin-top: 10px;
+	padding-left: 10px;
+	/* font-family: Roboto, sans-serif; */
+}
+
+.overview-thoidiem i {
+	font-size: 11px;
+}
+
+/* End đoạn giờ tốt nhất */
+
+/* Tiêu đề nhóm kết quả tốt nhất, đánh giá nhiều nhất... */
+
+.overview-khungtieude {
+	padding: 10px 10px 0px 0px;
+	font-size: 19px;
+	width: 100%;
+	/* font-family: Roboto, sans-serif; */
+}
+
+/*popup survey*/
+
+.overview-survey {
+	cursor: pointer;
+}
+
+.popupsurvey {
+	position: absolute;
+	left: 0;
+	z-index: 1;
+}
+
+/*end*/
+
+/*Đoạn thời kì*/
+
+.overview-period {
+	cursor: pointer;
+}
+
+.popupperiod {
+	position: absolute;
+	left: 0px;
+	z-index: 1;
+	width: 120%;
+}
+
+.popupperiod>.card>ul {
+	padding: 0px;
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+	height: fit-content;
+	width: 100%;
+	margin-bottom: 0px;
+}
+
+.popupperiod>.card>ul>li {
+	list-style: none;
+	display: inline-block;
+	width: 100%;
+	padding: 10px 20px;
+}
+
+.popupperiod>.card>ul>li.active>div:nth-child(1) {
+	color: #00a8ff;
+	font-size: 16px;
+}
+
+.popupperiod>.card>ul>li:hover {
+	cursor: pointer;
+	background: #eee;
+}
+
+.popupperiod>.card>ul>li>div:nth-child(2)>small {
+	color: #828080;
+}
+
+/*end đoạn thời kì*/
+
+/*đoạn chọn menu*/
+
+.overview-location {
+	cursor: pointer;
+}
+
+.overview-location-popup {
+	position: absolute;
+	left: 0;
+	width: 250px;
+	height: auto;
+	max-height: 195px;
+	overflow-y: auto;
+	z-index: 1;
+	background: #ffff;
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+.overview-location-popup>div {
+	padding: 0;
+}
+
+.overview-location-popup>div>ul {
+	width: 100%;
+	padding: 0;
+}
+
+.overview-location-popup>div>ul>li {
+	list-style: none;
+	display: inline-block;
+	padding: 8px 10px;
+	width: 100%;
+	color: rgba(0, 0, 0, 0.87);
+}
+
+.overview-location-popup>div>ul>li:not(:first-child):hover {
+	background: #eee;
+	cursor: pointer;
+}
+
+.overview-location-popup>div>ul>li:first-child {
+	position: relative;
+}
+
+.overview-location-popup>div>ul>li>svg {
+	position: absolute;
+	top: 15%;
+	right: 3%;
+	width: 25px;
+	fill: #e0e0e0;
+}
+
+.overview-location-popup input[type='text'] {
+	border: none;
+}
+
+.overview-location-popup input[type='text']:focus {
+	outline: none;
+}
+
+/*end*/
+
+/* Đoạn các biểu tượng mặt cười và số liệu % */
+
+.overview-emotion-image {
+	width: 100%;
+	text-align: center;
+}
+
+.overview-emotion-image>img {
+	width: 35px;
+}
+
+.overview-emotion-title>h5 {
+	/* font-family: Roboto, sans-serif; */
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+/* .overview-emotion-title>p
+{
+	 font-family: Roboto, sans-serif; 
+} */
+
+/* End */
+
+/* Khung Question  */
+
+#fba-overview-header .khung-question {
+	position: absolute;
+	left: 0;
+	width: 280px;
+	height: 160px;
+	overflow-y: auto;
+	z-index: 1;
+	background: white;
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+#fba-overview-header .khung-question .small-metric {
+	font-size: 10px;
+	border-bottom: 1px solid #e1e2e1;
+	font-style: italic;
+	padding: 8px;
+}
+
+#fba-overview-header .khung-question #khung-question-scroll li {
+	cursor: pointer;
+	padding: 8px 0 8px 15px;
+	list-style: none;
+}
+
+#fba-overview-header .khung-question #khung-question-scroll li:hover {
+	background: #ddd;
+}
+
+#fba-overview-header .khung-question .questionText {
+	color: forestgreen;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+#fba-overview-header .khung-question .timePeriod {
+	font-size: 10px;
+}
+
+/*End Huy*/
+
+/*table*/
+
+.overviewheadtable th {
+	padding: 0.3rem;
+	/* font-family: Roboto, sans-serif; */
+}
+
+.overviewheadtable th:not(:nth-child(2)) {
+	text-align: right;
+}
+
+.overviewbodytable td {
+	padding: 0.3rem;
+	/* font-family: Roboto, sans-serif; */
+}
+
+.overviewbodytable>tr>td:nth-child(1) {
+	color: #a9a9a8;
+}
+
+.overviewbodytable>tr>td:nth-child(2) {
+	max-width: 100px;
+}
+
+.overviewbodytable>tr>td:nth-child(2) a {
+	color: black;
+}
+
+.overviewbodytable>tr>td:nth-child(3) {
+	max-width: 300px;
+	text-align: right;
+}
+
+.overviewbodytable>tr>td:nth-child(4) {
+	display: flex;
+	justify-content: center;
+}
+
+.overviewbodytable .fa-caret-up {
+	color: #2bb540;
+}
+
+.overviewbodytable .fa-sort {
+	color: #999;
+}
+
+.overviewbodytable .fa-caret-down {
+	color: red;
+}
+
+/*table*/
+
+/*menu location*/
+
+.menu-0 {
+	margin-left: 15px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 15px)!important;
+}
+
+.menu-1 {
+	margin-left: 25px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 25px)!important;
+}
+
+.menu-2 {
+	margin-left: 35px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 35px)!important;
+}
+
+.menu-3 {
+	margin-left: 45px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 45px)!important;
+}
+
+.menu-4 {
+	margin-left: 55px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 55px)!important;
+}
+
+.menu-5 {
+	margin-left: 65px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 65px)!important;
+}
+
+.menu-6 {
+	margin-left: 75px;
+	border-left: 1px dotted #ddd;
+	width: calc(100% - 75px)!important;
+}
+
+/*end menu location*/
+
+/*Khung So với...*/
+
+.overview-khungchuaanh>div>h1 {
+	margin-bottom: 0px;
+	font-size: 40px;
+	/* font-family: Roboto, sans-serif; */
+}
+
+.overview-khungchuaanh>div>p>span, .overview-khungchuaanh>div>p {
+	margin-bottom: 0px;
+	font-size: 17px;
+	/* font-family: Roboto, sans-serif; */
+}
+
+/* .overview-khungchuaanh>div>h6
+{
+	font-family: Roboto, sans-serif; 
+} */
+
+.overview-khungchuaanh .col-md-6 {
+	padding: 0px;
+}
+
+.overview-khungchuaanh>.col-md-6:nth-child(2) {
+	padding-top: 50px;
+}
+
+.tuyetvoi>p {
+	font-size: 20px;
+	/* font-family: Roboto, sans-serif; */
+	margin-bottom: 0px;
+	margin-top: 10px;
+}
+
+/* .tuyetvoi
+{
+	 font-family: Roboto, sans-serif; 
+} */
+
+.tuyetvoi img {
+	width: 7%;
+}
+
+/* End Khung */
+
+.overview-hieuqua {
+	margin-top: 20px;
+}
+
+.overview-hieuqua>ul>li {
+	list-style: none;
+}
+
+.overview-hieuqua>ul>li:nth-child(1) {
+	float: left;
+	display: none;
+}
+
+.overview-hieuqua>ul>li:nth-child(2) {
+	float: right;
+}
+
+.overview-hieuqua>div>h5 {
+	font-size: 21px;
+	font-weight: 200;
+}
+
+.no-mg-right-and-left {
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+.nutcapnhat .fa-caret-down {
+	color: red;
+}
+
+.nutcapnhat .fa-caret-up {
+	color: green;
+}
+
+.nutcapnhat .fa-sort {
+	color: #828080;
+}
+
+/* #overview-chonkhuvuc
+{
+	 font-family: Roboto, sans-serif; 
+} */
+
+#overview-chonkhuvuc:hover {
+	cursor: pointer;
+}
+
+#overview-chonkhuvuc-menu li {
+	list-style: none;
+	padding: 10px;
+}
+
+#overview-chonkhuvuc-menu li:hover {
+	cursor: pointer;
+	background: #ddd;
+}
+
+.overview-chonkhuvuc-popup {
+	position: absolute;
+	top: 20px;
+	left: -25px;
+	z-index: 2;
+	background: #ffff;
+	width: 200px;
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.overview-chonkhuvuc-popup .card {
+	margin-bottom: 0px;
+	width: 200px;
+}
+
+/* .overview-chonkhuvuc-popup .card h4
+{
+	font-family: Roboto, sans-serif; 
+} */
+
+.overview-chonkhuvuc-popup .below {
+	border-radius: 3px;
+}
+
+.survey-block {
+	width: fit-content;
+	margin: auto;
+	position: relative;
+}
+
+.time-block {
+	margin-left: auto;
+}
+
+.time-block>div {
+	float: right;
+}
+
+.label-menu {
+	margin-bottom: 0px;
+	font-size: 11px;
+}
+
+/*Responsive*/
+
+@media only screen and (max-width: 767px) {
+	.khungdanhgia {
+		padding-left: 0px;
+	}
+	.survey-block {
+		margin: unset;
+	}
+	.time-block {
+		margin-left: unset;
+	}
+	.time-block>div {
+		float: none;
+	}
+	.label-menu {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 530px) {}
+
+@media only screen and (max-width: 450px) {}
+
+@media only screen and (max-width: 401px) {
+	.overview-chonkhuvuc-popup {
+		left: -30px;
+	}
+}
+
+@media only screen and (max-width: 495px) {
+	.popupperiod {
+		left: 0px!important;
+	}
+}

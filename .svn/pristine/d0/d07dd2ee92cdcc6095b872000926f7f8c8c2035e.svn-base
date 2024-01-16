@@ -1,0 +1,66 @@
+<block-ui></block-ui>
+<div class="row">
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card card-parent">
+        <div class="card-body" style="padding-top: 10px;">
+          <form (ngSubmit)="update_data(help_form)" #help_form="ngForm">
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <small>
+                  <i class="fa fa-home">&nbsp;</i>
+                  <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                  &nbsp;<a [routerLink]="[ '/dashboard']">{{language.trang_chu}}</a>&nbsp;
+                  <i class="fa fa-angle-double-right" aria-hidden="true">&nbsp;</i>
+                  <a [routerLink]="[ '/help']">{{language.tro_giup}}</a>&nbsp;
+                  <i class="fa fa-angle-double-right" aria-hidden="true">&nbsp;</i>{{language.sua_thong_tin}}</small>
+                <h1><i class="fa fa-plus-circle" style="color: #f19925">&nbsp;</i>{{language.sua_thong_tin_tro_giup}}</h1>
+              </div>
+            </div>
+            <div class="row" *ngFor="let item of help_info">
+              <!-- <div class="col-md-12 mt-1">
+                <label for="title_content">Ảnh bài viết</label>
+                <input type="file" class="form-control" ngModel name="hinhanh"
+                  (change)="handleFileInput($event.target.files)">
+                <img *ngIf="ImageUrl" style="width: 30%;" [src]="ImageUrl" alt="">
+              </div> -->
+              <div class="col-md-12 mt-1">
+                <label for="title_content">{{language.tieu_de}}</label>
+                <input required [ngModel]="item.title_content" type="text" class="form-control" id="title_content" name="title_content">
+              </div>
+              <div class="col-md-12 mt-1">
+                <label for="help_description">{{language.mo_ta_chung}}&nbsp;<small>{{language.duoi45_tu}}</small></label>
+                <textarea required [ngModel]="item.help_description" #help_description name="help_description" id="help_description" class="form-control" style="border-radius:0px;"
+                  cols="30" rows="5">{{item.help_description}}</textarea>
+                <small [ngStyle]="{'color': help_description.value.length > 450 ? 'red' : ''}">Số từ hiện tại: {{help_description.value.length}}</small>
+              </div>
+              <div class="col-md-12 mt-1">
+                <label for="help_content">{{language.noi_dung}}</label>
+                <div>
+                  <quill-editor required [ngModel]="item.help_content" name="help_content"></quill-editor>
+                </div>
+                <!-- <textarea ngModel name="help_content" id="help_content" class="form-control" style="border-radius:0px;"
+                  cols="30" rows="10"></textarea> -->
+              </div>
+              <div *ngIf="tag_array?.length > 0" class="col-md-12 mt-1">
+                <label for="">{{language.gan_the}}</label>
+                <ng-multiselect-dropdown [placeholder]="" [data]="tag_array" [(ngModel)]="selectedItems"
+                  [settings]="dropdownSettings" name="tag_select">
+                </ng-multiselect-dropdown>
+              </div>
+              <div class="col-md-12 mt-1">
+                <label for="">{{language.them_gan_the}}</label>
+                <tag-input ngModel name="tag_name"></tag-input>
+              </div>
+              <div class="col-md-12 mt-3">
+                <button class="btn btn-success mr-2" style="border-radius: 0px;" [disabled]="help_form.invalid">
+                  {{language.sua_thong_tin}}</button>
+                <a class="btn btn-danger" style="border-radius: 0px;" [routerLink]="['/help']">   {{language.quay_lai}}</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

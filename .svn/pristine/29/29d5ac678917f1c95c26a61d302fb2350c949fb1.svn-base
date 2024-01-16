@@ -1,0 +1,125 @@
+function intDateRangePicker(start_date, end_date) {
+    // var start = moment().subtract(0, 'days');
+    var start = moment();
+    var end = moment();
+
+    // console.log(' Number(new Date())', Number(new Date()));
+    // console.log(' new Date(Number(new Date()))', new Date(Number(new Date())));
+    // console.log(' new Date(Number(start_date))', new Date(Number(start_date)));
+
+    start._d = new Date(start_date);
+    end._d = new Date(end_date);
+
+
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'hôm nay': [moment(), moment()],
+            'hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'bảy ngày trước': [moment().subtract(6, 'days'), moment()],
+            // 'mười bốn ngày trước': [moment().subtract(13, 'days'), moment()],
+            // 'ba mươi ngày trước': [moment().subtract(29, 'days'), moment()],
+            'tuần này': [moment().startOf('week'), moment().endOf('week')],
+            'tuần trước': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],            
+            'tháng này': [moment().startOf('month'), moment().endOf('month')],
+            'tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'năm này': [moment().startOf('year'), moment().endOf('year')],
+            'năm trước': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+        }
+    }, cb);
+
+    cb(start, end);
+};
+function cb(start, end) {
+    $('#reportrange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    $('#startDateReportTemp').val(Number(start));
+    $('#endDateReportTemp').val(Number(end));
+}
+
+
+function intDateRangePickerCompare(start_date, end_date) {
+    // var start = moment().subtract(0, 'days');
+    var start = moment();
+    var end = moment();
+
+    // console.log(' Number(new Date())', Number(new Date()));
+    // console.log(' new Date(Number(new Date()))', new Date(Number(new Date())));
+    // console.log(' new Date(Number(start_date))', new Date(Number(start_date)));
+
+    start._d = new Date(start_date);
+    end._d = new Date(end_date);
+
+
+    $('#reportrangeCompare').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'hôm nay': [moment(), moment()],
+            'hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'bảy ngày trước': [moment().subtract(6, 'days'), moment()],
+            // 'mười bốn ngày trước': [moment().subtract(13, 'days'), moment()],
+            // 'ba mươi ngày trước': [moment().subtract(29, 'days'), moment()],
+            'tuần này': [moment().startOf('week'), moment().endOf('week')],
+            'tuần trước': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],            
+            'tháng này': [moment().startOf('month'), moment().endOf('month')],
+            'tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'năm này': [moment().startOf('year'), moment().endOf('year')],
+            'năm trước': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+        }
+    }, cbCompare);
+
+    cbCompare(start, end);
+};
+function cbCompare(start, end) {
+    $('#reportrangeCompare span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    $('#startDateReportTempCompare').val(Number(start));
+    $('#endDateReportTempCompare').val(Number(end));
+}
+
+  /*----------  Chọn lịch cho FBA bỏ hôm qua, hôm nay,..  ----------*/
+function intDateRangePickerFBA(start_date, end_date) {
+    // var start = moment().subtract(0, 'days');
+    var start = moment();
+    var end = moment();
+
+    // console.log(' Number(new Date())', Number(new Date()));
+    // console.log(' new Date(Number(new Date()))', new Date(Number(new Date())));
+    // console.log(' new Date(Number(start_date))', new Date(Number(start_date)));
+
+    start._d = new Date(start_date);
+    end._d = new Date(end_date);
+
+    $('#reportrangefba').daterangepicker({
+        startDate: start,
+        endDate: end,
+    }, cbfba);
+    cbfba(start, end);
+};
+function cbfba(start, end) {
+    $('#reportrangefba span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    $('#startDateReportTemp').val(Number(start));
+    $('#endDateReportTemp').val(Number(end));
+}
+/*----------  Kế thúc chọn lịch FBA  ----------*/
+/*----------  Nghĩa thêm loại lịch viewchild  ----------*/
+ function intDateRangePicker_viewchild(start_date, end_date) {
+    var start = moment();
+    var end = moment();
+    start._d = new Date(start_date);
+    end._d = new Date(end_date);
+    $('#reportrangefba').daterangepicker({
+        startDate: start,
+        endDate: end,
+    }, datetime_callback);
+    $('#reportrangefba span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    // $('#startDateReportTemp').val(start);
+    // $('#endDateReportTemp').val(end);
+};
+function datetime_callback(start, end) {
+    $('#reportrangefba span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+    $('#startDateReportTemp').val('\'' + start.format('YYYY-MM-DD') + '\'');
+    $('#endDateReportTemp').val('\'' + end.format('YYYY-MM-DD') + '\'').trigger('change');
+}
+/*----------  Kết thúc  ----------*/
+

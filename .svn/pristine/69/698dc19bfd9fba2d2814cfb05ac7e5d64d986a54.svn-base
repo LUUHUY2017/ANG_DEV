@@ -1,0 +1,307 @@
+body {
+    font-family: Roboto, sans-serif;
+}
+
+.card-administration {
+    /* border-radius: 0.25rem; */
+    /* box-shadow: inset 0 1px 1px rgba(0,0,0,.05); */
+    background: #ffffff;
+}
+
+.select-white {
+    background: white;
+}
+
+.label-admi {
+    font-weight: bold;
+}
+input.nofocus {
+    border: 1px solid #ddd;
+    border-radius: unset !important;
+    height: 31px;
+}
+
+input.nofocus:focus {
+    box-shadow: unset;
+    border-radius: unset !important;
+}
+
+.formsearch {
+    padding-left: 0px;
+    margin-bottom: 0px;
+}
+
+ng-select.backselect {
+    background: white;
+}
+
+ng-select.backselect .below {
+    background: white;
+}
+
+ng-select.backselect .clear {
+    display: none;
+}
+
+.buton-search {
+    height: 30px;
+    line-height: 15px;
+}
+
+ng-select.select-white>div:focus,
+input.select-white:focus {
+    border-color: rgba(82, 168, 236, .8);
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+.btn-them {
+    color: #333;
+    background-color: #f5f5f5;
+    border-color: rgba(0, 0, 0, .1)rgba(0, 0, 0, .1)#b3b3b3;
+}
+
+.btn-them:focus {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+    color: #333;
+    background-color: #f5f5f5;
+    border-color: rgba(0, 0, 0, .1)rgba(0, 0, 0, .1)#b3b3b3;
+}
+
+.btn-huy {
+    margin-right: 8px;
+    background-color: #e5e5e5;
+    color: #23282c;
+    border-color: #e5e5e5
+}
+
+.error-message {
+    color: crimson;
+    font-style: italic;
+}
+
+.form-no-marbottom {
+    margin-bottom: 3px;
+}
+
+.form-no-marbottom li {
+    list-style: none;
+}
+
+.form-no-marbottom>.lh-label {
+    line-height: 35px;
+}
+
+.form-no-marbottom ng-select>div:focus,
+.form-no-marbottom input:focus {
+    border-color: rgba(82, 168, 236, .8);
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+.card-adminstrastion .pi {
+    font-size: 14px;
+}
+
+.modal-footer,
+.modal-header {
+    padding: 5px 1rem;
+}
+
+
+/* Khung địa điểm*/
+
+.khung-location-administrator {
+    position: absolute;
+    left: 4.2%;
+    width: 92%;
+    height: 220px;
+    overflow: hidden;
+    background: white;
+    border-radius: 3px;
+    z-index: 10;
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+.khung-location-administrator #khung-location-scroll {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+ul#ul-location {
+    padding: 0;
+    margin: 0;
+}
+
+.khung-location-administrator li {
+    padding: 8px 0 8px 8px;
+    ;
+    cursor: pointer;
+    padding-left: 10px;
+    list-style: none;
+}
+
+.khung-location-administrator>input {
+    padding: 20px 8px 8px 8px;
+}
+
+.khung-location-administrator input:focus {
+    color: #5c6873;
+    background-color: #fff;
+    border-color: none;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.khung-location-administrator>li:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.location {
+    font-size: 17px;
+}
+
+.khung-location-administrator .menu-0 {
+    width: 100%;
+    font-weight: bold;
+}
+
+.khung-location-administrator .menu-1 {
+    margin-left: 25px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 25px)!important;
+}
+
+.khung-location-administrator .menu-2 {
+    margin-left: 35px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 35px)!important;
+}
+
+.khung-location-administrator .menu-3 {
+    margin-left: 45px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 45px)!important;
+}
+
+.khung-location-administrator .menu-4 {
+    margin-left: 55px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 55px)!important;
+}
+
+.khung-location-administrator .menu-5 {
+    margin-left: 65px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 65px)!important;
+}
+
+.khung-location-administrator .menu-6 {
+    margin-left: 75px;
+    border-left: 1px dotted #a19292;
+    width: calc(100% - 75px)!important;
+}
+
+li.active {
+    color: #1f8ad9!important
+}
+
+
+/* .config-text-administrator{
+  padding: 7px 4px 0 0 ; 
+} */
+
+.ad-location_filter_table {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+table.fba-location_table {
+    text-align: center
+}
+
+.ad-location_filter_table ul {
+    width: 100%;
+    padding: 0;
+    height: 30px;
+    margin-bottom: 0px;
+}
+
+.ad-location_filter_table li {
+    list-style: none;
+}
+
+.ad-location_filter_table li>a {
+    color: #20a8d8;
+    cursor: pointer;
+}
+
+.ad-location_filter_table li>a:hover {
+    text-decoration: underline;
+}
+
+.ad-location_filter_table li:nth-child(1) {
+    float: left;
+}
+
+.ad-location_filter_table li:nth-child(2) {
+    float: right;
+}
+
+.ad-location_filter_table li:nth-child(2) .input_filter_table {
+    width: 130px;
+    padding-left: 5px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15), 0 0 0px rgba(82, 168, 236, .2);
+    outline: none;
+    border: 1px solid #ddd;
+}
+
+.ad-location_filter_table li:nth-child(2) .input_filter_table:focus,
+.ad-location_filter_table .select_cus_table:focus {
+    /* box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6);    */
+    border-color: rgba(82, 168, 236, .8);
+}
+
+.ad-location_filter_table .select_cus_table {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15), 0 0 0px rgba(82, 168, 236, .2);
+}
+
+.ad-ng-select1 {
+    width: 46%;
+    background-color: white;
+}
+
+.ad-ng-select2 {
+    width: 46%;
+    float: right;
+    background-color: white;
+}
+
+.form-control-custom {
+    height: calc(2.0625rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #5c6873;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #e4e7ea;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.custom-select-ad {
+    display: block;
+    border: 1px solid #e4e7ea;
+    padding: 5px;
+    border-radius: 4px !important;
+    background: white;
+}
+
+#time-picker-wrapper {
+    z-index: 10000 !important;
+}

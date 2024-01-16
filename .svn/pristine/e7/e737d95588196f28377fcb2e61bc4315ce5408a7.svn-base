@@ -1,0 +1,459 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <block-ui></block-ui>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div class="card-header card-font">
+          <i class="cui-layers" aria-hidden="true"></i> <span>{{language.danh_sach_dia_diem}}</span>
+          <button *ngIf="isOrgAdmin || isSuperAdmin" [disabled]="!canAdd"
+            (click)="openPopupAddNewParentNode(insertParentNode)" style="float:right"
+            class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>{{language.them_dia_diem}}</button>
+        </div>
+        <div class="card-body">
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="row mb-3">
+                <div class="col-md-2">
+                  <ng-select class="bootstrap selectimeview" required [options]="orgArray" [ngModel]="organizationId"
+                    [allowClear]="false" (selected)="changeOrg($event)" [placeholder]="language.chon_to_chuc">
+                  </ng-select>
+                </div>
+              </div>
+              <p-treeTable #tt [value]="dataSource" selectionMode="single">
+                <ng-template pTemplate="header" let-columns>
+                  <tr>
+                    <th style="text-align:center">{{language.ten}}</th>
+                    <th style="text-align:center">{{language.ten_viet_tat}}</th>
+                    <th style="text-align:center">{{language.ma_dia_diem}}</th>
+                    <th style="text-align:center">{{language.trang_thai}}</th>
+                    <th style="text-align:center">{{language.xu_ly}}</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns">
+                  <tr [ttSelectableRow]="rowNode">
+                    <td>
+                      <p-treeTableToggler [rowNode]="rowNode" tooltipPosition="top" title="{{rowData.id}}">
+                      </p-treeTableToggler>
+                      <span>{{rowData.site_name}} <i class="fa fa-flag ng-flag" title="Cửa hàng"
+                          *ngIf="rowData.store"></i></span>
+                    </td>
+                    <td>
+                      <span>{{rowData.site_shortname}}</span>
+                    </td>
+                    <td>
+                      <span>{{rowData.site_code}}</span>
+                    </td>
+                    <td class="text-center">
+                      <span *ngIf="rowData.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                          class="fa fa-check"></i></span>
+                      <span *ngIf="rowData.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                          class="fa fa-remove"></i></span>
+                    </td>
+                    <td style="text-align:center">
+                      <ng-container *ngIf="rowData.enables == 1">
+                        <a (click)="openPopupAddNewChildrenNode(rowData,insertChildrenTemplate)" class="icon-green"><i
+                            class="fa fa-plus"></i>
+                        </a>&nbsp;&nbsp;
+                        <a (click)="openPopupUpdateCurrentItem(rowData,updateTemplate)" class="icon-blue"><i
+                            class="fa fa-pencil-square-o"></i>
+                        </a>&nbsp;&nbsp;
+                        <a (click)="openPopupDeleteItem(deleteTemplate, rowData)" class="icon-red" title="Xóa địa điểm">
+                          <i class="fa fa-times" aria-hidden="true"></i>
+                        </a>
+                      </ng-container>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-treeTable>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}.
+                {{language.vui_long}}<a style="color: #f3b21c; cursor: pointer;"
+                  (click)="ngOnInit()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #deleteTemplate>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="deleteCurrentItem()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Modal thêm mới node cha   -->
+  <ng-template #insertParentNode>
+    <form (ngSubmit)="addNewParentItem(insertParentForm)" #insertParentForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left"><i class="icon-plus">&nbsp;</i>{{language.them_dia_diem_mac_dinh}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label" for="tendiadiemId">{{language.ten_dia_diem}} <small
+            class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txttendiadiem="ngModel" id="tendiadiemId" type="text" required
+              minlength="2" maxlength="50" ngModel name="site_name" autocomplete="off">
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_dia_diem}}
+            </small>
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.minlength" class="error-message">
+              {{language.dia_diem_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.maxlength" class="error-message">
+              {{language.dia_diem_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label" for="sitecodeId">{{language.ma_dia_diem}} <small
+            class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txtsidecode="ngModel" id="sitecodeId" required ngModel type="text"
+              name="site_code" minlength="2" maxlength="50" autocomplete="off">
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ma_dia_diem}}
+            </small>
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.minlength" class="error-message">
+              {{language.ma_dia_diem_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.maxlength" class="error-message">
+              {{language.ma_dia_diem_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label" for="txtsidecode">{{language.ten_viet_tat}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" id="txtsidecode" required minlength="2" maxlength="50"
+              #txtdescription="ngModel" ngModel type="text" name="site_shortname" autocomplete="off">
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_tom_tat}}
+            </small>
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.minlength" class="error-message">
+              {{language.tom_tat_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.maxlength" class="error-message">
+              {{language.tom_tat_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.danh_muc}} </label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" [options]="categoryArray" ngModel name="category_id"
+              [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;padding-right: 1px;" class="col-md-4 col-4 col-form-label"></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-k-sr" type="checkbox" name="store" [(ngModel)]="isStore">
+              <label class="form-check-label" for="inline-k-sr">{{language.thoi_gian_hoat_dong}}</label>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isStore" class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.gio_mo_cua}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input type="time" class="form-control-custom ad-ng-select1 color-font" #openhour="ngModel" required ngModel
+              name="open_hour">
+            <input type="time" class="form-control-custom ad-ng-select2 color-font" #closehour="ngModel" required
+              ngModel name="close_hour">
+            <div *ngIf="openhour.touched && openhour.errors?.required">
+              <small class="error-message">
+                {{language.ban_chua_nhap_gio_mo_cua}}
+              </small>
+            </div>
+            <div *ngIf="closehour.touched && closehour.errors?.required">
+              <small class="error-message">
+                {{language.ban_chua_nhap_gio_dong_cua}}
+              </small>
+            </div>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="insertParentForm.invalid">{{language.them_dia_diem}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Modal  thêm mới  -->
+  <ng-template #insertChildrenTemplate>
+    <form (ngSubmit)="addNewChildrenItem(insertChildrenForm)" #insertChildrenForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_dia_diem}} <small>(node)</small></h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;" class="col-md-4 col-4 col-form-label lh-label"
+            for="tendiadiem">{{language.ten_dia_diem}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txttendiadiem="ngModel" id="tendiadiem" type="text" required
+              minlength="2" maxlength="50" ngModel name="site_name" autocomplete="off">
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_dia_diem}}
+            </small>
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.minlength" class="error-message">
+              {{language.dia_diem_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txttendiadiem.touched && txttendiadiem.errors?.maxlength" class="error-message">
+              {{language.dia_diem_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label" for="sitecodeId">{{language.ma_dia_diem}} <small
+            class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txtsidecode="ngModel" id="sitecodeId" required ngModel type="text"
+              name="site_code" minlength="2" maxlength="50" autocomplete="off">
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.required" class="error-message">
+              {{language.ma_dia_diem_co_nhieu_nhat_50_ki_tu}}
+            </small>
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.minlength" class="error-message">
+              {{language.ma_dia_diem_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txtsidecode.touched && txtsidecode.errors?.maxlength" class="error-message">
+              {{language.ma_dia_diem_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label" for="txtsidecode">{{language.ten_viet_tat}} <small
+            class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" id="txtsidecode" #txtdescription="ngModel" required ngModel
+              type="text" minlength="2" maxlength="50" name="site_shortname" autocomplete="off">
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_tom_tat}}
+            </small>
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.minlength" class="error-message">
+              {{language.tom_tat_co_it_nhat_2_ki_tu}}
+            </small>
+            <small *ngIf="txtdescription.touched && txtdescription.errors?.maxlength" class="error-message">
+              {{language.tom_tat_co_nhieu_nhat_50_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.danh_muc}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" [options]="categoryArray" ngModel name="category_id"
+              [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;padding-right: 1px;" class="col-md-4 col-4 col-form-label"></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-k-sr" type="checkbox" name="store" [(ngModel)]="isStore">
+              <label class="form-check-label" for="inline-k-sr"> {{language.thoi_gian_hoat_dong}} &nbsp; </label>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isStore" class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.gio_mo_cua}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input type="time" class="form-control-custom ad-ng-select1 color-font" #openhour="ngModel" required ngModel
+              name="open_hour">
+            <input type="time" class="form-control-custom ad-ng-select2 color-font" #closehour="ngModel" required
+              ngModel name="close_hour">
+            <div *ngIf="openhour.touched && openhour.errors?.required">
+              <small class="error-message">
+                {{language.ban_chua_nhap_gio_mo_cua}}
+              </small>
+            </div>
+            <div *ngIf="closehour.touched && closehour.errors?.required">
+              <small class="error-message">
+                {{language.ban_chua_nhap_gio_dong_cua}}
+              </small>
+            </div>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-primary" (click)="modalRef.hide()" [disabled]="insertChildrenForm.invalid">
+          {{language.them}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left"> {{language.cap_nhat_dia_diem}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;"
+            class="col-md-3 col-3 col-form-label lh-label">{{language.ten_dia_diem}} <small class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" id="nf" type="text" #site_name="ngModel" required
+              [ngModel]="dataUpdate.site_name" name="site_name">
+            <small *ngIf="site_name.touched && site_name.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_dia_diem}} </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_dia_diem}} <small class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" id="nf-email" #site_code="ngModel" required type="text"
+              [ngModel]="dataUpdate.site_code" name="site_code">
+            <li *ngIf="site_code.invalid && (site_code.dirty || site_code.touched)">
+              <small *ngIf=" site_code.errors.required" class="error-message">
+                {{language.ban_chua_nhap_ten_dia_diem}}
+              </small>
+            </li>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ten_viet_tat}} <small class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" id="nf-email" #site_shortname="ngModel" required type="text"
+              [ngModel]="dataUpdate.site_shortname" name="site_shortname">
+            <li *ngIf="site_shortname.invalid && (site_shortname.dirty || site_shortname.touched)">
+              <small *ngIf=" site_shortname.errors.required" class="error-message">
+                {{language.ban_chua_nhap_tom_tat}}
+              </small>
+            </li>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;" class="col-md-3 col-3 col-form-label lh-label">{{language.thuoc_dia_diem}} <small class="require-field">(*)</small></label>
+          <div class="col-md-9 col-9 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-administrator">
+              <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich custom-select-ad">
+                <span>&nbsp;{{siteSelected?.site_name}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-administrator block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <div style="position: relative;width: 100%;" class="inputgroup">
+                  <!-- <input (keyup)="search_menu($event.target.value)"
+                                        style="border:none !important;padding-left: 7px" type="text"
+                                        class="form-control" placeholder="Tìm kiếm địa điểm/ khu vực"> -->
+                  <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                    class="fa fa-search" aria-hidden="true"></i>
+                </div>
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of siteFilterArray" (click)="changeSite(item)"
+                    class="menu-{{item.alevel}} {{item.id == siteSelected?.id ? 'active' : ''}} {{item.enables == '1' ? null : 'disabledMenuItem'}}">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.danh_muc}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="categoryArray"
+              [ngModel]="dataUpdate.category_id" name="category_id" [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space: pre;padding-right: 1px;" class="col-md-3 col-3 col-form-label"> </label>
+          <div class="col-md-9 col-9 col-form-label">
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-k-sr" type="checkbox" name="store" [(ngModel)]="isStore">
+              <label class="form-check-label" for="inline-k-sr">{{language.thoi_gian_hoat_dong}} &nbsp; </label>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isStore" class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.gio_mo_cua}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input type="time" required class="bootstrap selecttimeview form-control-custom ad-ng-select1 color-font"
+              [ngModel]="dataUpdate.open_hour" name="open_hour">
+            <input type="time" required class="bootstrap selecttimeview form-control-custom ad-ng-select2 color-font"
+              [ngModel]="dataUpdate.close_hour" name="close_hour">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'" [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'" [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="updateForm.invalid">{{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+  <notifier-container></notifier-container>
+</main>

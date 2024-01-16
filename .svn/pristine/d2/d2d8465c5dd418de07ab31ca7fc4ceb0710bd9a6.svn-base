@@ -1,0 +1,401 @@
+<div class="card card-parent">
+  <!-- card-header -->
+  <div class="card-header">
+    <div class="row" id="fba-overview-header">
+      <block-ui></block-ui>
+      <div class="col-sm-12 col-md-4 pr-0">
+        <div>
+          <label for="" class="label-menu">{{language.dia_diem_khu_vuc}}</label>
+        </div>
+        <div style="width: auto; display: inline-block;" (click)="displaylocation=!displaylocation"
+          class="overview-location"><i class="fa fa-map-marker"></i><span
+            style="font-weight: bold;">&nbsp;{{location}}</span><i class="fa fa-caret-down"></i></div>
+        <div style=" display: inline-block; position: relative;" [hidden]="hidden_menu_location">
+          <div id="overview-chonkhuvuc" (click)="popuplocation=!popuplocation">&nbsp;&nbsp;<i
+              class="fa fa-chevron-circle-down icon-menu-header"></i></div>
+          <div class="overview-chonkhuvuc-popup" [hidden]="!popuplocation">
+            <div class="card">
+              <div class="card-header">
+                <h4>{{language.chon_dia_diem}}</h4>
+              </div>
+              <div class="card-body">
+                <ng-select class="bootstrap selectimeview" [options]="OrgOption" [allowClear]="false"
+                  [(ngModel)]="OrgOptionSelected" (selected)="OrgSelected($event)"></ng-select>
+              </div>
+              <div class="card-footer">
+                <div class="float-right">
+                  <button class="btn btn-default" (click)="popuplocation=false">{{language.dong}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="overview-location-popup" [hidden]="!displaylocation" (clickOutside)="displaylocation=false"
+          [exclude]="'.overview-location'">
+          <div class="card-body">
+            <ul>
+              <li><input type="text" placeholder="{{language.tim_kiem_dia_diem}}" style="width: 200px;"
+                  (keyup)="search_menu($event.target.value)"><svg class="jss527 searchIcon" focusable="false"
+                  viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                  </path>
+                  <path fill="none" d="M0 0h24v24H0z"></path>
+                </svg></li>
+              <li *ngFor="let item of menu_tree"
+                class="menu-{{item.alevel}} {{item.site_name === location ? 'li_active' : ''}}  {{item.enables == '0' ? 'li_unlist' : ''}}"
+                (click)="  item.enables == 1 ? changemenu(item.site_name,item.id) : ''">
+                {{item.site_name}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-xl-5 pr-0">
+        <div class="survey-block">
+          <label for="" class="label-menu">{{language.cau_hoi_khao_sat}}</label>
+          <div dropdown>
+            <div dropdownToggle class="overview-survey"><svg class="jss965 jss966" focusable="false" viewBox="0 0 24 24"
+                role="presentation" style="width: 20px;margin-bottom: 5px;">
+                <g>
+                  <g>
+                    <path d="M0 0h24v24H0z" style="fill: rgba(1, 1, 1, 0);"></path>
+                    <path
+                      d="M20.43 20.6H3.57a2.26 2.26 0 0 1-2.26-2.27V6.2a2.26 2.26 0 0 1 2.27-2.25h16.86A2.26 2.26 0 0 1 22.7 6.2v12.13a2.26 2.26 0 0 1-2.27 2.26zM3.57 5.9a.33.33 0 0 0-.32.3v12.13a.33.33 0 0 0 .32.32h16.86a.33.33 0 0 0 .32-.32V6.2a.33.33 0 0 0-.32-.3z">
+                    </path>
+                    <path
+                      d="M16.62 13.76h-2.1v-.2a2.58 2.58 0 0 1 .12-.88 1.92 1.92 0 0 1 .36-.6 11.08 11.08 0 0 1 1.08-1q.45-.37.45-.68a.62.62 0 0 0-.18-.47.77.77 0 0 0-.54-.17.88.88 0 0 0-.64.26 1.52 1.52 0 0 0-.33.9l-2.14-.26a2.92 2.92 0 0 1 .85-1.9 3.2 3.2 0 0 1 2.3-.72 3.4 3.4 0 0 1 1.93.5 2.1 2.1 0 0 1 1 1.8 1.74 1.74 0 0 1-.26.92 4.46 4.46 0 0 1-1.06 1.06 2.83 2.83 0 0 0-.7.7 1.45 1.45 0 0 0-.14.74zm-2.17.56h2.25v2h-2.25zM6.13 9.76h5.2v2h-5.2zM6.13 13.28h6.42v2H6.13z">
+                    </path>
+                  </g>
+                </g>
+              </svg><span style="font-weight: bold;">&nbsp;{{question}}</span><i class="fa fa-caret-down"></i></div>
+            <div *dropdownMenu class="dropdown-menu khung-question block">
+              <div id="khung-question-scroll">
+                <div class="ongoing">
+                  <div class="small-metric">{{language.dang_dien_ra}}</div>
+                  <ul style="padding: 0px;">
+                    <li *ngFor="let item of questions_ongoing" (click)="change_question(item)">
+                      <div class="questionText">
+                        <span>{{item.question_name}}
+                        </span>
+                      </div>
+                      <div class="timePeriod">
+                        <span style="display: block;">{{item.campaign_name}}</span>
+                        <span><i> {{language.fba_tu}} {{item.start_time | date: 'dd/MM/yyyy'}} {{language.fba_den}} {{item.end_time | date:
+														'dd/MM/yyyy' }}</i></span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="upcoming">
+                  <div class="small-metric">{{language.sap_dien_ra}}</div>
+                  <ul style="padding: 0px;">
+                    <li *ngFor="let item of questions_upcoming" (click)="change_question(item)">
+                      <div class="questionText">
+                        <span>{{item.question_name}}
+                        </span>
+                      </div>
+                      <div class="timePeriod">
+                        <span style="display: block;">{{item.campaign_name}}</span>
+                        <span><i> {{language.fba_tu}} {{item.start_time | date: 'dd/MM/yyyy'}} {{language.fba_den}} {{item.end_time | date:
+														'dd/MM/yyyy' }}</i></span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="ended">
+                  <div class="small-metric">{{language.ket_thuc}}</div>
+                  <ul style="padding: 0px;">
+                    <li *ngFor="let item of questions_ended" (click)="change_question(item)">
+                      <div class="questionText">
+                        <span>{{item.question_name}}
+                        </span>
+                      </div>
+                      <div class="timePeriod">
+                        <span style="display: block;">{{item.campaign_name}}</span>
+                        <span><i> {{language.fba_tu}} {{item.start_time | date: 'dd/MM/yyyy'}} {{language.fba_den}} {{item.end_time | date:
+														'dd/MM/yyyy' }}</i></span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-2 time-block">
+        <div style="position:relative;">
+          <label for="" class="label-menu">{{language.thoi_ky}}</label>
+          <div class="overview-period" (click)="displayperiod=!displayperiod"><i class="fa fa-calendar-o"></i><span
+              style="font-weight: bold;">&nbsp;{{time_label}}</span><i class="fa fa-caret-down"></i></div>
+          <div class="popupperiod" [hidden]="!displayperiod" style="height: 100%; z-index: 2;width: 150px;left: -30px;"
+            (clickOutside)="displayperiod=false" [exclude]="'.overview-period'">
+            <div class="card">
+              <ul>
+                <li *ngFor="let item of fba_time_period_overview" class="{{item.label === time_label ? 'active' : ''}}"
+                  (click)="emit_time(item.value,item.label)">
+                  <div>{{item.label}}</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end cardheader -->
+  <!-- card-body -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="overview-khungchuaanh">
+          <div class="col-12 col-md-12 khungdanhgia">
+            <div class="overview-khungchuaanh">
+              <!-- <img src="https://i.imgur.com/frxQvdX.png" alt=""> -->
+              <div>
+                <h6 style="letter-spacing: 1px; font-weight: bold;">{{language.danh_gia}}</h6>
+                <h1>
+                  {{emotion_now.total_response >= 0 ? (emotion_now.total_response | number:'1.0-2') : - emotion_now.total_response | number:'1.0-2'}}
+                </h1>
+                <p class="nutcapnhat">
+                  <i class="fa fa-{{carret}}">&nbsp;</i><span>{{comparison_total_emotion >=0 ? (comparison_total_emotion |
+										number: '1.0-2') : - comparison_total_emotion | number: '1.0-2'}}%</span>
+                </p>
+                <p style="color: #969696; font-size: 14px;">{{language.So_voi}} {{comparison_with | lowercase}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-12" style="padding-top: 0px;margin-top: 7px;">
+            <div class="row">
+              <div class="col-3 col-md-3 p-0">
+                <div class="overview-emotion-image">
+                  <img src="{{very_positive ? 'data:image/gif;base64,' + very_positive : ''}}" />
+                </div>
+                <div class="overview-emotion-title text-center">
+                  <h5 class="text-center">{{emotion_now.very_positive_percen | number:'1.0-2'}}%</h5>
+                  <p>{{emotion_now.very_positive | number:'1.0-2'}}</p>
+                </div>
+              </div>
+              <div class="col-3 col-md-3 p-0">
+                <div class="overview-emotion-image">
+                  <img src="{{ positive ? 'data:image/gif;base64,' + positive : ''}}" />
+                </div>
+                <div class="overview-emotion-title text-center">
+                  <h5 class="text-center">{{emotion_now.positive_percen | number:'1.0-2'}}%</h5>
+                  <p>{{emotion_now.positive | number:'1.0-2'}}</p>
+                </div>
+              </div>
+              <div class="col-3 col-md-3 p-0">
+                <div class="overview-emotion-image">
+                  <img src="{{ negative ? 'data:image/gif;base64,' + negative : ''}}" />
+                </div>
+                <div class="overview-emotion-title text-center">
+                  <h5 class="text-center">{{emotion_now.negative_percen | number:'1.0-2'}}%</h5>
+                  <p>{{emotion_now.negative | number:'1.0-2'}}</p>
+                </div>
+              </div>
+              <div class="col-3 col-md-3 p-0">
+                <div class="overview-emotion-image">
+                  <img src="{{ very_negative ? 'data:image/gif;base64,' + very_negative : ''}}" />
+                </div>
+                <div class="overview-emotion-title text-center">
+                  <h5 class="text-center">{{emotion_now.very_negative_percen | number:'1.0-2'}}%</h5>
+                  <p>{{emotion_now.very_negative | number:'1.0-2'}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 				<p>Có 12,768 đánh giá từ khách hàng trong tháng qua</p> -->
+      </div>
+      <div class="col-md-4">
+        <div class="overview-khungchuaanh">
+          <!-- <img src="https://i.imgur.com/7U4Qvzj.png" alt=""> -->
+          <div>
+            <h6 style="letter-spacing: 1px; font-weight: bold;">CX Index</h6>
+            <h1>{{cx_index_percent_now}}%</h1>
+            <p class="nutcapnhat"><i class="fa fa-{{carret_cx_index}}">&nbsp;</i><span>{{cx_index_percent_comparison >= 0 ?
+								(cx_index_percent_comparison | number:'1.0-2') : - cx_index_percent_comparison | number:'1.0-2'}}%</span></p>
+            <!-- <p class="nutcapnhat"><i class="fa fa-{{carret_cx_index}}">&nbsp;</i><span>{{cx_index_percent_comparison >= 0 ? cx_index_percent_comparison : - cx_index_percent_comparison | number:'1.0-2'}}%</span></p> -->
+            <p style="color: #969696; font-size: 14px;">{{language.So_voi}} {{comparison_with | lowercase}}</p>
+          </div>
+        </div>
+        <span style="margin-top: 10px;" class="tuyetvoi">
+          <p>{{cx_performance.title}}</p> {{language.So_voi}} {{comparison_with | lowercase}} {{cx_performance.content}}
+          <img src="{{ cx_performance.image ? 'data:image/gif;base64,' + cx_performance.image : ''}}" />
+        </span>
+      </div>
+      <div class="col-md-4">
+        <div class="overview-khungchuaanh">
+          <!-- <img src="https://i.imgur.com/frxQvdX.png" alt=""> -->
+          <div>
+            <h6 style="letter-spacing: 1px; font-weight: bold;">NPS Index</h6>
+            <h1>{{nps_index_percent_now}}%</h1>
+            <p class="nutcapnhat"><i class="fa fa-{{carret_nps_index}}">&nbsp;</i><span>{{nps_index_percent_comparison >= 0 ?
+								(nps_index_percent_comparison | number:'1.0-2') : - nps_index_percent_comparison | number:'1.0-2'}}%</span></p>
+            <!-- <p class="nutcapnhat"><i class="fa fa-{{carret_nps_index}}">&nbsp;</i><span>{{nps_index_percent_comparison >= 0 ? nps_index_percent_comparison : - nps_index_percent_comparison | number:'1.0-2'}}%</span></p> -->
+            <p style="color: #969696; font-size:14px;">{{language.So_voi}} {{comparison_with | lowercase }}</p>
+          </div>
+        </div>
+        <span style="margin-top: 10px;" class="tuyetvoi">
+          <p>{{nps_performance.title}}</p> {{language.So_voi}} {{comparison_with | lowercase}}
+          {{nps_performance.content}}
+          <img src="{{ nps_performance.image ? 'data:image/gif;base64,' + nps_performance.image : ''}}" />
+        </span>
+      </div>
+
+    </div>
+    <div class="row no-mg-right-and-left overview-hieuqua">
+      <ul style="padding: 0px; width: 100%; margin-bottom: 0px">
+        <li>
+          <h5>{{language.thoi_gian_co_hieu_qua_cao}}</h5>
+        </li>
+        <li>
+          <div id="overview-index">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="CX Index"
+                (click)="change_data_table()">CX
+                Index</label>
+              <label class="btn btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="NPS Index"
+                (click)="change_data_table()">NPS
+                Index</label>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="row no-mg-right-and-left overview-thoidiem" style="display: none;">
+      <div class="col-md-3">
+        <i class="fa fa-circle" style="color: #059c2e;"></i><span>&nbsp;{{language.gio_tot_nhat}}</span>
+      </div>
+      <div class="col-md-3">
+        <i class="fa fa-circle" style="color: #ed302b;"></i><span>&nbsp;{{language.gio_thap_nhat}}</span>
+      </div>
+      <div class="col-md-3">
+        <i class="fa fa-circle" style="color: #059c2e;"></i><span>&nbsp;{{language.ngay_tot_nhat}}</span>
+      </div>
+      <div class="col-md-3">
+        <i class="fa fa-circle" style="color: #ed302b;"></i><span>&nbsp;{{language.ngay_thap_nhat}}</span>
+      </div>
+    </div>
+    <div class="row no-mg-right-and-left">
+      <div class="col-md-6" id="overview-topcacdiem">
+        <div class="overview-khungtieude">{{language.nhom_cac_diem_co_ket_qua_tot_nhat}}</div>
+        <div>
+          <div class="table-responsive mt-1">
+            <table class="table table-hover table-striped">
+              <thead class="overviewheadtable">
+                <tr>
+                  <th style="text-align:center"></th>
+                  <th style="text-align:left">{{language.dia_diem}}</th>
+                  <th style="text-align:center">{{viewDataBy}}</th>
+                  <th style="text-align:center">{{viewDataBy}} <i class="fa fa-sort"></i></th>
+                </tr>
+              </thead>
+              <tbody class="overviewbodytable">
+                <tr *ngFor="let item of top_result[0]; let i = index">
+                  <td style="text-align:center">{{ i + 1}}</td>
+                  <td style="text-align:left">{{item.site_name}}</td>
+                  <td style="text-align:center">
+                    {{item.cx_index ? (item.cx_index | number:'1.0-2') : (item.nps_index | number:'1.0-2' )}}%</td>
+                  <td style="text-align:center"><i class="fa fa-{{item.cx_caret ? item.cx_caret : item.nps_caret}}">{{item.cx_index_comparison >= 0 ?
+												( item.cx_index_comparison | number:'1.0-2' ) : (item.nps_index_comparison | number:'1.0-2' )}}%</i>
+                  </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                  <td colspan="4" *ngIf="top_result?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" id="overview-diemkem">
+        <div class="overview-khungtieude">{{language.nhom_cac_diem_co_ket_qua_thap_nhat}}</div>
+        <div>
+          <div class="table-responsive mt-1">
+            <table class="table table-hover table-striped">
+              <thead class="overviewheadtable">
+                <tr>
+                  <th style="text-align:center"></th>
+                  <th style="text-align:left">{{language.dia_diem}}</th>
+                  <th style="text-align:center">{{viewDataBy}}</th>
+                  <th style="text-align:center">{{viewDataBy}} <i class="fa fa-sort"></i></th>
+                </tr>
+              </thead>
+              <tbody class="overviewbodytable">
+                <tr *ngFor="let item of top_result[1]; let i = index">
+                  <td style="text-align:center">{{i + 1}}</td>
+                  <td style="text-align:left">{{item.site_name}}</td>
+                  <td style="text-align:center">
+                    {{item.cx_index ? (item.cx_index | number:'1.0-2') : (item.nps_index | number:'1.0-2' )}}%</td>
+                  <td style="text-align:center"><i class="fa fa-{{item.cx_caret ? item.cx_caret : item.nps_caret}}">{{item.cx_index_comparison >= 0 ?
+												(item.cx_index_comparison  | number:'1.0-2' ) : ( item.nps_index_comparison  | number:'1.0-2' )}}%</i>
+                  </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                  <td colspan="4" *ngIf="top_result?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row no-mg-right-and-left" style="margin-top: 20px;">
+      <div class="col-md-6" id="overview-lydokhonghailong">
+        <p class="overview-khungtieude"> {{language.ly_do_khach_hang_kem_hai_long_nhat}}</p>
+        <div #chart_reason_nagative></div>
+      </div>
+      <div class="col-md-6" id="overview-cacthangtruoc">
+        <div class="overview-khungtieude"> {{language.nhom_cac_diem_co_so_luong_danh_gia_nhieu_nhat}}</div>
+        <div>
+          <div class="table-responsive mt-1">
+            <table class="table table-hover table-striped">
+              <thead class="overviewheadtable">
+                <tr>
+                  <th style="text-align:center"></th>
+                  <th style="text-align:left">{{language.dia_diem}}</th>
+                  <th style="text-align:center">{{language.danh_gia}}</th>
+                  <th style="text-align:center">{{language.danh_gia}}&nbsp;<i class="fa fa-sort"></i></th>
+                </tr>
+              </thead>
+              <tbody class="overviewbodytable">
+                <tr *ngFor="let item of total_response; let i = index">
+                  <td style="text-align:center">{{i + 1}}</td>
+                  <td style="text-align:left">{{item.site_name}}</td>
+                  <td style="text-align:center">{{ (item.total_response | number:'1.0-2' )}}</td>
+                  <td style="text-align:center"><i
+                      class="fa fa-{{item.total_caret}}">{{ (item.total_comparison  | number:'1.0-2' )}}%</i></td>
+                </tr>
+                <tr></tr>
+                <tr>
+                  <td colspan="4" *ngIf="total_response?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: right;width: 100%;font-size: 11px;">
+      {{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+</div>
+<!-- end card-body -->

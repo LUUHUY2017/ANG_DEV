@@ -1,0 +1,22 @@
+<ul class="header-administration" style="overflow-x: auto;">
+  <li routerLinkActive="active"> <a
+      [routerLink]="['/general/companies']">{{language == 'vn' ? 'Công ty' : 'Organizations'}} </a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/general/folders']">{{language == 'vn' ? 'Địa điểm' : 'Site'}} </a>
+  </li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/locations']">{{language == 'vn' ? 'Vị trí' : 'Location'}}
+    </a> </li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/categories']">
+      {{language == 'vn' ? 'Danh mục' : 'Categories'}} </a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/general/users']">{{language == 'vn' ? 'Người dùng' : 'Users'}} </a>
+  </li>
+  <li routerLinkActive="active"> <a
+      [routerLink]="['/general/clients']">{{language == 'vn' ? 'Ứng dụng' : 'Application'}} </a> </li>
+  <li routerLinkActive="active"> <a
+      [routerLink]="['/performance/addministrator/import_pos_sale']">{{language == 'vn' ? 'Nhập dữ liệu' : 'Insert data'}}
+    </a> </li>
+  <!-- <li routerLinkActive="active"> <a [routerLink]="['/general/vipcustomer']" *ngIf="showMenu"> Vip</a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/general/blacklist']" *ngIf="showMenu"> Blacklist</a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/general/staffupload']" *ngIf="showMenu"> Staff</a> </li> -->
+  <li routerLinkActive="active"> <a [routerLink]="['/general/zalosender']" *ngIf="showMenu"> OA Zalo</a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/general/zalofollower']" *ngIf="showMenu"> Zalo Follower</a> </li>
+</ul>

@@ -1,0 +1,49 @@
+.metric-comparison-time > app-timeperiod {
+  float: right;
+}
+:host ::ng-deep {
+  .select-visits {
+    width: fit-content !important;
+    > div {
+      width: 160px;
+      min-width: 160px;
+    }
+  }
+  .starttime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .endtime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .metric-comparison-time > app-timeperiod {
+    float: left;
+  }
+}
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+  vertical-align: middle!important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}

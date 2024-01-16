@@ -1,0 +1,324 @@
+<div class="card card-parent">
+   <div class="card-header">
+      <div class="row mr-0 ml-0" id="store-comparison-header">
+         <div class="col-sm-12 col-md-6 p-0">
+            <app-menutree #MenuInput (submit_menu)="get_emit_menu($event)"></app-menutree>
+            <span style="padding:0px 10px;">So với</span>
+            <app-menutree #MenuInput_1 (submit_menu)="get_emit_menu_compare($event)"></app-menutree>
+         </div>
+         <div class="col-sm-12 col-md-2 pr-0"></div>
+         <div class="col-sm-12 col-md-4 p-0">
+            <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+         </div>
+         <!-- end- ul#headmapmenu -->
+      </div>
+      <!-- end-row -->
+   </div>
+   <!-- end-card header -->
+   <div class="card-body card-body-bottom">
+      <div class="row">
+         <div class="container-fluid">
+            <div class="animated fadeIn">
+               <block-ui></block-ui>
+               <div class="card card-child">
+                  <div class="card-header">
+                     <div class="row">
+                        <ul id="headmapmenu_2">
+                           <li>
+                              <div>
+                                 <ng-select style="min-width: 110px;" class="bootstrap selecttimeview select-visits" [options]="indexOption" [allowClear]="false" [(ngModel)]="indexOptionSelected">
+                                 </ng-select>
+                              </div>
+                           </li>
+                           <li>
+                              <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                                 <ng-select class="bootstrap selecttimeview starttime" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select>
+                                 <span style="padding: 3px 0;">-</span>
+                                 <ng-select class="bootstrap  selecttimeview endtime" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select>
+                              </div>
+                              <button type="button" class="btn btn-primary float-right btnapdung buttoncommand" (click)="get_data()">
+                                 Áp dụng
+                              </button>
+                           </li>
+                           <li>
+                              <div>
+                                 <div class="btn-group float-right" dropdown>
+                                    <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnxuat buttoncommand"> Xuất
+                                    </button>
+                                    <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                                       <li role="menuitem"><a style="cursor:pointer" class="dropdown-item float-right" (click)="exportExcel()">Xuất ra Excel</a> </li>
+                                       <!-- <li role="menuitem"><a class="dropdown-item  float-right" href="#">Xuất  ra PDF</a>    </li>
+                                       <li role="menuitem"><a class="dropdown-item  float-right" href="#">Other</a></li> -->
+                                    </ul>
+                                 </div>
+                              </div>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+                  <div class="card-body card-body-bottom">
+                     <div class="row">
+                        <div class="col-sm-5">
+                        </div>
+                        <div class="col-sm-7 d-none d-md-block">
+                           <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
+                              <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour" (click)="change_view()">Giờ</label>
+                              <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day" (click)="change_view()">Ngày</label>
+                              <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week" (click)="change_view()">Tuần</label>
+                              <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Month" (click)="change_view()">Tháng</label>
+                              <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Year" (click)="change_view()">Năm</label>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- <div class="row foot-title-show">
+                        <div class="title-show1 ">
+                           {{site_name}} &nbsp;<span style="border-bottom: 1px dotted #7b7b7b;">so với</span> &nbsp;
+                           {{site_name_compare}} &nbsp; {{ title_index }} &nbsp; {{ starttime }} &minus; {{ endtime }}
+                           &nbsp;{{ title_time_period }}:
+                           {{ time_period }}, xem theo {{ view }}
+                        </div>
+                     </div> -->
+                     <div class="row">
+                        <div class="col-sm-12 col-md-12 ">
+                           <div #container></div>
+                        </div>
+                     </div>
+                     <div style="border-top:1px dotted #a7a4a4" class="row">
+                        <div class="table-responsive ">
+                           <table style="width: 100%;min-width: 900px" class="table table-striped table-comparation">
+                              <thead>
+                                 <tr>
+                                    <th style="width:220px;padding-left: 2.5rem;"> Thời gian </th>
+                                    <th style="width:220px"> {{site_name}} </th>
+                                    <th style="width:220px"> {{site_name_compare}} </th>
+                                    <th style="width:220px">
+                                       <!-- Chênh lệch -->
+                                    </th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Visits'">
+                                       <td></td>
+                                       <td> <b>{{total_num_to_enter |  number:'1.0-2'}}</b>
+                                          <!-- <br><span class="spancell">Tổng lượt khách</span> -->
+                                       </td>
+                                       <td> <b>{{total_num_to_enter_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_num_to_enter_compare > total_num_to_enter ? (total_num_to_enter_compare - total_num_to_enter | number:'1.0-2') :  (total_num_to_enter -total_num_to_enter_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_num_to_enter,total_num_to_enter_compare)}} lần) so với {{site_name_compare}} </span>
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Traffic Flow'">
+                                       <td></td>
+                                       <td> <b>{{total_traffic |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{total_traffic_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_traffic_compare > total_traffic ? (total_traffic_compare - total_traffic | number:'1.0-2') : (total_traffic - total_traffic_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_traffic, total_traffic_compare)}} lần) so với {{site_name_compare}} </span>
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'PasserBy'">
+                                       <td></td>
+                                       <td> <b>{{total_passer_by |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{total_passer_by_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_passer_by_compare > total_passer_by ? (total_passer_by_compare - total_passer_by | number:'1.0-2') : (total_passer_by - total_passer_by_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_passer_by,total_passer_by_compare)}} lần) so với {{site_name_compare}} </span>
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Shopper Visits'">
+                                       <td></td>
+                                       <td> <b>{{total_shopper_visits |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{total_shopper_visits_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_shopper_visits_compare > total_shopper_visits ? (total_shopper_visits_compare - total_shopper_visits | number:'1.0-2') : (total_shopper_visits - total_shopper_visits_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_shopper_visits,total_shopper_visits_compare)}} lần) so với {{site_name_compare}} </span>
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Turn in rate'">
+                                       <td></td>
+                                       <td> <b>{{total_turn_rate |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{total_turn_rate_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_turn_rate_compare > total_turn_rate ? (total_turn_rate_compare - total_turn_rate | number:'1.0-2') : (total_turn_rate - total_turn_rate_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_turn_rate,total_turn_rate_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Kids Visits'">
+                                       <td></td>
+                                       <td> <b>{{total_kids |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{total_kids_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{total_kids_compare > total_kids ? (total_kids_compare - total_kids | number:'1.0-2') : (total_kids - total_kids_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(total_kids,total_kids_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Avg Time'">
+                                       <td></td>
+                                       <td> <b>{{toHHMMSS(total_avg_time) }}</b> <br><span class="spancell">Thời gian trung bình</span> </td>
+                                       <td> <b>{{toHHMMSS(total_avg_time_compare) }}</b> <br><span class="spancell">Thời gian trung bình</span> </td>
+                                       <td>
+                                          <b>{{total_avg_time > total_avg_time_compare ? toHHMMSS((total_avg_time - total_avg_time_compare)) : toHHMMSS((total_avg_time_compare - total_avg_time)) }}</b>
+                                          <br><span class="spancell">Thời gian chênh lệch</span>
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Conversion rate'">
+                                       <td></td>
+                                       <td> <b>{{tt_conver |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_conver_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_conver_compare > tt_conver ? (tt_conver_compare - tt_conver | number:'1.0-2') : (tt_conver - tt_conver_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_conver,tt_conver_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'ATV'">
+                                       <td></td>
+                                       <td> <b>{{tt_atv |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_atv_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_atv_compare > tt_atv ? (tt_atv_compare - tt_atv | number:'1.0-2') : (tt_atv - tt_atv_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_atv,tt_atv_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Avg Items'">
+                                       <td></td>
+                                       <td> <b>{{tt_avg_item |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_avg_item_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_avg_item_compare > tt_avg_item ? (tt_avg_item_compare - tt_avg_item | number:'1.0-2') : (tt_avg_item - tt_avg_item_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_avg_item,tt_avg_item_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Sales Yield'">
+                                       <td></td>
+                                       <td> <b>{{tt_sales_yeild |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_sales_yeild_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_sales_yeild_compare > tt_sales_yeild ? (tt_sales_yeild_compare - tt_sales_yeild | number:'1.0-2') : (tt_sales_yeild - tt_sales_yeild_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_sales_yeild,tt_sales_yeild_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Transactions'">
+                                       <td></td>
+                                       <td> <b>{{tt_transactions |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_transactions_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_transactions_compare > tt_transactions ? (tt_transactions_compare - tt_transactions | number:'1.0-2') : (tt_transactions - tt_transactions_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_transactions,tt_transactions_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Sales'">
+                                       <td></td>
+                                       <td> <b>{{tt_sales |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_sales_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_sales_compare > tt_sales ? (tt_sales_compare - tt_sales | number:'1.0-2') : (tt_sales - tt_sales_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_sales,tt_sales_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Missed Sales Opportunity'">
+                                       <td></td>
+                                       <td> <b>{{tt_missed_sales |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_missed_sales_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_missed_sales_compare > tt_missed_sales ? (tt_missed_sales_compare - tt_missed_sales | number:'1.0-2') : (tt_missed_sales - tt_missed_sales_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_missed_sales,tt_missed_sales_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Loyal Visits'">
+                                       <td></td>
+                                       <td> <b>{{tt_loyal_visits |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_loyal_visits_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_loyal_visits_compare > tt_loyal_visits ? (tt_loyal_visits_compare - tt_loyal_visits | number:'1.0-2') : (tt_loyal_visits - tt_loyal_visits_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_loyal_visits,tt_loyal_visits_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Loyal Transactions'">
+                                       <td></td>
+                                       <td> <b>{{tt_loy_tran |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_loy_tran_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_loy_tran_compare > tt_loy_tran ? (tt_loy_tran_compare - tt_loy_tran | number:'1.0-2') : (tt_loy_tran - tt_loy_tran_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_loy_tran,tt_loy_tran_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Loyal Conversion rate'">
+                                       <td></td>
+                                       <td> <b>{{tt_loy_conver |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_loy_conver_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_loy_conver_compare > tt_loy_conver ? (tt_loy_conver_compare - tt_loy_conver | number:'1.0-2') : (tt_loy_conver - tt_loy_conver_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_loy_conver,tt_loy_conver_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Missed Loyal rate'">
+                                       <td></td>
+                                       <td> <b>{{tt_missed_loyal |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_missed_loyal_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_missed_loyal_compare > tt_missed_loyal ? (tt_missed_loyal_compare - tt_missed_loyal | number:'1.0-2') : (tt_missed_loyal - tt_missed_loyal_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_missed_loyal,tt_missed_loyal_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'CX index'">
+                                       <td></td>
+                                       <td> <b>{{tt_cx_index |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_cx_index_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_cx_index_compare > tt_cx_index ? (tt_cx_index_compare - tt_cx_index | number:'1.0-2') : (tt_cx_index - tt_cx_index_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_cx_index,tt_cx_index_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'NPS index'">
+                                       <td></td>
+                                       <td> <b>{{tt_nps_index |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_nps_index_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_nps_index_compare > tt_nps_index ? (tt_nps_index_compare - tt_nps_index | number:'1.0-2') : (tt_nps_index - tt_nps_index_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_nps_index,tt_nps_index_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Sales hours'">
+                                       <td></td>
+                                       <td> <b>{{tt_sales_hour |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_sales_hour_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_sales_hour_compare > tt_sales_hour ? (tt_sales_hour_compare - tt_sales_hour | number:'1.0-2') : (tt_sales_hour - tt_sales_hour_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_sales_hour,tt_sales_hour_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Shoppers on sales hour'">
+                                       <td></td>
+                                       <td> <b>{{tt_shopper_on_sh |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_shopper_on_sh_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_shopper_on_sh_compare > tt_shopper_on_sh ? (tt_shopper_on_sh_compare - tt_shopper_on_sh | number:'1.0-2') : (tt_shopper_on_sh - tt_shopper_on_sh_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_shopper_on_sh,tt_shopper_on_sh_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.indexOptionSelected === 'Sales on sales hour'">
+                                       <td></td>
+                                       <td> <b>{{tt_sales_on_sh |  number:'1.0-2'}}</b> </td>
+                                       <td> <b>{{tt_sales_on_sh_compare |  number:'1.0-2'}}</b> </td>
+                                       <td>
+                                          <b>{{tt_sales_on_sh_compare > tt_sales_on_sh ? (tt_sales_on_sh_compare - tt_sales_on_sh | number:'1.0-2') : (tt_sales_on_sh - tt_sales_on_sh_compare |  number:'1.0-2') }}</b>
+                                          <br> <span class="spancell"> {{site_name}} tương đương ({{ get_compar_per(tt_sales_on_sh,tt_sales_on_sh_compare)}} lần) so với {{site_name_compare}} </span> </td>
+                                    </ng-container>
+                                 </tr>
+                                 <tr *ngFor="let item of all_data">
+                                    <ng-container *ngIf="indexOptionSelected !== 'Avg Time'">
+                                       <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                                       <td> {{item.data | number:'1.0-2'}} <span [hidden]="indexOptionSelected === 'Turn in rate'  ||  indexOptionSelected === 'Conversion rate' || indexOptionSelected === 'Loyal Visits' || indexOptionSelected === 'Loyal Transactions' || indexOptionSelected === 'Loyal Conversion rate' || indexOptionSelected === 'Missed Loyal rate' || indexOptionSelected === 'CX index' || 
+                                          indexOptionSelected === 'Sales hours' ||     indexOptionSelected === 'Sales on sales hour' || indexOptionSelected === 'Shoppers on sales hour' || indexOptionSelected === 'NPS index' || indexOptionSelected === 'ATV' || indexOptionSelected === 'Avg Items'" class="spancell">({{item.data_percent}}%)</span> </td>
+                                       <td> {{item.data_compare | number:'1.0-2'}} <span [hidden]="indexOptionSelected === 'Turn in rate'  ||  indexOptionSelected === 'Conversion rate' || indexOptionSelected === 'Loyal Visits' || indexOptionSelected === 'Loyal Transactions' || indexOptionSelected === 'Loyal Conversion rate' || indexOptionSelected === 'Missed Loyal rate' || indexOptionSelected === 'CX index' ||   indexOptionSelected === 'Sales hours' ||     indexOptionSelected === 'Sales on sales hour' || indexOptionSelected === 'Shoppers on sales hour' || indexOptionSelected === 'NPS index' || indexOptionSelected === 'ATV' || indexOptionSelected === 'Avg Items'" class="spancell">({{item.data_compare_percent}}%)</span> </td>
+                                       <td class="{{item.data > item.data_compare ? 'fa-icon-green' : item.data == item.data_compare ? 'fa-icon-gray': 'fa-icon-red'  }}">
+                                          {{get_number_int(item.number_compare) | number:'1.0-2'}}
+                                       </td>
+                                    </ng-container>
+                                    <ng-container *ngIf="indexOptionSelected === 'Avg Time'">
+                                       <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                                       <td> {{ item.data ? (toHHMMSS(item.data *60)) : '00:00:00' }} </td>
+                                       <td> {{ item.data_compare ? (toHHMMSS(item.data_compare *60)) : '00:00:00' }} </td>
+                                       <td> {{item.data >= item.data_compare ? toHHMMSS((item.data - item.data_compare)*60 ) : toHHMMSS((item.data_compare - item.data)*60) }} </td>
+                                    </ng-container>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div id="divbaocao" style="float: right; font-size: 11px">Báo cáo này đã được tạo vào {{time_generate_report | date:
+         'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} -
+         <span style="color:blue; cursor:pointer;" (click)="reset_session()">làm mới báo cáo</span>
+      </div>
+   </div>
+</div>

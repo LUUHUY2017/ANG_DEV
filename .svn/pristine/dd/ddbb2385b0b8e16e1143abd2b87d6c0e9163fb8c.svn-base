@@ -1,0 +1,101 @@
+<main>
+   <div style="margin-top:15px" class="row">
+      <div class="col-md-12">
+         <app-adminstratormenu></app-adminstratormenu>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset" class="card card-administration">
+            <block-ui></block-ui>
+            <div class="card-body " style=" padding-top: 0px;">
+               <div class="row">
+                  <div class="col-lg-3">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi">Tổ
+                           chức</label>
+                        <ng-select class="bootstrap selectimeview backselect" required name="organization_id"
+                           [allowClear]="true" placeholder="Chọn tổ chức">
+                        </ng-select>
+
+                     </div>
+                  </div>
+                  <!-- <div class="col-lg-3">
+                           <div class="form-group col-md-12 formsearch">
+                              <label class="col-form-label label-admi">Chọn folder</label>
+                              <ng-select class="bootstrap select-white backselect"></ng-select>
+                           </div>
+                        </div> -->
+                  <div class="col-lg-3">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi"> Từ khóa</label>
+                        <input class="form-control select-white nofocus" name="tu_khoa" type="text" placeholder="Tìm kiếm...">
+                     </div>
+                  </div>
+                  <div class="col-lg-3">
+                     <div style="width: 110px;" class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi"> &nbsp; </label>
+                        <button (click)=get_data() class="btn btn-them form-control buton-search ">
+                           Tìm Kiếm</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 10px;" class="card">
+            <!-- <div class="card-header card-font">
+               <i class="fa fa-list-alt" aria-hidden="true"></i> <span>Thông tin tài khoản</span>
+            </div> -->
+            <div class="card-body card-table table-users">
+               <div class="table-responsive">
+                  <table style="width: 100%;min-width: 900px" class="table table-hover table-striped">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px">STT</th>
+                           <th style="width: 150px">Thời gian</th>
+                           <th style="width: 120px">Serial Number</th>
+                           <th style="width: 130px"> Thiết bị</th>
+                           <th style="width: 150px">Tình trạng</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td>1</td>
+                           <td>12/25/2018</td>
+                           <td>352961062609505</td>
+                           <td>King BUFFET Royal city</td>
+                           <td>Đang hoạt động</td>
+                        </tr>
+                        <tr>
+                           <td>2</td>
+                           <td>12/25/2018</td>
+                           <td>352961062609505</td>
+                           <td>King BUFFET Royal city</td>
+                           <td>Đang hoạt động</td>
+                        </tr>
+                        <tr>
+                           <td>3</td>
+                           <td>12/25/2018</td>
+                           <td>352961062609505</td>
+                           <td>King BUFFET Royal city</td>
+                           <td>Đang hoạt động</td>
+                        </tr>
+                        <tr>
+                           <td>4</td>
+                           <td>12/25/2018</td>
+                           <td>352961062609505</td>
+                           <td>King BUFFET Royal city</td>
+                           <td>Đang hoạt động</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</main>

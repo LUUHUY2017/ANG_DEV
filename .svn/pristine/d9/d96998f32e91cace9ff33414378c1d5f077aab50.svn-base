@@ -1,0 +1,426 @@
+<div class="app-body">
+  <div class="row">
+    <div class="ui-g-12 btnshow">
+      <div class="group-line" (click)="on_off_leftmenu()">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="width: 100%;
+    margin-left: 25px;
+    margin-right: 0px;">
+    <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 side {{show_menu_left}}" style="background: #f8f9fa; padding: 0px; display: flex;
+		flex-direction: column;">
+      <div class="row"
+        style="margin: 0px; background: #fff; border-bottom: 0.75px solid rgba(0, 0, 0, 0.12); box-shadow: -4px 1px 2px 1px #ddd; display: block;">
+        <div class="col-md-12" style="padding: 5px 10px;
+				height: 50px;
+				line-height: 40px;">
+          <img src="{{url + 'admin/Analytics.ico'}}" style="width: 40px;vertical-align: top; margin-left: 12px;">
+          <span style="font-family: 'Roboto', sans-serif;
+          font-size: 22px;
+          vertical-align: top;
+          display: inline-block;
+          padding-left: 11px;">
+            Analytics
+          </span>
+        </div>
+      </div>
+      <ul class="menu_ul mt-2" style="flex-grow: 1;">
+        <ng-container *ngFor="let item of navItems; let index = i">
+          <ng-container *ngIf="item.module_title === 'default'">
+            <li>
+              <a #menu_li (click)="get_animation(menu_li, $event)" [routerLink]="[item.url]"
+                routerLinkActive="selected">
+                <i class="{{item.icon}}" style="color: #73818f;
+												margin-right: 15px;
+												font-size: .875rem;"></i> {{type_language =='vn' ? item.name : item.name_en}}
+              </a>
+            </li>
+            <span class="label1"> {{language.bao_cao}}</span>
+          </ng-container>
+          <!--  !==  && item.module_title !== 'about' && item.module_title !== 'default' -->
+          <!-- <ng-container *ngIf="item.module_title !== 'all' item.children && item.children.length > 0"> -->
+          <ng-container *ngIf="['footfall', 'fba', 'genderage', 'performance'].includes(item.module_title)">
+            <li [routerLinkActive]="['show_sub_menu']">
+              <a #menu_li class="has_children" (click)="get_animation(menu_li, $event, true)"
+                routerLinkActive="show_sub_menu">
+                <img src="{{item.icon_src}}" style="width: 20px;
+								margin-right: 10px;"> {{type_language =='vn' ? item.name : item.name_en}}
+              </a>
+              <ul class="sub_menu_ul">
+                <li *ngFor="let item2 of item.children" [routerLinkActive]="['show_sub_menu']">
+                  <ng-container *ngIf="item2.children && item2.children.length > 0">
+                    <a #menu_li class="has_children" (click)="get_animation(menu_li, $event, true)"
+                      routerLinkActive="selected">
+                      {{type_language =='vn' ? item2.name :item2.name_en}}
+                    </a>
+                    <ul class="sub_menu_ul">
+                      <li *ngFor="let item3 of item2.children">
+                        <a class="add-padding" #menu_li (click)="get_animation(menu_li, $event)"
+                          [routerLink]="[item3.url]" routerLinkActive="selected">
+                          {{type_language =='vn' ? item3.name : item3.name_en}}
+                        </a>
+                      </li>
+                    </ul>
+                  </ng-container>
+                  <ng-container *ngIf="!item2.children">
+                    <a #menu_li (click)="get_animation(menu_li, $event)" [routerLink]="[item2.url]"
+                      routerLinkActive="selected">
+                      {{type_language =='vn' ? item2.name : item2.name_en}}
+                    </a>
+                  </ng-container>
+                </li>
+              </ul>
+            </li>
+          </ng-container>
+        </ng-container>
+      </ul>
+      <ul class="menu_ul">
+        <ng-container *ngFor="let item of navItems; let index = i">
+          <ng-container *ngIf="item.module_title == 'all'">
+            <li [routerLinkActive]="['show_sub_menu']">
+              <a #menu_li class="has_children" (click)="get_animation(menu_li, $event, true)"
+                routerLinkActive="show_sub_menu">
+                <i class="{{item.icon}}" style="color: #73818f;
+							margin-right: 15px;
+							font-size: 0.875rem;"></i> {{type_language =='vn' ? item.name : item.name_en}}
+              </a>
+              <ul class="sub_menu_ul">
+                <li *ngFor="let item2 of item.children" [routerLinkActive]="['show_sub_menu']">
+                  <a #menu_li (click)="get_animation(menu_li, $event)" [routerLink]="[item2.url]"
+                    routerLinkActive="selected">
+                    <!-- <i class="{{item2.icon}}" style="color: #73818f;
+											margin-right: 15px;
+											font-size: .875rem;"></i> -->
+                    {{type_language =='vn' ? item2.name : item2.name_en}}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="['about'].includes(item.module_title)">
+            <li [routerLinkActive]="['show_sub_menu']">
+              <a #menu_li class="has_children" (click)="get_animation(menu_li, $event, true)"
+                routerLinkActive="show_sub_menu">
+                <i class="{{item.icon}}" style="color: #73818f;
+							margin-right: 15px;
+							font-size: 0.875rem;"></i> {{type_language =='vn' ? item.name : item.name_en}}
+              </a>
+              <ul class="sub_menu_ul">
+                <li *ngFor="let item2 of item.children" [routerLinkActive]="['show_sub_menu']">
+                  <a #menu_li (click)="get_animation(menu_li, $event)" [routerLink]="[item2.url]"
+                    routerLinkActive="selected">
+                    <!-- <i class="{{item2.icon}}" style="color: #73818f;
+											margin-right: 15px;
+											font-size: .875rem;"></i> -->
+                    {{type_language =='vn' ? item2.name : item2.name_en}}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ng-container>
+        </ng-container>
+        <!-- class="show_sub_menu" -->
+        <li [routerLinkActive]="['show_sub_menu']" >
+          <a #menu_li class="has_children" (click)="get_animation(menu_li, $event, true)"
+            routerLinkActive="show_sub_menu">
+            <i class="cui cui-bell" style="color: #73818f;  margin-right: 15px;  font-size: 0.875rem;"></i> {{type_language =='vn' ? 'Thông báo và phản hồi' : 'Notification & feedback'}} <span class="badge badge-danger">{{count_notification}}</span>
+          </a>
+          <ul class="sub_menu_ul">
+            <li>
+              <a (click)="openModal(notification)">
+                Thông báo <span class="badge badge-danger">{{count_notification}}</span>
+              </a>
+            </li>
+            <li>
+              <a (click)="openModal(template)">
+                Phản hồi
+              </a>
+            </li>
+            <li>
+              <a (click)="get_help(help)">
+                Trợ giúp
+              </a>
+            </li>
+          </ul>
+        </li>
+        <!-- class="show_sub_menu" -->
+        <li [routerLinkActive]="['show_sub_menu']" >
+          <a #menu_li_2 class="has_children" (click)="get_animation(menu_li_2, $event, true)"
+            routerLinkActive="show_sub_menu">
+            <i class="fa fa-info-circle" style="color: #73818f;  margin-right: 15px; font-size: 0.875rem;"></i> {{type_language =='vn' ? 'Thông tin người dùng' : 'User infomation'}}
+          </a>
+          <ul class="sub_menu_ul">
+            <li routerLinkActive="selected">
+              <a   style=" white-space: nowrap; padding: 10px 0px 10px 40px;overflow-x: hidden;" (click)="get_animation(menu_li_2, $event)" [routerLink]="['/userconfig/editinfo']">
+                <p style="line-height: 20px;" title="{{username}}" class="mb-0">{{language.ten_nguoi_dung}}: {{username}}</p>
+                <p style="line-height: 20px;" title=" {{email}}" class="mb-0">Email: {{email}}</p>
+                <p style="line-height: 20px;" title="{{organization_name ? organization_name :  language.khong_to_chuc }}" class="mb-0">{{language.to_chuc}}: {{organization_name ? organization_name :  language.khong_to_chuc }}</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <!-- <div
+        style="background-color: inherit;font-size:13px;width: 100%;color:#686666;padding:5px 0 5px 10px;border-top: 0.6px solid rgba(0, 0, 0, 0.12)">
+        <label style=" margin-bottom: 0.2rem !important;"><i style="color:#73818f" class="fa fa-bell"></i>&nbsp;
+          {{language.thong_bao_}} &nbsp;<span class="badge badge-pill badge-danger"
+            style="user-select: none; cursor: pointer;" (click)="openModal(notification)">{{count_notification}}
+            {{language.thong_bao}} </span></label><br>
+        <label class="link_icon" style="cursor: pointer;margin-bottom: 0.2rem !important;" (click)="get_help(help)"><i
+            class="fa fa-question-circle"></i>&nbsp; {{language.tro_giup}}</label><br>
+        <label class="link_icon" style="cursor: pointer;margin-bottom: 0.2rem !important;"
+          (click)="openModal(template)"><i style="color:#73818f"
+            class="fa fa-commenting"></i>&nbsp;{{language.phan_hoi}}</label><br>
+        <label (click)='goToLink("#/guides/report")' style=" margin-bottom: 0.2rem !important;"><i style="color:#73818f"
+            class="fa fa-book"></i>&nbsp;{{language.huong_dan_su_dung}}</label><br>
+      </div> -->
+      <!-- <div
+        style="background-color: inherit;font-size:13px;width: 100%;color:#686666;padding:5px 0 5px 10px;border-top: 0.6px solid rgba(0, 0, 0, 0.12)">
+        <label style=" margin-bottom: 0.2rem !important;"><i style="color:#73818f"
+            class="fa fa-user-circle-o"></i>&nbsp;{{language.ten_nguoi_dung}}&nbsp;<i
+            style="cursor:pointer; text-decoration: underline;"
+            [routerLink]="['/userconfig/editinfo']">{{username}}</i></label><br>
+        <label style=" margin-bottom: 0.2rem !important;"><i style="color:#73818f"
+            class="fa fa-envelope"></i>&nbsp;Email:&nbsp;<i>{{email}}</i></label><br>
+        <label style=" margin-bottom: 0.2rem !important;"><i style="color:#73818f" class="fa fa-clock-o"></i>&nbsp;
+          {{language.to_chuc}}
+          &nbsp;<i>{{organization_name ? organization_name :  language.khong_to_chuc }}</i></label>
+      </div> -->
+      <button style="width: 100%;
+			color: #747475;
+			background: #f8f9fa;
+			border-color: transparent;
+			border-top-color: rgba(0, 0, 0, 0.12);
+			font-weight: bold;
+			z-index: 1;
+			line-height: 25px; min-height: 25px;" type="submit" [routerLink]="['/login']" class="btn btn-sm"><i
+          style="color:crimson" class="fa fa-ban"></i> &nbsp; {{language.dang_xuat}}
+      </button>
+    </div>
+
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-10 right_content">
+      <div class="grade-blur" [hidden]="show" (click)="on_off_leftmenu()"></div>
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+<div class="app-footer">
+  <span>
+    <a target="_blank" href="https://ars.acs.vn/">ACS Analytics Platform</a> &copy; 2020. Version: {{version}}. API: {{version_api}}. Service: {{version_service}}. SK: {{version_socketio}}</span>
+  <span class="ml-auto">Powered by
+    <a target="_blank" href="https://www.acs.vn/">ACS Solutions</a>
+  </span></div>
+<!-- Modal  cập nhật  -->
+<ng-template #template>
+  <form (ngSubmit)="add_feedback(fb_form)" #fb_form="ngForm">
+    <div class="modal-header">
+      <h4 class="modal-title pull-left"> {{language.gui_phan_hoi}}</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-3 col-3 col-form-label lh-label"> {{language.tieu_de}} </label>
+        <div class="col-md-9 col-9 col-form-label">
+          <input class="form-control color-font" ngModel name="title">
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-3 col-3 col-form-label lh-label"> {{language.noi_dung}}</label>
+        <div class="col-md-9 col-9 col-form-label">
+          <textarea required class="form-control" style="border-radius:0px;" cols="30" rows="10" ngModel
+            name="feedback_content" required></textarea>
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-3 col-3 col-form-label lh-label" style="line-height: 15px;">
+          {{language.hinh_anh}}<small> {{language.tuy_chon_}}</small></label>
+        <div class="col-md-9 col-9 col-form-label">
+          <input type="file" class="form-control" ngModel name="hinhanh"
+            (change)="handleFileInput($event.target.files)">
+          <img *ngIf="ImageUrl" style="width: 100%;" [src]="ImageUrl" alt="">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}
+      </a>
+      <button class="btn btn-primary" (click)="modalRef.hide()" [disabled]="fb_form.invalid">
+        {{language.gui}}</button>
+    </div>
+  </form>
+</ng-template>
+<!-- Kết thúc  Modal cập nhật-->
+
+<ng-template #notification>
+  <div class="modal-header" style="position: relative;">
+    <span *ngIf="data_notification.length > 0" style="position: absolute;
+    right: 15px;
+    bottom: 2px;
+    color: red;
+    font-style: italic;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;" (click)="truncate_all()"> {{language.xoa_tat_ca}}</span>
+    <h5 class="modal-title" style="color:#f3b21c;"><i class="fa fa-bell">&nbsp;</i>
+      {{language.chi_tiet_thong_bao}}<small
+        style="font-size: 12px; font-style: italic;color: #999;display: block;">{{data_notification.length}}
+        {{language.thong_bao}}</small></h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span>&times;</span>
+    </button>
+  </div>
+  <div class="modal-body auto_scroll">
+    <div class="row flex_item" style="    min-height: 150px;
+    font-style: italic;
+    color: #999;" *ngIf="data_notification.length === 0">
+      <h4><i class="fa fa-folder-open-o">&nbsp;</i> {{language.chua_co_thong_bao}}
+      </h4>
+    </div>
+    <div class="row motthongbao {{!item.actived ? 'unseen' : ''}}" *ngFor="let item of data_notification"
+      (click)="notification_click(item)">
+      <div class="col-2 col-md-2 flex_item"><i class="fa fa-{{item.icon}}" style="font-size: 25px;color: #f3b21c;"></i>
+      </div>
+      <div class="col-10 col-md-10" style="
+			padding-left: 0px;
+	">
+        <p class="m-0 noidungnotfication" style="font-size: 15px;line-height: 19px;" [innerHTML]="item.message_content">
+        </p>
+        <p class="m-0" style="color: #4dbd74;font-size: 10px;"><i class="fa fa-clock-o"></i>
+          {{item.created_at | date: 'hh:mm dd-MM-yyyy'}}</p>
+      </div>
+      <!-- <span (click)="delete_item(item)"><i class="fa fa-times"></i></span> -->
+    </div>
+  </div>
+  <div *ngIf="error_message" class="modal-footer" style="display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #f86c6b;
+	font-style: italic;">
+    <h4>{{error_message}}</h4>
+  </div>
+</ng-template>
+<!-- Kết thúc  Modal cập nhật-->
+<ng-template #help>
+  <div class="modal-header" style="background: #757575;
+	border-color: #757575;
+	position: relative;
+	border-radius: 0px;">
+    <h5 class="modal-title" style="color:#f3b21c;">
+      <i class="fa {{ status === 1 ? 'fa-question-circle-o' : 'fa-arrow-circle-o-left' }}"
+        [ngStyle]="{'color': status !== 1 ? 'white' : 'inherit', 'cursor': status !== 1 ? 'pointer' : 'unset'}"
+        (click)="status = 1">&nbsp;</i>{{language.tro_giup}}
+      <i class="fa fa-spinner spinner" style="color: #fff;" *ngIf="spinner"></i>
+    </h5>
+    <button type="button" class="close pull-right" style="color: #fff;" aria-label="Close" (click)="modalRef.hide()">
+      <span>&times;</span>
+    </button>
+
+  </div>
+  <div *ngIf="status === 1" class="modal-body auto_scroll" style="position:relative;">
+    <div class="row flex_item" style="    min-height: 150px;
+			font-style: italic;
+			color: #999;" *ngIf="tag_array.length === 0">
+      <h4><i class="fa fa-folder-open-o">&nbsp;</i>{{message_status}}</h4>
+    </div>
+    <ng-container *ngIf="tag_array.length > 0">
+      <div class="row">
+        <div class="col-md-12 mt-2 mb-2">
+          <p style="    margin-bottom: 0px;
+				font-weight: 700;
+				color: #777;"> {{language.pho_bien}}</p>
+        </div>
+      </div>
+      <div style="min-height: 80px;">
+        <div class="row motthongbao" *ngFor="let item of tag_array" (click)="get_detail_help(item.id)">
+          <div class="col-2 col-md-2 flex_item"><img src="../../../assets/img/iconmenu/list.png" style="width: 40px">
+          </div>
+          <div class="col-10 col-md-10" style="    display: flex;
+						align-items: center;">
+            <p class="m-0 noidungnotfication" style="font-size: 20px;line-height: 30px; border-bottom: 1px solid #ddd;
+							width: 100%;">{{item.tag_name}}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <div class="row" style="
+    border-top: 1px solid #ddd;">
+      <a style="padding: 20px;
+			text-transform: uppercase;
+			font-family: Open-Bold;" (click)="modalRef.hide()" [routerLink]="[ '/help' ]">
+        {{language.truy_cap_danh_sach}} <i class="fa fa-external-link"></i></a>
+    </div>
+    <div class="row" style="
+    border-top: 1px solid #ddd;">
+      <a class="add_help" *ngIf="userLever === 0" (click)="to_add_help()">
+        {{language.them_moi_tro_giup}} <i class="fa fa-plus-circle"></i></a>
+    </div>
+  </div>
+  <div *ngIf="status === 2" class="modal-body auto_scroll">
+    <div class="row flex_item" style="    min-height: 150px;
+			font-style: italic;
+			color: #999;" *ngIf="help_array.length === 0">
+      <h4><i class="fa fa-folder-open-o">&nbsp;</i>
+        {{language.chua_co_bai_viet_huong_dan_nao}} </h4>
+    </div>
+    <div class="row motbaiviet" *ngFor="let item of help_array">
+      <div class="col-md-12 mt-2 mb-2">
+        <p style="margin-bottom: 0px;
+				font-weight: 700;    font-size: 22px;">{{item.title_content}}</p>
+      </div>
+      <div class="col-md-12">
+        <div style="color: #777;font-size: 16px;" [innerHTML]="item.help_content" class="noidungbook"></div>
+      </div>
+      <div class="col-md-12" style="padding: 15px;">
+        <div class="atentionlabel" style="color: #777;
+				font-size: 15px;
+				font-style: italic;
+				padding: 10px 0px 10px 60px;
+				background: #eee;">
+          {{item.help_description ? item.help_description : language.chua_co_tom_tat_noi_dung }}
+        </div>
+      </div>
+      <div (click)="get_element($event.target)" class="col-md-12 trongbaivietnay mt-2" style="cursor: pointer;
+			padding: 15px 20px;
+			border-top: 1px solid #ddd;">
+        <a style="font-style: italic;
+				    color: #007ad9;
+				font-family: Open-Bold;"> {{language.trong_bai_viet_nay}} </a>
+      </div>
+      <ul style="padding: 0px 15px;
+			border-left: 2px solid #ddd;
+			list-style: none;
+			margin-left: 20px;">
+        <li *ngFor="let item2 of item.tag_name" (click)="get_detail_help(item.tag_id)"><a class="linktag">{{item2}}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="row" style="
+    border-top: 1px solid #ddd;">
+      <a style="padding: 20px;
+			text-transform: uppercase;
+			font-family: Open-Bold;" (click)="modalRef.hide()" [routerLink]="[ '/help' ]">
+        {{language.truy_cap_danh_sach_tro_giup}} <i class="fa fa-external-link"></i></a>
+    </div>
+    <div class="row" style="
+    border-top: 1px solid #ddd;">
+      <a class="add_help" *ngIf="userLever === 0" (click)="to_add_help()">
+        {{language.them_moi_tro_giup}} <i class="fa fa-plus-circle"></i></a>
+    </div>
+  </div>
+  <div *ngIf="error_message" class="modal-footer" style="display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #f86c6b;
+		font-style: italic;">
+    <h4>{{error_message}}</h4>
+  </div>
+</ng-template>
+<!-- <app-footer>
+
+</app-footer> -->

@@ -1,0 +1,22 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+// Routing
+import { AgeRoutingModule } from './age-routing.module';
+
+import { UserPermissionGuard } from '../../shared/user_permission.guard';
+import { GenderagePermissionGuard } from '../../shared/genderage_permission.guard';
+
+
+@NgModule({
+  imports: [
+    AgeRoutingModule
+  ],
+  declarations: [
+  ],
+  providers: [
+    UserPermissionGuard
+    , GenderagePermissionGuard
+  ]
+})
+export class AgeModule { }

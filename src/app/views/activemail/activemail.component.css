@@ -1,0 +1,18 @@
+.noidunggioithieu {
+    text-align: left;
+    font-size: 13px;
+}
+
+.language-css {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: inline;
+    text-align: right;
+    font-size: 11px;
+    color: #232f3f;
+}
+
+.language-css select {
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.3);
+}

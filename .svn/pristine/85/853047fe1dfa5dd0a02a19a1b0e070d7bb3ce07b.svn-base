@@ -1,0 +1,7 @@
+<ul class="header-administration" style="overflow-x: auto;">
+  <li routerLinkActive="active"> <a [routerLink]="['/gender-age/administration/terminals']">{{language =='vn'? 'Thiết bị horizon-robotic' : '
+        Horizon-robotic equipment'}} </a> </li>
+  <li routerLinkActive="active"> <a [routerLink]="['/gender-age/administration/user-mail']"> {{language =='vn'? 'Cấu hình mail báo cáo' : '
+    Configure report mail'}}   </a>
+  </li>
+</ul>

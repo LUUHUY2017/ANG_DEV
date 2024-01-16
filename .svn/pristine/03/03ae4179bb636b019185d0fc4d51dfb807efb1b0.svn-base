@@ -1,0 +1,467 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"> <i class="cui-layers" aria-hidden="true"></i>
+            {{language.danh_sach_cong_ty}}</span>
+          <button *ngIf="isSuperAdmin" style="float:right;" type="button" class="btn btn-them buton-search"
+            (click)="openPopupAddItem(insertTemplate)"><i class="icon-plus">&nbsp;</i>{{language.them_cong_ty}}</button>
+        </div>
+        <div class="card-body card-table table-companies">
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="table-responsive">
+                <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                  <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">{{language.STT}}</th>
+                        <th style="width: 80px;text-align: left;">Logo đại diện</th>
+                        <th style="width: 80px;text-align: left;">Tên tổ chức</th>
+                        <th style="width: 80px;text-align: left;">Mã tổ chức</th>
+                        <th style="width: 80px;text-align: left;">Tên viết tắt</th>
+                        <th style="width: 80px;text-align: left;">Hoạt động</th>
+                        <!-- <th style="width: 120px;text-align: left;text-indent: 1rem;">Ngày cập nhật</th> -->
+                        <th style="width: 150px;">{{language.xu_ly}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                        <td></td>
+                        <td><input type="text" name="organization_name" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="organization_code" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="organization_shortname" ngModel autocomplete="off"></td>
+                        <td>
+                          <select name="actived" ngModel style="padding: 3px 5px 3px 5px;">
+                            <option value="">Tất cả</option>
+                            <option value=1>Hoạt động</option>
+                            <option value=0>Ngừng hoạt động</option>
+                          </select>
+                        </td>
+                        <!-- <td><input type="text" disabled autocomplete="off"></td> -->
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                      </tr>
+                      <tr *ngFor="let items of mf.data;let i = index">
+                        <td>{{i + 1}}</td>
+                        <td style="text-align: left;">
+                          <img src="{{items.company_logo}}" alt="" class="card-img-top" style="max-width: 100px;">
+                        </td>
+                        <td style="text-align: left;">{{items.organization_name}}
+                        </td>
+                        <td style="text-align: left;">{{items.organization_code}}
+                        </td>
+                        <td style="text-align: left;">{{items.organization_shortname}}
+                        </td>
+                        <td class="text-center">
+                          <span *ngIf="items.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                              class="fa fa-check"></i></span>
+                          <span *ngIf="items.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                              class="fa fa-remove"></i></span>
+                        </td>
+                        <!-- <td style="text-align: left;">{{items.updated_at}}
+                        </td> -->
+                        <td style="width: 100px;">
+                          <a *ngIf="isSuperAdmin" (click)="openPopupUpdateRoleOrg(items,roleTemplate)"
+                            class="icon-green" style="cursor: pointer;">
+                            <i class="icon-settings"></i>
+                          </a>&nbsp;
+                          <a *ngIf="canUpdate" (click)="openPopupUpdateCurrentItem(items,updateTemplate)"
+                            class="icon-blue" style="cursor: pointer;">
+                            <i class="cui-note"></i>
+                          </a>&nbsp;
+                          <!-- <a *ngIf="!canUpdate" (click)="openPopupShowInfo(items,infoTemplate)"
+                            style="cursor: pointer;">
+                            <i class="icon-info"></i>
+                          </a>&nbsp; -->
+                          <!-- <a (click)="openPopupDeleteItem(items,deleteTemplate)" class="icon-red" title="Xóa vị trí">
+                            <i class="cui-circle-x" aria-hidden="true"></i>
+                          </a>&nbsp; -->
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length === 0">
+                        <td colspan="8" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                          <span>{{language.khong_co_du_lieu}}</span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length > rowsOnPage">
+                        <td colspan="8">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <!-- <tfoot class="fba-tablet-list-tfoot">
+                  
+                </tfoot> -->
+                  </table>
+                </form>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                  style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại lại
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal  thêm mới  -->
+  <ng-template #insertTemplate>
+    <form (ngSubmit)="addNewItem(insertForm)" #insertForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_cong_ty}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.cong_ty}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" id="nf" type="text" #txtname="ngModel" required ngModel
+              name="organization_name">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_cong_ty}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label"> {{language.logo_cong_ty}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <img *ngIf="imageView" class="card-img-top" [src]="imageView" style="width:50%;">
+            <input style="margin-top:2px;" type="file" class="form-control" ngModel name="company_logo"
+              (change)="uploadimagequality($event.target)">
+            <small class="require-field mt-3">Kích thước ảnh phù hợp: {{appservice.uploadImageHeight}} x
+              {{appservice.uploadImageWidth}}</small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_cong_ty}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" id="nf-email" #txtcode="ngModel" required type="text" ngModel
+              name="organization_code">
+            <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ma_cong_ty}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label"> {{language.ten_viet_tat}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" #txtshortname="ngModel" required ngModel
+              name="organization_shortname">
+            <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_viet_tat}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.mo_ta}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <textarea class="form-control rounded-0" cols="30" rows="10" name="organization_description"
+              #txtdes="ngModel" ngModel></textarea>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">Subdomain <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" #txtsubdomain="ngModel" required ngModel
+              name="subdomain_name">
+            <small *ngIf="txtsubdomain.touched && txtsubdomain.errors?.required" class="error-message">
+              Bạn chưa nhập subdomain
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.Email_quan_tri}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" #txtuser_email="ngModel" required name="email" ngModel>
+            <small *ngIf="txtuser_email.touched && txtuser_email.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_email}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.mat_khau}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="password" #txtuser_password="ngModel" required ngModel
+              name="user_password">
+            <small *ngIf="txtuser_password.touched && txtuser_password.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_mat_khau}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom" style="border-bottom: 2px solid #ddd;">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.chon_chi_so}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-multiselect-dropdown [data]="indexArray" name="indexList" ngModel [settings]="dropdownSettings"
+              required>
+            </ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}<small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'" [ngModel]="'1'"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'" [ngModel]="'1'"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="insertForm.invalid">
+          {{language.them}}</button>
+      </div>
+    </form>
+  </ng-template>
+
+  <!-- Modal  cập nhật  -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_cong_ty}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <div class="col-md-8 col-8 col-form-label">
+            <input hidden class="form-control color-font" type="text" #txtname="ngModel" required
+              [ngModel]="dataUpdate.id" name="id" (change)="preventChange()">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.cong_ty}}<small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" id="nf" type="text" #txtname="ngModel" required
+              [ngModel]="dataUpdate.organization_name" name="organization_name">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_cong_ty}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.logo_cong_ty}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <img *ngIf="imageViewBase64" [src]="imageViewBase64" class="card-img-top">
+            <input style="margin-top:2px;" type="file" class="form-control" ngModel name="company_logo"
+              (change)="uploadimagequality($event.target)">
+            <small class="require-field mt-3">Kích thước ảnh phù hợp: {{appservice.uploadImageHeight}} x
+              {{appservice.uploadImageWidth}}</small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_cong_ty}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txtcode="ngModel" required type="text"
+              [ngModel]="dataUpdate.organization_code" name="organization_code">
+            <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ma_cong_ty}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_viet_tat}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" #txtshortname="ngModel" required
+              [ngModel]="dataUpdate.organization_shortname" name="organization_shortname">
+            <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_ten_viet_tat}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.mo_ta}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <textarea class="form-control rounded-0" cols="30" rows="10" name="organization_description"
+              #txtdes="ngModel" [ngModel]="dataUpdate.organization_description"></textarea>
+          </div>
+        </div>
+        <ng-container *ngIf="isSuperAdmin">
+          <div class="form-group row form-no-marbottom">
+            <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.ten_mien_sub}}</label>
+            <div class="col-md-8 col-8 col-form-label">
+              <input class="form-control color-font" type="text" #txtsub="ngModel" [ngModel]="dataUpdate.subdomain_name"
+                name="subdomain_name">
+              <small *ngIf="txtsub.touched && txtsub.errors?.required" class="error-message">
+                {{language.ban_chua_nhap_ten_mien}}
+              </small>
+            </div>
+          </div>
+          <div class="form-group row form-no-marbottom">
+            <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}<small
+                class="require-field">(*)</small></label>
+            <div class="col-md-8 col-8 col-form-label">
+              <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'"
+                  [ngModel]="dataUpdate.actived" name="actived">
+                <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+              </div>
+              <div class="form-check form-check-inline mr-1">
+                <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'"
+                  [ngModel]="dataUpdate.actived" name="actived">
+                <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="updateForm.invalid">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template #infoTemplate>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Xem thông tin công ty</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-4 col-4 col-form-label lh-label">{{language.cong_ty}} <small
+            class="require-field">(*)</small></label>
+        <div class="col-md-8 col-8 col-form-label">
+          <input class="form-control color-font" type="text" required [value]="dataUpdate.organization_name">
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-4 col-4 col-form-label lh-label">{{language.logo_cong_ty}}<small
+            class="require-field">(*)</small></label>
+        <div class="col-md-8 col-8 col-form-label">
+          <img class="card-img-top" [src]="dataUpdate.company_logo">
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_cong_ty}}</label>
+        <div class="col-md-8 col-8 col-form-label">
+          <input class="form-control color-font" type="text" [value]="dataUpdate.organization_code">
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_viet_tat}}</label>
+        <div class="col-md-8 col-8 col-form-label">
+          <input class="form-control color-font" type="text" [value]="dataUpdate.organization_shortname">
+        </div>
+      </div>
+      <div class="form-group row form-no-marbottom">
+        <label class="col-md-4 col-4 col-form-label lh-label">{{language.mo_ta}}</label>
+        <div class="col-md-8 col-8 col-form-label">
+          <textarea class="form-control">{{dataUpdate.organization_description}}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a (click)="modalRef.hide()" class="btn btn-huy active">
+        {{language.dong}}</a>
+    </div>
+  </ng-template>
+  <!-- Modal chỉnh sửa quyền -->
+  <ng-template #roleTemplate>
+    <form (ngSubmit)="updateRoleCurrentItem(updateRoleForm)" #updateRoleForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_chi_so}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.cong_ty}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" readonly [value]="dataUpdate.organization_name">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom" style="border-bottom: 2px solid #ddd;">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.chi_so_su_dung}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-multiselect-dropdown [placeholder]="'Chọn chỉ số'" [data]="indexArray" name="indexList"
+              [(ngModel)]="itemCurrentIndex" [settings]="dropdownSettings" required>
+            </ng-multiselect-dropdown>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="updateRoleForm.invalid">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Model hỏi xóa -->
+  <ng-template #delete_template>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_item()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;"
+            class="btn btn-huy active pr-4 pl-4">{{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+  <notifier-container></notifier-container>
+</main>

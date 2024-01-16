@@ -1,0 +1,78 @@
+
+:host ::ng-deep {
+  /*Select Visit*/
+  .starttime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .endtime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .select1 {
+    width: fit-content !important;
+    > div {
+      width: 130px;
+      min-width: 130px;
+    }
+  }
+  .select2 {
+    width: fit-content !important;
+    > div {
+      width: 130px;
+      min-width: 130px;
+    }
+  }
+  #multiselect-group ng-multiselect-dropdown:nth-child(1) {
+    min-width: 35%;
+    display: inline-block;
+  }
+  #multiselect-group ng-multiselect-dropdown:nth-child(3) {
+    width: 51%;
+    display: inline-block;
+  }
+  #multiselect-group .multiselect-dropdown[_ngcontent-c4] .dropdown-btn[_ngcontent-c4] .selected-item[_ngcontent-c4] {
+    font-size: 12px;
+  }
+}
+/**
+- Huy update 03/11/2018 headmapmenu va khung ngay gio rieng
+ */
+
+.fa-caret-down {
+  padding-left: 3px;
+}
+
+/* end modified*/
+
+.visit-time > app-timeperiod {
+  float: right;
+}
+
+@media only screen and (max-width: 576px) {
+  .visit-time > app-timeperiod {
+    float: left;
+  }
+}
+.table-visit tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}

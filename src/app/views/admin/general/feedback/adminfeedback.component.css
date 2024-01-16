@@ -1,0 +1,132 @@
+body {
+  font-family: Roboto, sans-serif;
+}
+
+.card-administration {
+  /* border: 1px solid #e3e3e3; */
+  /* border-radius: 0.25rem; */
+  /* box-shadow: inset 0 1px 1px rgba(0,0,0,.05); */
+  background: #ffffff;
+}
+
+.select-white {
+  background: white;
+}
+
+.label-admi {
+  font-weight: bold;
+}
+
+input.nofocus {
+  border: 1px solid #ddd;
+  border-radius: unset !important;
+  height: 31px;
+}
+
+input.nofocus:focus {
+  box-shadow: unset;
+  border-radius: unset !important;
+}
+
+input[type=file] {
+  border: unset;
+}
+
+.formsearch {
+  padding-left: 0px;
+  margin-bottom: 0px;
+}
+
+ng-select.backselect {
+  background: white;
+}
+
+ng-select.backselect .below {
+  background: white;
+}
+
+ng-select.backselect .clear {
+  display: none;
+}
+
+ng-select.select-white>div:focus, input.select-white:focus {
+  border-color: rgba(82, 168, 236, .8);
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+.buton-search {
+  height: 30px;
+  line-height: 15px;
+}
+
+.error-message {
+  color: crimson;
+  font-style: italic;
+}
+
+.btn-them {
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: rgba(0, 0, 0, .1)rgba(0, 0, 0, .1)#b3b3b3;
+}
+
+.btn-them:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: rgba(0, 0, 0, .1)rgba(0, 0, 0, .1)#b3b3b3;
+}
+
+.btn-huy {
+  margin-right: 8px;
+  background-color: #e5e5e5;
+  color: #23282c;
+  border-color: #e5e5e5
+}
+
+.form-no-marbottom {
+  margin-bottom: 3px;
+}
+
+.form-no-marbottom>.lh-label {
+  line-height: 35px;
+}
+
+.form-no-marbottom ng-select>div:focus, .form-no-marbottom input:focus {
+  border-color: rgba(82, 168, 236, .8);
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+/*--------------Phần table-----------------*/
+
+/* .table-companies table th{
+	text-align: center;
+} */
+
+.table-companies table thead th {
+  border-bottom: 1px solid #c8ced3 !important;
+  border-top: unset !important;
+}
+
+.table-companies .table td {
+  vertical-align: middle;
+}
+
+.modal-footer, .modal-header {
+  padding: 5px 1rem;
+}
+
+tfoot.companies_table-tfoot ul.pagination {
+  float: right;
+  margin-bottom: -1rem;
+}
+
+tfoot.companies_table-tfoot tr td {
+  padding: 3px 0 3px 3px;
+}

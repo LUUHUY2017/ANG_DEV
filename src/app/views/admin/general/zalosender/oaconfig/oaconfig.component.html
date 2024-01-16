@@ -1,0 +1,82 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div style=" border:unset;border-radius: 3px;" class="card">
+      <div class="card-body">
+        <ng-container *ngIf="!isOnload && errorMess == null">
+          <main class="inbox">
+            <!-- List-reports -->
+            <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+              <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>{{item}}</strong>
+              </div>
+              <div class="form-group">
+                <label for="nf-email">ID OA Zalo</label>
+                <input class="form-control" type="text" name="official_account" [ngModel]="dataUpdate?.official_account"
+                  required #txtOAID="ngModel">
+                <small *ngIf="txtOAID.touched && txtOAID.errors?.required"
+                  class="error-message">{{language.ban_chua_nhap_id}}</small>
+              </div>
+              <div class="form-group">
+                <label for="nf-email">Private Key</label>
+                <input class="form-control" type="text" name="secret" [ngModel]="dataUpdate?.secret" required
+                  #txtsecret="ngModel">
+                <small *ngIf="txtsecret.touched && txtsecret.errors?.required"
+                  class="error-message">{{language.ban_chua_nhap_private_key}}</small>
+              </div>
+              <div class="form-group">
+                <label for="nf-email">{{language.ten_hien_thi}}</label>
+                <input class="form-control" type="text" name="display_name" [ngModel]="dataUpdate?.display_name"
+                  required #txtdisplayname="ngModel">
+                <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.required"
+                  class="error-message">{{language.ban_chua_nhap_ten_hien_thi}}</small>
+              </div>
+              <div class="form-group">
+                <label for="nf-email">{{language.ma_dang_ky}}</label>
+                <input class="form-control" type="text" name="invite_code" [ngModel]="dataUpdate?.invite_code" required
+                  #txtinvitecode="ngModel">
+                <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.required"
+                  class="error-message">{{language.ban_chua_nhap_ma_dang_ky}}</small>
+              </div>
+              <div class="form-group">
+                <label class="lh-label">QR Code <small class="require-field">(*)</small></label>
+                <div class="col-form-label">
+                  <img style="max-width: 400px" *ngIf="imageViewBase64" [src]="imageViewBase64" class="card-img-top">
+                  <input style="margin-top:2px;" type="file" class="form-control"
+                    (change)="uploadimagequality($event.target)">
+                  <small class="require-field mt-3">Kích thước ảnh phù hợp: {{appservice.uploadImageHeight}} x
+                    {{appservice.uploadImageWidth}}</small>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>{{language.hoat_dong}}</label>
+                <div class="col-md-9 col-9 col-form-label">
+                  <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                    <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'"
+                      [ngModel]="dataUpdate ? dataUpdate.actived : '1'" name="actived">
+                    <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                    <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'"
+                      [ngModel]="dataUpdate ? dataUpdate.actived : '1'" name="actived">
+                    <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+                  </div>
+                </div>
+              </div>
+              <!-- <a class="btn btn-danger rounded-0 {{updateForm.invalid ? 'disabledMenuItem' : null}}"
+                  style="color: #fff;" (click)="openPopupTestMail(testEmailTemplate, updateForm)">
+                  {{language.kiem_tra_gui_mail}}</a> &nbsp;&nbsp; -->
+              <button class="btn btn-success rounded-0" [disabled]="updateForm.invalid">
+                {{language.luu_cau_hinh}}</button>
+            </form>
+          </main>
+        </ng-container>
+        <ng-container *ngIf="!isOnload && errorMess != null">
+          <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. {{language.vui_long}}<a
+              style="color: #f3b21c; cursor: pointer;"
+              (click)="resetChange()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { EditNotificationComponent } from './editnotification.component';
+import { EditNotificationRoutingModule } from './editnotification-routing.module';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { NotificationService } from '../notification.service';
+import { BlockUIModule } from 'ng-block-ui';
+import { SelectModule } from 'ng-select';
+
+@NgModule({
+    declarations: [
+        EditNotificationComponent
+    ],
+    imports: [
+        CommonModule,
+        EditNotificationRoutingModule,
+        FormsModule,
+        RouterModule,
+        BlockUIModule,
+        SelectModule
+    ],
+    exports: [],
+    providers: [NotificationService],
+})
+export class EditNotificationModule {
+    constructor() {}
+ }

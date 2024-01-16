@@ -1,0 +1,63 @@
+{
+  "_from": "@tinymce/tinymce-angular",
+  "_id": "@tinymce/tinymce-angular@3.0.1",
+  "_inBundle": false,
+  "_integrity": "sha512-L6wL/hhyqWCtkA08Mq3Cck5rcFaZaDy6ETATlr40hCfDhLNP9W9f8ibxHmsj7EUJNDxhANS67zFLlSc0IXUvZg==",
+  "_location": "/@tinymce/tinymce-angular",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "@tinymce/tinymce-angular",
+    "name": "@tinymce/tinymce-angular",
+    "escapedName": "@tinymce%2ftinymce-angular",
+    "scope": "@tinymce",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@tinymce/tinymce-angular/-/tinymce-angular-3.0.1.tgz",
+  "_shasum": "4746c6cc3340ce4c73e22576127dc122e11d6b73",
+  "_spec": "@tinymce/tinymce-angular",
+  "_where": "H:\\BIUI",
+  "author": {
+    "name": "Ephox Inc"
+  },
+  "bugs": {
+    "url": "https://github.com/tinymce/tinymce-angular/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "tslib": "^1.9.0"
+  },
+  "deprecated": false,
+  "description": "Official TinyMCE Angular Component",
+  "es2015": "fesm2015/tinymce-tinymce-angular.js",
+  "esm2015": "esm2015/tinymce-tinymce-angular.js",
+  "esm5": "esm5/tinymce-tinymce-angular.js",
+  "fesm2015": "fesm2015/tinymce-tinymce-angular.js",
+  "fesm5": "fesm5/tinymce-tinymce-angular.js",
+  "homepage": "https://github.com/tinymce/tinymce-angular#readme",
+  "license": "Apache-2.0",
+  "main": "bundles/tinymce-tinymce-angular.umd.js",
+  "metadata": "tinymce-tinymce-angular.metadata.json",
+  "module": "fesm5/tinymce-tinymce-angular.js",
+  "name": "@tinymce/tinymce-angular",
+  "peerDependencies": {
+    "@angular/core": "^6.0.0 || ^7.0.0",
+    "@angular/common": "^6.0.0 || ^7.0.0",
+    "@angular/forms": "^6.0.0 || ^7.0.0"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinymce/tinymce-angular.git"
+  },
+  "sideEffects": false,
+  "typings": "tinymce-tinymce-angular.d.ts",
+  "version": "3.0.1"
+}

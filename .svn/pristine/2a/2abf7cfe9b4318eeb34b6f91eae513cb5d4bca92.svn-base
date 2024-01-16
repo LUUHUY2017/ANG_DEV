@@ -1,0 +1,214 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"><i class="cui-layers"
+              aria-hidden="true"></i>{{language.danh_sach_ung_dung}}</span>
+          <button *ngIf="canAdd" (click)="openPopupAddItem(insertTemplate)" style="float:right"
+            class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>
+            {{language.them_moi}}</button>
+        </div>
+        <div class="card-body">
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="row mb-3" *ngIf="isSuperAdmin">
+                <div class="col-md-2">
+                  <ng-select class="bootstrap selectimeview" required [options]="orgArray" [ngModel]="organizationId"
+                    [allowClear]="false" (selected)="changeOrg($event)" placeholder="Chọn tổ chức">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                  <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">{{language.STT}}</th>
+                        <th style="width: 80px;text-align: left;">ID Client</th>
+                        <th style="width: 120px;text-align: left;text-indent: 1rem;">Tên ứng dụng</th>
+                        <th style="width: 150px;text-align: left;text-indent: 1rem;">Secret</th>
+                        <th style="width: 150px;text-align: left;text-indent: 1rem;">Ngày cập nhật</th>
+                        <th style="width: 150px;">{{language.xu_ly}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                        <td><input type="text" name="id" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="name" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="secret" ngModel autocomplete="off"></td>
+                        <td><input type="date" disabled autocomplete="off"></td>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                      </tr>
+                      <tr *ngFor="let items of mf.data;let i = index">
+                        <td>{{i + 1}}</td>
+                        <td style="text-align: left;">{{items.id}}
+                        </td>
+                        <td style="text-align: left;">{{items.name}}
+                        </td>
+                        <td style="text-align: left;">{{items.secret}}</td>
+                        <td style="text-align: left;">{{items.updated_at}}</td>
+                        <td style="width: 100px;">
+                          <a (click)="openPopupUpdateCurrentItem(items,updateTemplate)" class="icon-blue"
+                            title="Sửa vị trí">
+                            <i class="cui-note" aria-hidden="true"></i>
+                          </a>&nbsp;
+                          <a (click)="openPopupDeleteItem(items,deleteTemplate)" class="icon-red" title="Xóa vị trí">
+                            <i class="cui-circle-x" aria-hidden="true"></i>
+                          </a>&nbsp;
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length === 0">
+                        <td colspan="8" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                          <span>{{language.khong_co_du_lieu}}</span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length > rowsOnPage">
+                        <td colspan="8">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <!-- <tfoot class="fba-tablet-list-tfoot">
+                  
+                </tfoot> -->
+                  </table>
+                </form>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                  style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại lại
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Model hỏi xóa -->
+  <ng-template #deleteTemplate>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="deleteCurrentItem()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;"
+            class="btn btn-huy active pr-4 pl-4">{{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Cập nhật thông tin client</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ten_ung_dung}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" id="nf" type="text" minlength="3" #txtname="ngModel" required
+              [ngModel]="dataUpdate.name" name="name">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.nhap_ten_ung_dung}}
+            </small>
+            <small *ngIf="txtname.touched && txtname.errors?.minlength" class="error-message">
+              {{language.ten_ung_dung_3_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">Secret</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="dataUpdate.secret" #txtclientSecret="ngModel"
+              required minlength="3" name="secret">
+            <small *ngIf="txtclientSecret.touched && txtclientSecret.errors?.required" class="error-message">
+              Nhập secret
+            </small>
+            <small *ngIf="txtclientSecret.touched && txtclientSecret.errors?.minlength" class="error-message">
+              secret có ít nhất 3 kí tự
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="updateForm.invalid">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+
+  <!-- Modal thêm mới  -->
+  <ng-template #insertTemplate>
+    <form (ngSubmit)="addNewItem(insertForm)" #insertForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm mới client</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ten_ung_dung}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtclientName="ngModel" required name="name">
+            <small *ngIf="txtclientName.touched && txtclientName.errors?.required" class="error-message">
+              {{language.nhap_ten_ung_dung}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">Secret</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtclientSecret="ngModel"
+              required minlength="3" name="secret">
+            <small *ngIf="txtclientSecret.touched && txtclientSecret.errors?.required" class="error-message">
+              Nhập secret
+            </small>
+            <small *ngIf="txtclientSecret.touched && txtclientSecret.errors?.minlength" class="error-message">
+              secret có ít nhất 3 kí tự
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="insertForm.invalid"> {{language.them_moi}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <notifier-container></notifier-container>
+  <block-ui></block-ui>
+  <!-- Kết thúc  Modal thêm mới -->
+</main>

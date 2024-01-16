@@ -1,0 +1,689 @@
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, HostBinding } from '@angular/core';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+} from '@angular/animations';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+import * as io from 'socket.io-client';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+import { NgForm } from '@angular/forms';
+import { NotifierService } from 'angular-notifier';
+@Component({
+  templateUrl: './vipcustomermanager.component.html',
+  styleUrls: ['./vipcustomermanager.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('openClose', [
+      state('open', style({
+        opacity: 1,
+      })),
+      state('closed', style({
+        opacity: 0,
+      })),
+      transition('open => closed', [
+        animate('0.5s')
+      ]),
+      transition('closed => open', [
+        animate('0.3s')
+      ]),
+    ]),
+    trigger('openCloseDropdown', [
+      state('open', style({
+        opacity: 1,
+        visibility: 'visible',
+        transform: 'translateY(0px)'
+      })),
+      state('closed', style({
+        opacity: 0,
+        visibility: 'hidden',
+        transform: 'translateY(25px)'
+      })),
+      transition('open => closed', [
+        animate('0.15s')
+      ]),
+      transition('closed => open', [
+        animate('0.15s ease-in')
+      ]),
+    ]),
+  ]
+})
+@ViewChild(GeneralMenuComponent)
+export class VipCustomerManagerComponent implements OnInit {
+  @BlockUI() blockUI: NgBlockUI;
+  private readonly notifier: NotifierService;
+  private socket: SocketIOClient.Socket;
+  viplist: any;
+  public modalRef: BsModalRef;
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  library: any;
+  active_record: any;
+  vip_id: any;
+  load_delete: boolean;
+  upload_data: any;
+  id_delete: any;
+  countdown: number;
+  timeout: number;
+  interval;
+  intervalDelete;
+  intervalUpdate;
+  isOpen = true;
+  can_add = false;
+  can_get_data = true;
+  organization_arr_filter: any;
+  organization_id_filter: any;
+  error_message: boolean;
+  userlogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  page_id = '\'' + environment.Pages.general.roles + '\'';
+  onLoad: boolean;
+  error_popup_message: boolean;
+  onloadPopup: boolean;
+  dropdownList_site: any;
+  organization_id: number;
+  site_id: number;
+  location_insert: any;
+  siteSelectionDisplay = false;
+  urlImage = environment.apiUrl + 'images/vipcustomer/';
+  image_source: string | Blob;
+  ImageUrll1: boolean;
+  data_update: any;
+  organization_update: any;
+  search_key: string;
+  snapVipcustomer: any;
+  siteFilter: any;
+  siteFilterModel: any;
+  siteFilterDisplay = false;
+  can_search = false;
+  blacklist_name: any;
+  option_delete = 0;
+  date_now = new Date();
+  constructor(private router: Router
+    , notifierService: NotifierService
+    , private route: ActivatedRoute
+    , private appservice: AppService
+    , private modalService: BsModalService) {
+    this.socket = io(environment.UrlSocket);
+    this.notifier = notifierService;
+    // const self = this;
+    // this.socket.on('connect', function() {
+    //   alert('Không thể kết nối với hệ thống máy chủ');
+    //   this.socket.close();
+    // });
+  }
+  ngOnInit(): void {
+    this.get_page_param();
+    const self = this;
+    // Vừa load trang thì không lấy dữ liệu từ socket io
+    this.can_get_data = false;
+    // Lấy thư viện ảnh về
+    this.socket.on('admin_staff_vip_backlist_get_image_response_from_server_to_web', function (dataFromIo) {
+      // xóa vòng lặp
+      clearInterval(self.interval);
+      // check xem có được get data không
+      if (self.can_get_data) {
+        if (!environment.production) {
+          console.log('From socket io get img', dataFromIo);
+        }
+        // nếu dữ liệu trả về lỗi
+        if (dataFromIo.message.toLowerCase() !== 'success') {
+          self.error_popup_message = true;
+        } else {
+          if (dataFromIo.type.toLowerCase() === 'vip_img') {
+            if (!environment.production) {
+              console.log(dataFromIo);
+            }
+            // Nếu có ảnh
+            if (dataFromIo.images.length > 0) {
+              self.library = dataFromIo.images;
+              self.active_record = self.library[0];
+            } else {
+              // Nếu rỗng thì set thư viện về rỗng. Active record set về null
+              self.library = [];
+              self.active_record = null;
+            }
+          }
+        }
+        // dừng con quay popup
+        self.onloadPopup = false;
+        // Mọi sự kiện sau khi lấy ảnh sẽ không nhận dữ liệu nữa
+        self.can_get_data = false;
+      }
+    });
+    // Sự kiện chờ kết quả thêm ảnh
+    this.socket.on('admin_staff_vip_backlist_add_image_response_from_server_to_web', function (dataFromIo) {
+      // Sự kiện tắt con quay quá 20s đã xử lý khi upload ảnh rồi
+      // Nếu trong vòng 20s thì can_get_data = true, quá 20s sẽ không nhận dữ liệu nữa
+      if (self.can_get_data) {
+        // Khi nhận được sự kiện trong khoảng 20s thì dừng vòng lặp. tắt con quay blockUI.
+        clearInterval(self.intervalUpdate);
+        self.blockUI.reset();
+        if (!environment.production) {
+          console.log('add image response', dataFromIo);
+        }
+        // Nếu dữ liệu ảnh so sánh không phù hợp thì hiển thị không phù hợp và không nhận data về nữa
+        if (!dataFromIo.status) {
+          alert('Kết quả so sánh với ảnh gốc là: Không phù hợp');
+          self.can_get_data = false;
+        } else { // Nếu thành công. check type và gửi sự kiện để lấy lại ảnh
+          if (dataFromIo.type === 'vip_img') {
+            const dataEmit = {
+              socket_id: self.socket.id
+              , id: self.vip_id
+              , organization_id: self.organization_id
+              , type: 'vip_img'
+            };
+            self.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', dataEmit);
+          }
+        }
+      }
+    });
+    // Sự kiện chờ kết quả xóa ảnh
+    this.socket.on('admin_staff_vip_backlist_delete_image_response_from_server_to_web', function (dataServer) {
+      if (!environment.production) {
+        console.log('delete respone', dataServer);
+      }
+      // Sự kiện xóa quá 20s đã được xử lý
+      if (self.can_get_data) {
+        // Khi nhận được sự kiện trong khoảng 20s thì dừng vòng lặp. tắt con quay blockUI.
+        clearInterval(self.intervalDelete);
+        self.blockUI.reset();
+        // Nếu xóa thành công
+        if (dataServer.status) {
+          // Nếu xóa thành công thì emit lại sự kiện để lấy lại thư viện ảnh
+          const dataEmit = {
+            socket_id: self.socket.id
+            , id: self.vip_id
+            , organization_id: self.organization_id
+            , type: 'vip_img'
+          };
+          self.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', dataEmit);
+        } else { // Nếu xóa không thành công
+          alert('Xử lý dữ liệu không thành công');
+          self.can_get_data = false;
+        }
+      }
+    });
+  }
+
+  /**************** NHÓM CODE GET DATA *****************/
+  get_page_param() {
+    // set về mặc định
+    this.error_message = false;
+    // hiển thị loading
+    this.onLoad = true;
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        const lever = Number(this.userlogged.lever);
+        const organization_id = Number(this.userlogged.organization_id);
+        // Nếu lấy được thông tin tổ chức thì xử lý tiếp
+        if (param.organization_arr.length > 0) {
+          if (lever === 0) {
+            this.organization_arr_filter = param.organization_arr.slice(0);
+            this.organization_id_filter = this.organization_arr_filter[0].value;
+          } else {
+            this.organization_arr_filter = param.organization_arr.filter(
+              item => Number(item.value) === Number(organization_id));
+            this.organization_id_filter = this.organization_arr_filter[0].value;
+          }
+          // Lấy dữ liệu
+          this.get_data();
+        } else { // Nếu không lấy được thì báo lỗi, và dừng việc lấy dữ liệu luôn
+          this.stopLoadingOnError();
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error + '');
+        }
+        // Nếu không lấy được thì báo lỗi, và dừng việc lấy dữ liệu luôn
+        this.stopLoadingOnError();
+      }
+    );
+  }
+  get_data() {
+    // off error dành cho việc load khi chuyển tổ chức
+    this.error_message = false;
+    // animation lấy dữ liệu
+    this.isOpen = false;
+    // tắt chức năng thêm, search
+    this.can_add = false;
+    this.can_search = false;
+    const data = {
+      organization_id: this.organization_id_filter
+      , deleted: this.option_delete
+    };
+    this.appservice.post(data, environment.API.vip_user_get).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // bật chức năng thêm
+        this.can_add = true;
+        if (para.data.length > 0) {
+          // giữ lại bản gốc
+          this.snapVipcustomer = para.data.slice(0);
+          // Nếu đang tìm
+          if (this.search_key) {
+            this.viplist = this.viplist.filter(x => x.vip_name.toLowerCase().indexOf(this.search_key) !== -1);
+          } else { // nếu không
+            this.viplist = para.data;
+          }
+        } else { // Nếu dữ liệu trả về là rỗng
+          this.viplist = [];
+        }
+        // Nếu có dữ liệu thì có thể tìm dữ liệu
+        if (this.viplist.length > 0) {
+          this.can_search = true;
+        }
+      },
+      (error) => {
+        // Nếu kết nối không thành công
+        if (!environment.production) {
+          console.log(error);
+        }
+        // Show lỗi
+        this.error_message = true;
+      }).add(() => { // Sự kiện này xảy ra kể cả lỗi hay không lỗi
+        // Load xong sẽ dừng con quay lại
+        this.isOpen = true;
+        this.onLoad = false;
+      });
+  }
+  /***************** END GROUP ********************/
+  /************* NHÓM CODE XÓA VÀ TÌM KIẾM ***************/
+  delete_target(item: any) { // Xóa đối tượng
+    const c = confirm('Bạn chắc chắn muốn thực hiện quá trình này?');
+    if (c) {
+      this.blockUI.start('Đang xử lý dữ liệu');
+      const data = {
+        id: item.id
+        , deleted: Number(item.deleted) === 0 ? 1 : 0
+      };
+      const url = environment.API.vip_user_get + '_delete_vip';
+      this.appservice.post(data, url).subscribe(
+        para => {
+          if (!environment.production) {
+            console.log('dữ liệu gửi về', para);
+          }
+          if (para.message !== 1) {
+            this.customize_error('Quá trình xóa không thành công!');
+          } else {
+            this.got_success('Quá trình xóa thành công!');
+            const dataEmit = {
+              socket_id: this.socket.id
+              , id: item.id // black list id
+              , organization_id: item.organization_id
+              , type: 'vip'
+            };
+            // Quá trình xử lý thành công sẽ emit cho bên AI load lại bộ nhớ
+            this.socket.emit('admin_staff_vip_backlist_delete_request_from_web_to_server', dataEmit);
+            // Xóa xong load lại data
+            this.get_data();
+          }
+        },
+        (error) => {
+          if (!environment.production) {
+            console.log(error);
+          }
+          this.customize_error('Truy cập dữ liệu không thành công!');
+        }).add(() => {
+          this.blockUI.stop();
+        });
+    }
+  }
+  search_target() {
+    // chuyển giá trị truyền vào về chữ thường để so sánh
+    const string = this.search_key !== undefined ? this.search_key.toLowerCase() : '';
+    if (string !== '') {
+      console.log(this.viplist);
+      this.viplist = this.snapVipcustomer.filter(x => x.vip_name.toLowerCase().indexOf(string) !== -1);
+    } else {
+      this.viplist = this.snapVipcustomer.slice(0);
+    }
+  }
+  /***************** END GROUP ********************/
+  /****************** Nhóm Code Insert black list *******************/
+  // Hàm hiển thị popup để thêm dữ liệu
+  show_insert(template: TemplateRef<any>) {
+    // Xét lỗi về mặc định
+    this.error_popup_message = false;
+    // Ẩn hiển thị ảnh
+    this.ImageUrll1 = true;
+    // Xét giá trị ảnh mặc định về null
+    this.image_source = null;
+    this.blockUI.start('Đang tải dữ liệu');
+    // Đưa trạng thái tìm kiếm về ban đầu
+    this.search_key = '';
+    // và khởi tạo lại danh sách blacklist
+    this.viplist = this.snapVipcustomer;
+    // set trường tổ chức
+    try {
+      this.organization_update = this.organization_arr_filter.filter(item => item.value === this.organization_id_filter);
+    } catch {
+      this.organization_update = [];
+    }
+    // Nếu có thông tin về tổ chức thì hiện popup thêm mới
+    if (this.organization_update.length > 0) {
+      this.openModal(template);
+    } else { // Nếu không có thông tin về tổ chức
+      this.customize_error('Dữ liệu về tổ chức không tồn tại');
+    }
+    this.blockUI.stop();
+  }
+  // Upload thêm mới black list
+  // Sang server check file extension
+  InsertUpload(event, insert_vip_avatar) {
+    console.log(event);
+    if (event.target.files) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.image_source = file;
+      reader.onload = (target) => {
+        insert_vip_avatar.src = reader.result;
+      };
+      // Nếu có ảnh thì hiện ảnh
+      this.ImageUrll1 = false;
+      event.target.value = '';
+    } else {
+      // Nếu không có ảnh thì ẩn đi
+      this.ImageUrll1 = true;
+      insert_vip_avatar.src = null;
+    }
+  }
+  insertform(form: NgForm) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const formData = new FormData();
+    if ('organization_id' in form.value) {
+      formData.append('organization_id', form.value.organization_id);
+    } else {
+      formData.append('organization_id', this.userlogged.organization_id);
+    }
+    formData.append('vip_name', form.value.vip_name);
+    formData.append('vip_code', form.value.vip_code);
+    formData.append('phone', form.value.phone);
+    formData.append('gender', form.value.gender);
+    formData.append('birthday', form.value.birthday);
+    if (this.image_source) {
+      formData.append('avatar', this.image_source);
+    }
+    const url = environment.API.vip_user_get + '_post_add';
+    this.appservice.post(formData, url).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if (para.message === 1) {
+          this.got_success('Thêm dữ liệu thành công');
+          this.get_data();
+          this.modalRef.hide();
+        } else if (Number(para.message) === 2) {
+          alert('Kiểu file upload không phù hợp');
+          this.error_popup_message = true;
+        } else {
+          this.error_popup_message = true;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.error_popup_message = true;
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  /********************* END GROUP **********************/
+  /********************* NHÓM CODE UPDATE BLACK LIST **********************/
+  show_update(item: any, template: TemplateRef<any>) {
+    this.vip_id = item.id;
+    this.error_popup_message = false;
+    this.blockUI.start('Đang tải dữ liệu');
+    const url = environment.API.vip_user_get + '_edit';
+    const data = {
+      id: this.vip_id
+    };
+    this.appservice.post(data, url).subscribe(res => {
+      console.log(res);
+      if ('message' in res) {
+        this.customize_error('Không tìm thấy dữ liệu');
+      } else {
+        this.data_update = res.data;
+        this.organization_update = this.organization_arr_filter.filter(item2 => item2.value === this.data_update[0].organization_id);
+        this.openModal(template);
+      }
+    }, (error) => {
+      this.customize_error('Truy cập dữ liệu có lỗi xảy ra');
+    }).add(() => {
+      this.blockUI.stop();
+    });
+  }
+  // Upload sửa thông tin black list
+  UpdateUpload(event, update_staff_avatar) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.image_source = file;
+      reader.onload = (target) => {
+        update_staff_avatar.src = reader.result;
+      };
+      event.target.value = '';
+    } else {
+      update_staff_avatar.src = null;
+    }
+  }
+  updateform(form: NgForm) {
+    this.blockUI.start('Đang xử lý dữ liệu');
+    const formData = new FormData();
+    formData.append('id', this.vip_id);
+    if ('organization_id' in form.value) {
+      formData.append('organization_id', form.value.organization_id);
+    } else {
+      formData.append('organization_id', this.userlogged.organization_id);
+    }
+    formData.append('vip_name', form.value.vip_name);
+    formData.append('vip_code', form.value.vip_code);
+    formData.append('phone', form.value.phone);
+    formData.append('gender', form.value.gender);
+    formData.append('birthday', form.value.birthday);
+    if (this.image_source) {
+      formData.append('avatar', this.image_source);
+    }
+    const url = environment.API.vip_user_get + '_post_edit';
+    this.appservice.post(formData, url).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if (para.message !== 1) {
+          this.error_popup_message = true;
+        } else {
+          this.got_success('Chỉnh sửa dữ liệu thành công');
+          this.get_data();
+          this.modalRef.hide();
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.error_popup_message = true;
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  /********************* END GROUP **********************/
+  /***************** UPLOAD ẢNH THƯ VIỆN ********************/
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    // xét các giá trị về mặc định
+    this.can_get_data = true;
+    this.onloadPopup = true;
+    this.active_record = null;
+    this.error_popup_message = false;
+    this.library = [];
+    this.blacklist_name = item.staff_name;
+    // Hiển thị popup
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    // trong 20 giây mà dữ liệu không về thì không lấy dữ liệu nữa
+    this.countdown = 20;
+    this.interval = setInterval(() => {
+      this.countdown = this.countdown - 1;
+      if (this.countdown === 0) {
+        this.can_get_data = false;
+        this.onloadPopup = false;
+        this.error_popup_message = true;
+        clearInterval(this.interval);
+        alert('Quá trình xử lý vượt quá thời gian quy định');
+      }
+    }, 1000);
+    // quá trình gửi dữ liệu
+    const data = {
+      socket_id: this.socket.id
+      , id: item.id
+      , organization_id: item.organization_id
+      , type: 'vip_img'
+    };
+    // xét vào để sự kiện on socket có thể xử lý tiếp được
+    this.vip_id = item.id;
+    this.organization_id = item.organization_id;
+    // emit sự kiện để lấy dữ liệu ảnh về
+    this.socket.emit('admin_staff_vip_backlist_get_image_request_from_web_to_serve', data);
+  }
+  getUploadData(event) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      this.can_get_data = true;
+      reader.onload = (target) => {
+        this.countdown = 20;
+        this.blockUI.start('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+        this.intervalUpdate = setInterval(() => {
+          this.countdown = this.countdown - 1;
+          this.blockUI.update('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+          if (this.countdown === 0) {
+            this.can_get_data = false;
+            clearInterval(this.intervalUpdate);
+            this.blockUI.stop();
+            alert('Quá trình xử lý vượt quá thời gian quy định');
+          }
+        }, 1000);
+        console.log(this.vip_id);
+        this.upload_data = {
+          socket_id: this.socket.id
+          , organization_id: this.organization_id
+          , id: this.vip_id
+          , type: 'vip_img'
+          , image_base64: String(reader.result).replace('data:image/jpeg;base64,', '')
+          , access_token: localStorage.getItem(environment.access_token)
+          , tocken_type: environment.Bearer
+        };
+        // console.log(this.upload_data);
+        this.socket.emit('admin_staff_vip_backlist_add_image_request_from_web_to_serve', this.upload_data);
+      };
+      event.target.value = '';
+    }
+  }
+  delete_item(active_record: any, uploadform) {
+    const c = confirm('Bạn chắc chắn muốn thực hiện quá trình này?');
+    if (c) {
+      clearInterval(this.intervalDelete);
+      this.can_get_data = true;
+      this.id_delete = active_record.id;
+      this.load_delete = true;
+      const data = {
+        socket_id: this.socket.id
+        , id: this.id_delete
+        , type: 'vip_img'
+        , access_token: localStorage.getItem(environment.access_token)
+        , tocken_type: environment.Bearer
+      };
+      this.countdown = 20;
+      this.blockUI.start('Đang xử lý dữ liệu trong ' + this.countdown + ' giây');
+      this.socket.emit('admin_staff_vip_backlist_delete_image_request_from_web_to_server', data);
+      this.intervalDelete = setInterval(() => {
+        this.countdown = this.countdown - 1;
+        this.blockUI.update('Đang xử lý ảnh trong ' + this.countdown + ' giây');
+        if (this.countdown === 0) {
+          this.can_get_data = false;
+          clearInterval(this.intervalDelete);
+          this.blockUI.stop();
+          alert('Quá trình xử lý vượt quá thời gian quy định');
+        }
+      }, 1000);
+    }
+  }
+  /******************* Support Function ******************/
+  // Hàm dừng khi gặp lỗi
+  stopLoadingOnError() {
+    this.error_message = true;
+    this.onLoad = false;
+  }
+  // Click vào hình thì trigger vào input file
+  trigger_click(upload) {
+    const event: Event = new Event('click');
+    upload.click();
+    clearInterval(this.interval);
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // lỗi Mặc định
+  got_error(message, callback: Function = null) {
+    let default_message = 'Có lỗi xảy ra';
+    if (this.userlogged.lever === '0') {
+      default_message = message;
+    }
+    this.notifier.notify('error', default_message);
+    if (callback) {
+      callback();
+    }
+  }
+  // Lỗi tự cấu hình
+  customize_error(message, callback: Function = null) {
+    this.notifier.notify('error', message);
+    if (callback) {
+      callback();
+    }
+  }
+  // Thông báo thành công
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  /* Đoạn xóa tại client
+  self.library.splice(self.library.findIndex(item => item.id === self.id_delete), 1);
+  if (self.library.length > 0) {
+    self.library.sort();
+    self.active_record = self.library[0];
+  } else if (self.library.length === 0) {
+    self.active_record = null;
+  } */
+  /******************* End ******************/
+}
+
+

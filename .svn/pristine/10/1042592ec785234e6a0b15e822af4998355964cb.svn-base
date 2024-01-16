@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+
+<head>
+  <base href="./">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Business Intelligence">
+  <meta name="author" content="Cong Quyet">
+  <meta name="keyword" content="Business Intelligence">
+  <link rel="shortcut icon" href="assets/favicon.ico">
+  <title>Business Intelligence</title>
+
+  <script type="text/javascript" src="./assets/daterangepicker/jquery.min.js"></script>
+  <script type="text/javascript" src="./assets/daterangepicker/moment.min.js"></script>
+  <script type="text/javascript" src="./assets/daterangepicker/daterangepicker.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="./assets/daterangepicker/daterangepicker.css" />
+  
+<link rel="stylesheet" href="styles.207d2ee2e9157845c3d0.css"></head>
+
+<body class="app">
+  Đang tải dữ liệu...
+<script type="text/javascript" src="runtime.a37aa331fc17413fcf99.js"></script><script type="text/javascript" src="polyfills.b4f4b0ecd078d5f525cb.js"></script><script type="text/javascript" src="scripts.6ce3f50150b33aeaa691.js"></script><script type="text/javascript" src="main.f2e0cbfb920a3405e07a.js"></script></body>
+
+</html>

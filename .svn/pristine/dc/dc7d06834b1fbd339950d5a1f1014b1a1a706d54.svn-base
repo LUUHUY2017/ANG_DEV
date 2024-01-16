@@ -1,0 +1,435 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <block-ui></block-ui>
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px;"> <i class="cui-layers" aria-hidden="true"></i> Danh sách Official
+                  Account</span>
+               <button *ngIf="can_add" (click)="open_modal_them_moi(templates)" style="float:right"
+                  class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>Thêm mới</button>
+            </div>
+            <div class="card-body card-table table-fba-tablet">
+               <div class="row fba-location_filter_table">
+                  <ul>
+                     <li id="showrow">
+                        <!-- <span class="font-span-table">Số dòng: &nbsp;</span>
+                        <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                           <option [ngValue]="15">15</option>
+                           <option [ngValue]="30">30</option>
+                           <option [ngValue]="50">50</option>
+                           <option [ngValue]="100">100</option>
+                        </select> -->
+                        <select style="margin-left:10px;" class="input-sm select_cus_table"
+                           (change)="changeorganization_table($event.target.value)">
+                           <option *ngFor="let item of organization_arr" value="{{item.value}}">{{item.label}}</option>
+                        </select>
+                     </li>
+                     <li><label class="font-span-table" title="theo tên tài khoản hoặc tên người tạo"
+                           for="searchtext">Tìm kiếm: &nbsp;</label><input type="text" class="input_filter_table"
+                           [(ngModel)]="tu_khoa" id="searchtext" (ngModelChange)="search_table($event)"></li>
+                  </ul>
+               </div>
+               <div class="table-responsive">
+                  <table [mfData]="data_filter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                     style="width: 100%;min-width: 900px" class="table fba-location_table">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px;">STT</th>
+                           <th style="width: 120px;text-align: left">Tên tài khoản</th>
+                           <th style="width: 120px;text-align: left">OA ID</th>
+                           <th style="width: 150px;text-align: left">Ngày cập nhật</th>
+                           <th style="width: 150px;text-align: left">Người cập nhật</th>
+                           <th style="width: 80px;text-align: left">Tình trạng</th>
+                           <th style="width: 90px;">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let items of mf.data;let i = index">
+                           <td>{{i + 1}}</td>
+                           <td style="text-align: left">{{items.display_name}}</td>
+                           <td style="text-align: left">{{items.official_account}}</td>
+                           <td style="text-align: left">{{items.updated_at}}</td>
+                           <td style="text-align: left">{{items.name}}</td>
+                           <td class="text-center">
+                              <span *ngIf="items.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                                    class="fa fa-check"></i></span>
+                              <span *ngIf="items.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                                    class="fa fa-remove"></i></span>
+                           </td>
+                           <td style="width: 100px;">
+                              <a (click)="get_event_module(items,eventModule)" class="icon-blue" title="Sửa tài khoản">
+                                 <i class="icon-settings" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a (click)="show_update(items,template)" class="icon-blue" title="Sửa tài khoản">
+                                 <i class="cui-note" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="can_delete" (click)="show_delete(items,dialog)" class="icon-red"
+                                 title="Xóa tài khoản">
+                                 <i class="cui-circle-x" aria-hidden="true"></i>
+                              </a>&nbsp;
+                           </td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                           <td colspan="8" *ngIf="data_filter?.length === 0"
+                              style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                              <span>Không có dữ liệu</span>
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="fba-tablet-list-tfoot">
+                        <tr>
+                           <td colspan="8">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <notifier-container></notifier-container>
+   <!-- Model hỏi xóa -->
+   <ng-template #dialog>
+      <div class="modal-body box-shadow">
+         <div class="row">
+            <div class="col-md-12 mb-3">
+               <div id="border-remove">
+                  <i class="fa fa-remove fa-3x"></i>
+               </div>
+            </div>
+            <div class="col-md-12 text-center">
+               <h3>Bạn có chắc chắn muốn xóa?</h3>
+               <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+            </div>
+            <div class="col-md-12 text-center">
+               <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_location()"
+                  style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+               <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                  Đóng</button>
+            </div>
+         </div>
+      </div>
+   </ng-template>
+   <!-- Modal  cập nhật -->
+   <ng-template #template>
+      <form (ngSubmit)="update_object(update_form)" #update_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left"><i class="icon-note" style="font-size: 15px;color: #20a8d8;">&nbsp;</i>Cập
+               nhật tài khoản</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+               <strong>{{item}}</strong>
+            </div>
+            <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-4 col-4 col-form-label lh-label">Mã tài khoản <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" [ngModel]="data_update.id" #txtloca="ngModel"
+                     required name="id" autocomplete="off" (change)="preventChange()">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Tên tài khoản <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" [ngModel]="data_update.display_name"
+                     #txtdisplayname="ngModel" required name="display_name" minlength="3" maxlength="60"
+                     autocomplete="off">
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên tài khoản
+                  </small>
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.minlength" class="error-message">
+                     Tên tài khoản có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.maxlength" class="error-message">
+                     Tên tài khoản có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">OA ID <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" [ngModel]="data_update.official_account"
+                     #txtloca="ngModel" required name="official_account" minlength="3" maxlength="60"
+                     autocomplete="off">
+                  <small *ngIf="txtloca.touched && txtloca.errors?.required" class="error-message">
+                     Bạn chưa nhập mã tài khoản OA
+                  </small>
+                  <small *ngIf="txtloca.touched && txtloca.errors?.minlength" class="error-message">
+                     Mã tài khoản OA có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtloca.touched && txtloca.errors?.maxlength" class="error-message">
+                     Mã tài khoản OA có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">SECRET KEY <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" [ngModel]="data_update.secret" #txtsecret="ngModel"
+                     required name="secret" minlength="3" maxlength="60">
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.required" class="error-message">
+                     Bạn chưa nhập Secret
+                  </small>
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.minlength" class="error-message">
+                     Secret có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.maxlength" class="error-message">
+                     Secret có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Invite Code <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" [ngModel]="data_update.invite_code"
+                     #txtinvitecode="ngModel" required name="invite_code" minlength="3" maxlength="15">
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.required" class="error-message">
+                     Bạn chưa nhập invite code
+                  </small>
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.minlength" class="error-message">
+                     Invite code có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.maxlength" class="error-message">
+                     Invite code có nhiều nhất 15 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="width:70%" class="col-md-4 col-4 col-form-label">Hoạt động</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value=1
+                        [ngModel]="data_update.actived" name="actived">
+                     <label class="form-check-label" for="inline-t-ac">Có</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value=0
+                        [ngModel]="data_update.actived" name="actived">
+                     <label class="form-check-label" for="inline-f-ac">Không</label>
+                  </div>
+               </div>
+            </div>
+            <small class="require-field mt-3">(*) yêu cầu bạn hãy nhập đầy đủ thông tin</small>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-success" [disabled]="update_form.invalid">
+               Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+
+   <!-- Modal thêm mới  -->
+   <ng-template #templates>
+      <form (ngSubmit)="insert_object(object_form)" #object_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left"><i class="icon-plus"
+                  style="font-size: 15px;color: #20a8d8;">&nbsp;</i>Thêm tài khoản</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+               <strong>{{item}}</strong>
+            </div>
+            <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-4 col-4 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [ngModel]="organization_id" name="organization_id" [allowClear]="false">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Tên tài khoản <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" ngModel #txtdisplayname="ngModel" required
+                     name="display_name" minlength="3" maxlength="60" autocomplete="off">
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên tài khoản
+                  </small>
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.minlength" class="error-message">
+                     Tên tài khoản có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.maxlength" class="error-message">
+                     Tên tài khoản có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">OA ID <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" ngModel #txtloca="ngModel" required
+                     name="official_account" minlength="3" maxlength="60" autocomplete="off">
+                  <small *ngIf="txtloca.touched && txtloca.errors?.required" class="error-message">
+                     Bạn chưa nhập mã tài khoản OA
+                  </small>
+                  <small *ngIf="txtloca.touched && txtloca.errors?.minlength" class="error-message">
+                     Tài khoản OA có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtloca.touched && txtloca.errors?.maxlength" class="error-message">
+                     Tài khoản OA có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">SECRET KEY <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" ngModel #txtsecret="ngModel" required name="secret"
+                     minlength="3" maxlength="60">
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.required" class="error-message">
+                     Bạn chưa nhập Secret
+                  </small>
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.minlength" class="error-message">
+                     Secret có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtsecret.touched && txtsecret.errors?.maxlength" class="error-message">
+                     Secret có nhiều nhất 60 kí tự
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Invite Code <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control color-font" type="text" ngModel #txtinvitecode="ngModel" required
+                     name="invite_code" minlength="3" maxlength="15">
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.required" class="error-message">
+                     Bạn chưa nhập invite code
+                  </small>
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.minlength" class="error-message">
+                     Invite code có ít nhất 3 kí tự
+                  </small>
+                  <small *ngIf="txtinvitecode.touched && txtinvitecode.errors?.maxlength" class="error-message">
+                     Invite code có nhiều nhất 15 kí tự
+                  </small>
+               </div>
+            </div>
+            <small class="require-field mt-3">(*) yêu cầu bạn hãy nhập đầy đủ thông tin</small>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" [disabled]="object_form.invalid">
+               Thêm mới</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal thêm mới -->
+   <!-- Modal cập nhật event -->
+   <ng-template #eventModule>
+      <form (ngSubmit)="update_event(event_form)" #event_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left"><i class="icon-plus" style="font-size: 15px;color: #20a8d8;">&nbsp;</i>Cập
+               nhật sự kiện</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+               <strong>{{item}}</strong>
+            </div>
+            <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-4 col-4 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [ngModel]="organization_id" name="organization_id" [allowClear]="false">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-4 col-4 col-form-label lh-label">ID</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" (change)="preventChange()" type="text" name="oa_id"
+                     [ngModel]="data_update.id" readonly required>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">OA CODE</label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <input class="form-control" (change)="preventChange()" type="text" name="oa_code"
+                     [ngModel]="data_update.official_account" readonly required>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-4 col-4 col-form-label lh-label">Chọn sự kiện <small
+                     class="require-field">(*)</small></label>
+               <div class="col-md-8 col-8 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="eventArray" ngModel
+                     name="event_id" [allowClear]="false" [placeholder]="'Chọn sự kiện'"
+                     (ngModelChange)="getFollowerEvent($event)">
+                  </ng-select>
+                  <!-- <select class="form-control" name="event_array" ngModel placeholder="Chọn sự kiện">
+                     <option [ngValue]="0" selected>--- Chọn sự kiện ---</option>
+                     <option *ngFor="let e of eventArray" [ngValue]="e.id">{{e.event_name}}
+                        {{e.selected == 1 ? '&radic;' : null}}</option>
+                  </select> -->
+                  <!-- <ng-multiselect-dropdown name="event_array" required [placeholder]="'chọn sự kiện'"
+                     [data]="eventArray" [(ngModel)]="selectedEvent" [settings]="dropdownSettings">
+                  </ng-multiselect-dropdown> -->
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom"
+               *ngIf="followerArray?.length > 0 || selectedfollowerArray.length > 0">
+               <div class="col-md-5 col-5 col-form-label">
+                  <span style="font-size: 13px;font-family: Open-bold;">Người chưa được chọn</span>
+                  <ul class="ng-data-list">
+                     <li *ngIf="followerArray.length === 0">Không có dữ liệu</li>
+                     <li *ngFor="let item of followerArray" (click)="checkedItem(item, 1, $event.target)">
+                        <i class="cui-{{item.gender == 1 ? 'user' : 'user-female'}}">&nbsp;</i>{{item.item_text}}
+                     </li>
+                  </ul>
+               </div>
+               <div class="col-md-2 col-2 flex_item" style="flex-direction: column">
+                  <a (click)="to_selected_array()"
+                     class="form-control btn btn-primary mb-2 {{status === 0 || followerArray.length === 0 ? 'disabledMenuItem' : null}}"
+                     style="border-radius: 0px;"><i class="icon-arrow-right-circle" style="color: #fff"></i></a>
+                  <a (click)="to_unselected_array()"
+                     class="form-control btn btn-primary {{status === 1 || selectedItem.length === 0 ? 'disabledMenuItem' : null}}"
+                     style="border-radius: 0px;"><i class="icon-arrow-left-circle" style="color: #fff"></i></a>
+               </div>
+               <div class="col-md-5 col-5 col-form-label">
+                  <span style="font-size: 13px;font-family: Open-bold;"><i class="cui-circle-check"
+                        style="color:#4dbd74">&nbsp;</i>Người đã được chọn</span>
+                  <ul class="ng-data-list">
+                     <li *ngIf="selectedfollowerArray.length === 0">Không có dữ liệu</li>
+                     <li *ngFor="let item of selectedfollowerArray" (click)="checkedItem(item, 0, $event.target)">
+                        <i class="cui-{{item.gender == 1 ? 'user' : 'user-female'}}">&nbsp;</i>{{item.item_text}}
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <small class="require-field mt-3">(*) yêu cầu bạn hãy nhập đầy đủ thông tin</small>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn btn-success" [disabled]="event_form.invalid">Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+</main>

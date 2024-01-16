@@ -1,0 +1,291 @@
+<app-fbamenu></app-fbamenu>
+<div class="card" style="margin-bottom: 10px;">
+  <div class="card-body body-breadcumb">
+    <div class="row khungthemmoi">
+      <ul>
+        <li>
+          <i class="fa fa-plus-square"></i><span>&nbsp;{{language.sua_thong_tin}} Setting</span>
+        </li>
+        <li><i class="fa fa-home"></i>&nbsp;<a>Admin</a>&nbsp;/&nbsp;<a
+            [routerLink]="['/fba/setting/application']">Settings</a> / Edit</li>
+      </ul>
+    </div>
+    <block-ui></block-ui>
+  </div>
+</div>
+<form (ngSubmit)="edit_setting(Form_edit_setting)" #Form_edit_setting="ngForm">
+  <div class="card">
+    <div class="card-body">
+      <div class="row" style="border: 1px solid #ddd; border-radius: 3px;">
+        <div class="col-md-3 text-center step-group {{ status === 1 ? 'active' : '' }}" (click)="change_status(1)">
+          <p>Tab 1</p>
+          <small>{{language.man_hinh_logo}}</small>
+        </div>
+        <div class="col-md-3 text-center step-group {{ status === 2 ? 'active' : '' }}" (click)="change_status(2)">
+          <p>Tab 2</p>
+          <small>{{language.man_hinh_ly_do}}</small>
+        </div>
+        <div class="col-md-3 text-center step-group {{ status === 3 ? 'active' : '' }}" (click)="change_status(3)">
+          <p>Tab 3</p>
+          <small>{{language.man_hinh_thong_tin_khach_hang}}</small>
+        </div>
+        <div class="col-md-3 text-center step-group {{ status === 4 ? 'active' : '' }}" (click)="change_status(4)">
+          <p>Tab 4</p>
+          <small>{{language.man_hinh_ket_thuc}}</small>
+        </div>
+      </div>
+      <ng-container *ngIf="dataUpdate">
+        <div class="row mt-3 group-content {{ status === 1 ? 'show' : '' }}">
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-12" [hidden]=true>
+                <label for="">{{language.to_chuc}}</label>
+                <input type="text" class="form-control" name="organization_id" [ngModel]="dataUpdate.organization_id">
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.logo_cong_ty}}
+                  <small
+                    class="require-field">({{appservice.uploadImageHeight + 'x' + this.appservice.uploadImageWidth}})</small>
+                </label>
+                <img src="{{url_img + dataUpdate.company_logo}}" style="width:50%;display:block;">
+                <input type="file" class="form-control" ngModel name="company_logo"
+                  (change)="handleFileInput($event.target,1)">
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.logo_ung_dung}}
+                  <small
+                    class="require-field">({{appservice.uploadImageHeight + 'x' + this.appservice.uploadImageWidth}})</small>
+                </label>
+                <img src="{{url_img + dataUpdate.application_logo}}" style="width:50%;display:block;">
+                <input type="file" class="form-control" ngModel name="application_logo"
+                  (change)="handleFileInput($event.target,2)">
+              </div>
+              <div class="col-md-12 mt-4">
+                <a class="btn btn-danger edit-button mr-2" routerLink="/fba/setting/setting"><i
+                    class="fa fa-arrow-circle-left"></i>&nbsp;{{language.quay_lai}}</a>
+                <a class="btn btn-primary edit-button" (click)="status=2"><i
+                    class="fa fa-arrow-circle-right"></i>&nbsp;{{language.tiep_theo}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <img src="https://i.imgur.com/0uYc2Kq.png" width="100%" alt="">
+          </div>
+        </div>
+        <div class="row mt-3 group-content {{ status === 2 ? 'show' : '' }}">
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_send}}</label>
+                <input type="text" class="form-control" required #txtsend="ngModel" name="btn_send"
+                  ngModel="{{dataUpdate.btn_send}}">
+                <small *ngIf="txtsend.touched && txtsend.errors?.required" class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_nut_send}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_cancel}}</label>
+                <input type="text" required #txtcancel="ngModel" class="form-control" name="btn_cancel"
+                  ngModel="{{dataUpdate.btn_cancel}}">
+                <small *ngIf="txtcancel.touched && txtcancel.errors?.required" class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_nut_cancel}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_khung_ly_do}}</label>
+                <input type="text" required #txtreason_other_title="ngModel" class="form-control"
+                  name="reason_other_title" ngModel="{{dataUpdate.reason_other_title}}">
+                <small *ngIf="txtreason_other_title.touched && txtreason_other_title.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_khung_ly_do}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_goi_y}}</label>
+                <input type="text" required #txtreason_other_highligt="ngModel" class="form-control"
+                  name="reason_other_highligt" ngModel="{{dataUpdate.reason_other_highligt}}">
+                <small *ngIf="txtreason_other_highligt.touched && txtreason_other_highligt.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_goi_y_ly_do}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_ly_do}}</label>
+                <input type="text" required #txtreason_title="ngModel" class="form-control" name="reason_title"
+                  ngModel="{{dataUpdate.reason_title}}">
+                <small *ngIf="txtreason_title.touched && txtreason_title.errors?.required" class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_ly_do}}
+                </small>
+              </div>
+              <div class="col-md-12 mt-4" a>
+                <a class="btn btn-danger edit-button mr-2" (click)="status=1"><i
+                    class="fa fa-arrow-circle-left"></i>&nbsp;{{language.quay_lai}}</a>
+                <a class="btn btn-primary edit-button" (click)="status=3"><i
+                    class="fa fa-arrow-circle-right"></i>&nbsp;{{language.tiep_theo}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 text-center">
+            <img src="https://i.imgur.com/l2XOnrS.png" width="80%" alt="">
+            <img src="https://i.imgur.com/rJHvdoE.png" width="80%">
+          </div>
+        </div>
+        <div class="row mt-3 group-content {{ status === 3 ? 'show' : '' }}">
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_thong_tin_khach_hang}}</label>
+                <input type="text" required #txtcustomer_info_title="ngModel" class="form-control"
+                  ngModel="{{dataUpdate.customer_info_title}}" name="customer_info_title">
+                <small *ngIf="txtcustomer_info_title.touched && txtcustomer_info_title.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_thong_tin_khach_hang}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_khung_ten_kh}}</label>
+                <input type="text" required #txtcustomer_info_name="ngModel" class="form-control"
+                  name="customer_info_name" ngModel="{{dataUpdate.customer_info_name}}">
+                <small *ngIf="txtcustomer_info_name.touched && txtcustomer_info_name.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_khung_ten_kh}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_khung_email_kh}}</label>
+                <input required #txtcustomer_info_email="ngModel" type="text" class="form-control"
+                  name="customer_info_email" ngModel="{{dataUpdate.customer_info_email}}">
+                <small *ngIf="txtcustomer_info_email.touched && txtcustomer_info_email.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_khung_email_kh}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <label for="">{{language.tieu_de_khung_sdt_kh}}</label>
+                <input required #txtcustomer_info_phone="ngModel" type="text" class="form-control"
+                  ngModel="{{dataUpdate.customer_info_phone}}" name="customer_info_phone">
+                <small *ngIf="txtcustomer_info_phone.touched && txtcustomer_info_phone.errors?.required"
+                  class="error-message">
+                  {{language.ban_chua_nhap_tieu_de_khung_sdt_kh}}
+                </small>
+              </div>
+              <div class="col-md-12">
+                <div>
+                  <label for="">{{language.yeu_cau_tu_chon}}</label>
+                </div>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" [(ngModel)]="dataUpdate.customer_info_any_require"
+                      name="customer_info_any_require" value='1'>{{language.co}}
+                  </label>
+                </div>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" [(ngModel)]="dataUpdate.customer_info_any_require"
+                      name="customer_info_any_require" value='0'>{{language.khong}}
+                  </label>
+                </div>
+              </div>
+              <ng-container *ngIf="dataUpdate.customer_info_any_require === '0'">
+                <div class="col-md-12">
+                  <div>
+                    <label for="">{{language.yeu_cau_ten_khach_hang}} </label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_name_require"
+                        name="customer_info_name_require" value='1'>{{language.co}}
+                    </label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_name_require"
+                        [checked]="dataUpdate.customer_info_any_require === '0'" name="customer_info_name_require"
+                        value='0'>{{language.khong}}
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div>
+                    <label for="">{{language.yeu_cau_email_khach_hang}}</label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_email_require"
+                        name="customer_info_email_require" value='1'>{{language.co}}
+                    </label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_email_require"
+                        [checked]="dataUpdate.customer_info_any_require === '0'" name="customer_info_email_require"
+                        value='0'>{{language.khong}}
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div>
+                    <label for="">{{language.yeu_cau_sdt_khach_hang}}</label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_phone_require"
+                        name="customer_info_phone_require" value='1'>{{language.co}}
+                    </label>
+                  </div>
+                  <div class="form-check-inline">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" [ngModel]="dataUpdate.customer_info_phone_require"
+                        [checked]="dataUpdate.customer_info_any_require === '0'" name="customer_info_phone_require"
+                        value='0'>{{language.khong}}
+                    </label>
+                  </div>
+                </div>
+              </ng-container>
+              <div class="col-md-12 mt-4">
+                <a class="btn btn-danger edit-button mr-2" (click)="status=2"><i
+                    class="fa fa-arrow-circle-left"></i>&nbsp;{{language.quay_lai}}</a>
+                <a class="btn btn-primary edit-button" (click)="status=4"><i
+                    class="fa fa-arrow-circle-right"></i>&nbsp;{{language.tiep_theo}}</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <img src="https://i.imgur.com/ToM6AOH.png" width="100%" alt="">
+          </div>
+        </div>
+        <div class="row mt-3 group-content {{ status === 4 ? 'show' : '' }}">
+          <div class="col-md-6">
+            <div class="col-md-12">
+              <label for="">{{language.thong_diep_ket_thuc}} 1</label>
+              <input required #txtfinish_message="ngModel" type="text" class="form-control"
+                ngModel="{{dataUpdate.finish_message}}" name="finish_message">
+              <small *ngIf="txtfinish_message.touched && txtfinish_message.errors?.required" class="error-message">
+                {{language.ban_chua_nhap_thong_diep_ket_thuc}} 1
+              </small>
+            </div>
+            <div class="col-md-12">
+              <label for="">{{language.thong_diep_ket_thuc}} 2</label>
+              <input required #txtfinish_message2="ngModel" type="text" class="form-control"
+                ngModel="{{dataUpdate.finish_message2}}" name="finish_message2">
+              <small *ngIf="txtfinish_message2.touched && txtfinish_message2.errors?.required" class="error-message">
+                {{language.ban_chua_nhap_thong_diep_ket_thuc}} 2
+              </small>
+            </div>
+            <div class="col-md-12 mt-4">
+              <a class="btn btn-danger edit-button mr-2" (click)="status=3"><i
+                  class="fa fa-arrow-circle-left"></i>&nbsp;{{language.quay_lai}}</a>
+              <!-- <button class="btn btn-primary edit-button" *ngIf="Form_edit_setting.valid && can_update"><i
+                  class="fa fa-check"></i>&nbsp;{{language.xac_nhan}}</button> -->
+              <button class="btn btn-primary edit-button" *ngIf="Form_edit_setting.valid "><i
+                  class="fa fa-check"></i>&nbsp;{{language.xac_nhan}}</button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <img src="https://i.imgur.com/t4JQFbO.png" width="100%" alt="">
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</form>

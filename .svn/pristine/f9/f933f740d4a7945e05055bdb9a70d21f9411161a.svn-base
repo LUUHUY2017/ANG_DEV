@@ -1,0 +1,197 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row m-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 visit-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div> <!-- card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child ">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <!-- <ng-select style="min-width: 110px;" class="bootstrap selecttimeview select-visits" [options]="indexOption" [allowClear]="false" [(ngModel)]="indexOptionSelected"></ng-select> -->
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                      bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
+                  </li>
+                  <!-- li-visit -->
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card-body card-body-bottom">
+              <div class="row">
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-7 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right ml btnngaygio" data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                      (click)="get_data()">{{language.gio}}</label>
+                    <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
+                      [(ngModel)]="viewDataBy" btnRadio="Day" (click)="get_data()">{{language.ngay}}</label>
+                    <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
+                      [(ngModel)]="viewDataBy" btnRadio="Week" (click)="get_data()">{{language.tuan}}</label>
+                    <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
+                      [(ngModel)]="viewDataBy" btnRadio="Month" (click)="get_data()">{{language.thang}}</label>
+                    <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
+                      [(ngModel)]="viewDataBy" btnRadio="Year" (click)="get_data()">{{language.nam}}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row foot-title-show">
+                <div class="title-show1 ">
+                  {{site_name}} &nbsp; {{title_index}} &nbsp; {{ starttime }}&minus; {{ endtime }} &nbsp;
+                  {{ title_time_period }}: {{ time_period }}, {{language.xem_theo}} {{ view }}
+                </div>
+              </div>
+              <!--/.row-->
+              <!-- Biểu đồ -->
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <div class="table-responsive ">
+                  <table style="width: 100%;min-width: 900px" class="table table-striped table-visit">
+                    <thead>
+                      <tr>
+                        <th style="width: 400px;padding-left: 2.5rem;">{{language.thoi_gian}}
+                          <br> <span style="margin-left:0%;" class="spancell">
+                            ({{show_label_table}})
+                          </span>
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.passerby">
+                          {{indexes.passerby}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                          {{indexes.shoppers}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.visitors">
+                          {{indexes.visitors}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                          {{ indexes.turn_in_rate}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                          {{indexes.kids_visitors}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.traffic_flow">
+                          {{indexes.traffic_flow}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !==indexes.avg_time">
+                          {{indexes.avg_time}} (min)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.passerby">
+                          <b>{{this.total_passer_by |  number:'1.0-2'}}</b> </td>
+                        <!-- <br><span class="spancell"></span> -->
+                        <td [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                          <b>{{this.total_shopper_visits |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.visitors">
+                          <b>{{this.total_num_to_enter |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                          <b>{{this.total_kids |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                          <b>{{this.total_turn_rate |  number:'1.0-2'}} (%)</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.traffic_flow">
+                          <b>{{this.total_traffic |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !==indexes.avg_time"><b>{{toHHMMSS(total_avg_time) }}</b>
+                        </td>
+                      </tr>
+                      <ng-container *ngIf="chart_data != null">
+                        <tr *ngFor="let item of chart_data">
+                          <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.passerby">
+                            {{item.passer_by |  number:'1.0-2'}}
+                            <span class="spancell">({{Go_number(item.passer_by, total_passer_by)}}%)</span>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                            {{item.shopper_visits |  number:'1.0-2'}}
+                            <span class="spancell">({{Go_number(item.shopper_visits, total_shopper_visits)}}%)</span>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                            {{item.kids_visits |  number:'1.0-2'}}
+                            <span class="spancell">({{Go_number(item.kids_visits, total_kids)}}%)</span>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                            {{item.turn_in_rate |  number:'1.0-2'}}
+                            <span class="spancell">(%)</span>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.visitors">
+                            {{item.num_to_enter |  number:'1.0-2'}}
+                            <span class="spancell">({{Go_number(item.num_to_enter, total_num_to_enter)}}%)</span>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexes.traffic_flow">
+                            {{item.traffic |  number:'1.0-2'}}
+                            <span class="spancell">({{Go_number(item.traffic, total_traffic)}}%)</span></td>
+                          <td [hidden]="this.indexOptionSelected !==indexes.avg_time">{{toHHMMSS(item.avg_time * 60)}}
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
+      {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div> <!-- card-body-parent -->
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông báo!</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Có lỗi xảy ra! Vui lòng nhấn<a style="color: blue; cursor: pointer;" (click)="reset_session()"> vào đây </a> để
+      tải lại</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">Tải lại</button>
+  </div>
+</ng-template>

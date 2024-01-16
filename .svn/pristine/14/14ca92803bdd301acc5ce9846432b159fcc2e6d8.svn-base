@@ -1,0 +1,310 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import * as io from 'socket.io-client';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// tree node
+import { TreeNode } from 'primeng/components/common/treenode';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+import { NotifierService } from 'angular-notifier';
+@Component({
+  templateUrl: './companies.component.html',
+  styleUrls: ['./companies.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+@ViewChild(GeneralMenuComponent)
+export class CompaniesComponent implements OnInit {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  can_update = false;
+  module_update: any;
+  private socket: SocketIOClient.Socket;
+  connectSocketIo = localStorage.getItem('connectSocketIo') === '1';
+  private readonly notifier: NotifierService;
+  constructor(private router: Router
+    , private route: ActivatedRoute
+    , private appservice: AppService
+    , private modalService: BsModalService
+    , notifierService: NotifierService) {
+    this.notifier = notifierService;
+    if (this.connectSocketIo) {
+      this.socket = io(environment.UrlSocket);
+    }
+  }
+  // Khai báo kiểu dữ kiệu
+  organization: any;
+  data2: any;
+  public modalRef: BsModalRef;
+  hidden_select_organization = false;
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  modulelist = [
+    {
+      item_id: 'footfall'
+      , item_label: 'Hệ thống Footfall'
+    },
+    {
+      item_id: 'fba'
+      , item_label: 'Hệ thống Fba'
+    },
+    {
+      item_id: 'genderage'
+      , item_label: 'Hệ thống Gender Age'
+    }
+  ];
+  dropdownSettings = {
+    singleSelection: false,
+    idField: 'item_id',
+    textField: 'item_label',
+    selectAllText: 'Chọn tất cả',
+    unSelectAllText: 'Bỏ chọn tất cả',
+    itemsShowLimit: 3,
+    allowSearchFilter: true
+  };
+  is_admin_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  ngOnInit(): void {
+    this.is_admin();
+    this.show_select_organization();
+    this.get_data();
+  }
+  is_admin() {
+    if (!environment.production) {
+      console.log(this.is_admin_organization);
+    }
+    if (this.is_admin_organization.length > 0 || Number(this.user_info.lever) === 0) {
+      this.can_update = true;
+    }
+  }
+  // giám sát thiết bị
+  got_error(message, callback: Function = null) {
+    let default_message = 'Có lỗi xảy ra';
+    if (this.user_info.lever === '0') {
+      default_message = message;
+    }
+    this.notifier.notify('error', default_message);
+    if (callback) {
+      callback();
+    }
+  }
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    this.module_update = [];
+    if (!environment.production) {
+      console.log('a', item);
+    }
+    const data = {
+      id: item.id
+    };
+    this['ImageUrll' + 2] = '';
+    this.blockUI.start('Đang tải dữ liệu...');
+    const url = environment.FBA.Administration.update_organization + '_get';
+    this.appservice.post(data, url).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if ('message' in para) {
+          this.got_error(para.message);
+        } else {
+          this.data2 = Object.assign({}, para.organization_array[0]);
+          para.get_module.forEach(element => {
+            const e = this.modulelist.find(index => index.item_id === element.page_module);
+            if (e) {
+              this.module_update.push(e);
+            }
+          });
+          this.modalRef = this.modalService.show(template, {
+            backdrop: true,
+            ignoreBackdropClick: true
+          });
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  // thay đổi tổ chức selected header
+  show_select_organization() {
+    const userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+    if (!environment.production) {
+      console.log('userInfo', userInfo);
+    }
+    if (userInfo.lever === '0') {
+      this.hidden_select_organization = false;
+    } else {
+      this.hidden_select_organization = true;
+    }
+  }
+  // upload ảnh chất lượng đánh giá
+  uploadimagequality(file: FileList, number: Number) {
+    const fileload = file[0];
+    const reader = new FileReader();
+    // hiện ảnh
+    reader.onload = e => this['ImageUrll' + number] = reader.result;
+    reader.readAsDataURL(fileload);
+    // lên server
+    this['ImageUrl' + number] = file.item(0);
+    if (!environment.production) {
+      console.log(this['ImageUrl' + number]);
+    }
+  }
+  // suibmit form thêm data
+  get_data() {
+    const data = {
+      data: 1
+    };
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', data);
+    }
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.get_organization_filter).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.organization = para;
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+  updateform(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    if (this['ImageUrl' + 2]) { data.append('company_logo', this['ImageUrl' + 2], this['ImageUrl' + 2].name); }
+    data.append('token', localStorage.getItem(environment.access_token));
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.update_organization).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        if (para.status === 1) {
+          this.got_success('Cập nhật dữ liệu thành công');
+          if (this.connectSocketIo) {
+            const dataToEmit = {
+              organization_id: para.organization_id
+              , tocken_type: para.tocken_type
+              , access_token: para.access_token
+            };
+            this.socket.emit('fba_tablet_reload_data', dataToEmit);
+          }
+          this.get_data();
+        } else {
+          this.got_error(para.status);
+          this.modalRef.hide();
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+
+  insertform(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    if (this['ImageUrl' + 1]) { data.append('company_logo', this['ImageUrl' + 1], this['ImageUrl' + 1].name); }
+    this.appservice.post(data, environment.FBA.Administration.insert_organization).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.get_data();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+
+  delete_org(id: number) {
+    const c = confirm('Bạn đồng ý xóa?');
+    const data = {
+      id: id
+      // , deleted: 1
+    };
+    if (c) {
+      if (!environment.production) {
+        console.log(data);
+      }
+      this.blockUI.start('Đang xử lý dữ liệu...');
+      this.appservice.post(data, environment.FBA.Administration.delete_organization).subscribe(
+        param => {
+          this.get_data();
+        },
+        (error) => {
+          if (!environment.production) {
+            console.log(error);
+          }
+          this.blockUI.start('Lỗi, không kết nối được máy chủ');
+          this.blockUI.stop();
+        },
+        () => {
+          this.blockUI.stop();
+        }
+      );
+    }
+  }
+
+}
+
+
+

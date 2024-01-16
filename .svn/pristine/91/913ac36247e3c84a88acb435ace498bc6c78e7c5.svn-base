@@ -1,0 +1,748 @@
+body {
+  font-family: Open-light !important;
+  // font-family: 'Roboto' sans-serif !important;
+}
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap&subset=vietnamese');
+@font-face {
+  font-family: "Open-semi";
+  src: url("../../../fonts/OpenSans-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "Open-bold";
+  src: url("../../../fonts/OpenSans-Bold.ttf");
+}
+
+@font-face {
+  font-family: "Open-regular";
+  src: url("../../../fonts/OpenSans-Regular.ttf");
+}
+
+@font-face {
+  font-family: "Open-light";
+  src: url("../../../fonts/Roboto-Light.ttf");
+}
+@import "~@ng-select/ng-select/themes/default.theme.css";
+.link_icon:hover {
+  text-decoration: underline;
+}
+
+.menu_ul {
+  padding-left: 0px;
+  list-style: none;
+}
+
+.menu_ul li {
+  display: block;
+  position: relative;
+  border-radius: 0px 25px 25px 0px;
+}
+
+.menu_ul li:active {
+  outline: unset;
+}
+.noborder {
+  border-radius: unset;
+}
+.menu_ul .label1,
+.menu_ul .label2 {
+  padding: 5px 10px 0px 10px;
+  color: rgba(0, 0, 0, 0.54);
+  display: block;
+  content: "";
+  user-select: none;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 11px;
+  border-top: 0.6px solid rgba(0, 0, 0, 0.12);
+}
+
+.menu_ul > li > a {
+  padding: 15px 0px 15px 10px;
+}
+
+// tesst
+.menu_ul li > a {
+  display: block;
+  color: #747475 !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 10px;
+  border-radius: inherit;
+  user-select: none;
+  transition: 0.3s ease-in;
+}
+
+.right_content {
+  background: #f8f9fa;
+}
+
+.show_sub_menu {
+  background: #dadce0;
+}
+
+.show_sub_menu > .has_children::after {
+  transform: rotate(-90deg);
+}
+
+.show_sub_menu > ul.sub_menu_ul {
+  max-height: 1300px;
+  transition: max-height 0.1s ease-in;
+}
+
+.menu_ul li > a:hover {
+  text-decoration: none;
+  background: #f3b21c;
+}
+
+.add-padding {
+  padding-left: 90px !important;
+}
+
+.has_children::after {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  display: block;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  margin-top: -4px;
+  content: "";
+  background-image: url(data:image/svg+xml;charset=utf8;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMSAxNCc+PHBhdGggZmlsbD0nIzczODE4ZicgZD0nTTkuMTQ4IDIuMzUybC00LjE0OCA0LjE0OCA0LjE0OCA0LjE0OHEwLjE0OCAwLjE0OCAwLjE0OCAwLjM1MnQtMC4xNDggMC4zNTJsLTEuMjk3IDEuMjk3cS0wLjE0OCAwLjE0OC0wLjM1MiAwLjE0OHQtMC4zNTItMC4xNDhsLTUuNzk3LTUuNzk3cS0wLjE0OC0wLjE0OC0wLjE0OC0wLjM1MnQwLjE0OC0wLjM1Mmw1Ljc5Ny01Ljc5N3EwLjE0OC0wLjE0OCAwLjM1Mi0wLjE0OHQwLjM1MiAwLjE0OGwxLjI5NyAxLjI5N3EwLjE0OCAwLjE0OCAwLjE0OCAwLjM1MnQtMC4xNDggMC4zNTJ6Jy8+PC9zdmc+);
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: 0.2s;
+}
+
+.sub_menu_ul {
+  padding-left: 0px;
+  margin-top: 0px;
+  list-style: none;
+  overflow: hidden;
+  transition: 0.4s;
+  max-height: 0px;
+  transition: max-height 0.15s ease-out;
+}
+
+.sub_menu_ul > li > a {
+  display: block;
+  position: relative;
+  padding: 15px 0px 15px 60px;
+}
+
+.ripple {
+  border-radius: 50%;
+  background-color: #ffffff61;
+  position: absolute;
+  transform: scale(0.6);
+  animation: ripple 0.6s linear forwards;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.selected {
+  // background: #dadce0;
+  background: #f3b21c;
+}
+
+.navbar {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  color: #fff;
+  background: linear-gradient(to right, rgb(26, 22, 50), rgb(8, 22, 42));
+  height: 100%;
+}
+
+.navbardropdown {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.column1 {
+  width: 15%;
+}
+
+.column2 {
+  width: 85%;
+  margin-right: 10px;
+}
+
+.sidebar .nav-dropdown.open {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sidebar .nav-link.active {
+  background: #575d61;
+}
+
+// Notifications
+.flex_item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motthongbao {
+  cursor: pointer;
+  position: relative;
+  padding: 8px 0px;
+}
+
+.motthongbao > span {
+  position: absolute;
+  top: 0px;
+  color: crimson;
+  right: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.5s;
+}
+
+.motthongbao:hover {
+  background: #ddd;
+}
+
+.motthongbao:hover span {
+  opacity: 1;
+  visibility: visible;
+}
+
+.auto_scroll {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.unseen {
+  background: #eee;
+}
+
+.seen {
+  background: #fff;
+}
+
+.noidungnotfication > b {
+  text-transform: capitalize;
+}
+
+// .motthongbao:not(:first-child) {
+//   margin-top: 1rem;
+// }
+/*Nghĩa 26/10*/
+
+.btnshow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
+.group-line {
+  width: fit-content;
+}
+
+.group-line:hover {
+  cursor: pointer;
+}
+
+.line {
+  width: 25px;
+  border: 1px solid #8a8a8a;
+  margin: 5px 0px;
+}
+/* ------------ Ng-Select Card----------------*/
+
+.bootstrap {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+  min-width: 100px;
+}
+
+select-dropdown > div.below {
+  z-index: 5 !important;
+}
+/* ------------ Custom Card----------------*/
+
+.card-parent {
+  border: unset !important;
+  border-radius: unset;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+}
+
+.card-header {
+  border-bottom: 1px solid #ececec;
+  background: #fff;
+}
+
+.card-child {
+  border: 1px solid #f0f3f5 !important;
+}
+
+.card-body-bottom {
+  padding: 20px 20px 8px 20px !important;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid #ececec !important;
+}
+
+/*---------------Thay đổi ngày giờ------------*/
+
+.d-md-block {
+  margin-bottom: 5px;
+}
+
+.d-md-block .btn-custom:not(:disabled):not(.disabled).active {
+  color: #222;
+  background-image: -webkit-linear-gradient(top, #f0f0f0, #dfdfdf);
+  background-color: #c8ced3;
+  border-color: #c8ced3;
+  border-color: #ccc;
+  font-weight: bold;
+  box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+.d-md-block .btn-custom {
+  color: #222;
+  font-weight: bold;
+  background-color: transparent;
+  border-color: #c8ced3;
+}
+
+.table td {
+  padding: 0.55rem 0.75rem;
+}
+
+// helps
+.trongbaivietnay {
+  position: relative;
+}
+
+.trongbaivietnay::after {
+  background: no-repeat center;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzFhNzNlOCI+PHBhdGggZD0iTTE0LjgzIDE2LjQyTDI0IDI1LjU5bDkuMTctOS4xN0wzNiAxOS4yNWwtMTIgMTItMTItMTJ6Ii8+PHBhdGggZD0iTTAtLjc1aDQ4djQ4SDB6IiBmaWxsPSJub25lIi8+PC9zdmc+);
+  background-size: 1.5rem;
+  content: "";
+  height: 1.375rem;
+  margin-top: -0.75rem;
+  position: absolute;
+  right: 1.125rem;
+  top: 50%;
+  width: 1.375rem;
+}
+
+.motbaiviet.active ul {
+  display: none;
+}
+
+.atentionlabel {
+  min-height: 50px;
+  position: relative;
+}
+
+.atentionlabel::after {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBkPSJNOSAyMWMwIC41LjQgMSAxIDFoNGMuNiAwIDEtLjUgMS0xdi0xSDl2MXptMy0xOUM4LjEgMiA1IDUuMSA1IDljMCAyLjQgMS4yIDQuNSAzIDUuN1YxN2MwIC41LjQgMSAxIDFoNmMuNiAwIDEtLjUgMS0xdi0yLjNjMS44LTEuMyAzLTMuNCAzLTUuNyAwLTMuOS0zLjEtNy03LTd6IiBmaWxsPSIjZWE4NjAwIi8+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg==);
+  background-repeat: no-repeat;
+  content: "";
+  height: 24px;
+  margin-left: -40px;
+  margin-top: 6px;
+  position: absolute;
+  width: 24px;
+  top: 11px;
+  left: 60px;
+}
+
+.add_help {
+  padding: 20px;
+  text-transform: uppercase;
+  font-family: Open-Bold;
+  color: #007ad9 !important;
+  cursor: pointer;
+}
+
+.add_help:hover {
+  text-decoration: underline !important;
+}
+
+.linktag {
+  cursor: pointer;
+  color: #20a8d8 !important;
+}
+
+.linktag:hover {
+  text-decoration: underline !important;
+}
+
+.spinner {
+  color: #fff;
+  position: absolute;
+  top: 20px;
+  left: 110px;
+  font-size: 20px;
+  animation: xoaytron 1s infinite;
+}
+.infinity {
+  animation: xoaytron 1s infinite;
+}
+.noidungbook img {
+  max-width: 100%;
+}
+@keyframes buttonhover {
+  0% {
+    transform: rotate(-20deg) !important;
+  }
+  50% {
+    transform: rotate(20deg) !important;
+  }
+  to {
+    transform: rotate(0) !important;
+  }
+}
+@keyframes xoaytron {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .d-md-block {
+    display: block !important;
+  }
+  .btn-group > .btn.active {
+    z-index: 0;
+  }
+  .auto_scroll {
+    max-height: 250px;
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  .side {
+    height: 100%;
+    position: fixed;
+    transition: 0.3s;
+    top: 0px;
+    left: -300px;
+    z-index: 3;
+    background: #fff !important;
+    width: 300px;
+    overflow: auto;
+    max-width: unset;
+  }
+  .left {
+    margin-left: 300px !important;
+  }
+  .btnshow {
+    background: #fff;
+    display: block;
+  }
+  .app-body {
+    margin-top: 40px;
+    padding-top: 10px;
+  }
+  .grade-blur {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    background: #00000073;
+    z-index: 2;
+  }
+}
+
+@media only screen and (max-width: 414px) {
+  .d-md-block {
+    margin-left: 15px;
+  }
+  .d-md-block label {
+    font-size: 3vw;
+  }
+}
+
+@media only screen and (max-width: 395px) {
+  .d-md-block {
+    margin-left: 15px;
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  .sidebar {
+    margin-left: -200px !important;
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    width: 250px;
+  }
+  /*27/10*/
+  .show_right_content {
+    transition: 0.3s;
+    width: 74% !important;
+    transform: translateX(200px) !important;
+  }
+}
+/*--------------- Icon thêm sửa xóa---------------------*/
+
+.icon-blue {
+  color: #02026f !important;
+  cursor: pointer;
+}
+
+.icon-red {
+  color: #9a0909 !important;
+  cursor: pointer;
+}
+
+.icon-green {
+  color: #024a1b !important;
+  cursor: pointer;
+}
+
+.icon-black {
+  color: black !important;
+  cursor: pointer;
+}
+
+.nav {
+  width: auto !important;
+}
+
+.li_active {
+  color: #00a8ff !important;
+}
+
+.i-black {
+  color: #1a1a1a;
+}
+
+.color-font {
+  color: #23282c !important;
+}
+
+input.form-control {
+  border-radius: 0 !important;
+}
+
+.icon-down {
+  float: right;
+  font-size: 11px;
+  margin-right: -0.1rem;
+}
+
+.icon-stars {
+  color: red;
+  font-weight: bold;
+}
+
+.bg-danger {
+  background-color: #fd254d !important;
+}
+
+.card.bg-danger {
+  border-color: #fd254d !important;
+}
+
+.bg-warning {
+  background-color: #ffc20a !important;
+}
+
+.card.bg-warning {
+  border-color: #ffc20a !important;
+}
+
+.bg-info {
+  background-color: #35cbf7 !important;
+}
+
+.card.bg-info {
+  border-color: #35cbf7 !important;
+}
+
+.bg-primary {
+  background-color: #1da1ef !important;
+}
+
+.card.bg-primary {
+  border-color: #1da1ef !important;
+}
+.fa-icon-green {
+  color: green;
+}
+.fa-icon-green {
+  color: green;
+}
+.fa-icon-red {
+  color: red;
+}
+.fa-icon-gray {
+  color: #2a405b;
+}
+.pdl-5 {
+  padding-left: 5px;
+}
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+}
+.table-comparation tr td {
+  vertical-align: middle;
+}
+.highcharts-subtitle {
+  min-width: 900px !important;
+  top: 0px !important;
+  font-size: 11px !important;
+  margin-top: 7px !important;
+}
+.h6-header {
+  color: black;
+  font-weight: bold;
+  font-size: 17px;
+}
+.font-icon {
+  color: #f3b920;
+  font-size: 17px;
+}
+.disabledMenuItem {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.boxShadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+}
+.noBorderRadius {
+  border-radius: unset;
+}
+.icon-tooltip {
+  font-size: 12px;
+  z-index: 999999;
+  color: #5d5b5b;
+}
+// Ng select group
+.ng-select .ng-select-container {
+  background-color: #fff;
+  border-radius: unset;
+  border: unset;
+  min-height: unset;
+  align-items: center;
+}
+div.ng-optgroup > span.ng-option-label,
+div.ng-optgroup > span.ng-star-inserted {
+  font-weight: bold;
+  color: #007ad9 !important;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 10px;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-optgroup {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked:hover {
+  background-color: #f3b21c !important;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+  background-color: #f3b21c !important;
+  color: #060606;
+}
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+  background-color: #f1f1f1;
+}
+.ng-select .ng-arrow-wrapper {
+  width: 20px;
+  padding-right: 0px;
+}
+// .table td {
+//   color: #000000;
+// }
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value .ng-value-icon {
+  float: left;
+  padding: 1px 1px;
+}
+.ng-select.ng-select-multiple .ng-select-container .ng-value-container {
+  flex-wrap: unset !important;
+  margin-right: 15px !important;
+  overflow-x: hidden;
+}
+.ng-select .ng-clear-wrapper {
+  position: absolute !important;
+  right: 12px !important;
+  top: 5px;
+}
+.require-field {
+  color: crimson;
+}
+// role site
+.site-0
+{
+  margin-left: 0px;
+}
+.site-1
+{
+  margin-left: 10px;
+}
+.site-2
+{
+  margin-left: 20px;
+}
+.site-3
+{
+  margin-left: 30px;
+}
+.site-4
+{
+  margin-left: 40px;
+}
+.site-5
+{
+  margin-left: 50px;
+}
+.site-6
+{
+  margin-left: 60px;
+}
+.ng-flag {
+  font-size: 11px;
+  color: #f19129;
+  border: 1px solid #bf693645;
+  padding: 2px;
+  border-radius: 2px;
+}
+#border-remove
+{
+  width: fit-content;
+  margin: auto;
+  padding: 10px 15px;
+  border-radius: 50%;
+  border: 2px solid #9c1b1b;
+}
+#border-remove>i
+{
+  color: #9c1b1b;
+}
+.reload-item {
+  color: #f18c2a;
+  text-align: end;
+  font-size: 11px;
+  font-style: italic;
+  cursor: pointer;
+}
+.reload-item:hover {
+  text-decoration: underline;
+}

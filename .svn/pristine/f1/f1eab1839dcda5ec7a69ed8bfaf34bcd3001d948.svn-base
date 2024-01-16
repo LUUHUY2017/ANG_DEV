@@ -1,0 +1,183 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <block-ui></block-ui>
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"><i class="cui-layers" aria-hidden="true"></i>
+            {{language.danh_sach_danh_muc}}</span>
+          <button *ngIf="canAdd" (click)="openPopupAddItem(insertTemplate)" style="float:right"
+            class="btn btn-them buton-search"><i class="icon-plus">&nbsp;</i>
+            {{language.them_moi}}</button>
+        </div>
+        <div class="card-body">
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="row mb-3" *ngIf="isSuperAdmin">
+                <div class="col-md-2">
+                  <ng-select class="bootstrap selectimeview" required [options]="orgArray"
+                    [ngModel]="organizationId" [allowClear]="false" (selected)="changeOrg($event)"
+                    [placeholder]="language.chon_to_chuc">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                  <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">{{language.STT}}</th>
+                        <th style="width: 80px;text-align: left;">{{language.ten_danh_muc}}</th>
+                        <th style="width: 120px;text-align: left;text-indent: 1rem;">{{language.ngay_cap_nhat}}</th>
+                        <th style="width: 150px;">{{language.xu_ly}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                        <td><input type="text" name="category_name" ngModel autocomplete="off"></td>
+                        <td><input type="text" disabled autocomplete="off"></td>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                      </tr>
+                      <tr *ngFor="let items of mf.data;let i = index">
+                        <td>{{i + 1}}</td>
+                        <td style="text-align: left;">{{items.category_name}}
+                        </td>
+                        <td style="text-align: left;">{{items.updated_at}}
+                        </td>
+                        <td style="width: 100px;">
+                          <a (click)="openPopupUpdateCurrentItem(items,updateTemplate)" class="icon-blue">
+                            <i class="cui-note" aria-hidden="true"></i>
+                          </a>&nbsp;
+                          <a (click)="openPopupDeleteItem(items,deleteTemplate)" class="icon-red">
+                            <i class="cui-circle-x" aria-hidden="true"></i>
+                          </a>&nbsp;
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length === 0">
+                        <td colspan="8" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                          <span>{{language.khong_co_du_lieu}}</span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length > rowsOnPage">
+                        <td colspan="8">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <!-- <tfoot class="fba-tablet-list-tfoot">
+
+                </tfoot> -->
+                  </table>
+                </form>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. {{language.vui_long}}<a
+                  style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Model hỏi xóa -->
+  <ng-template #deleteTemplate>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="deleteCurrentItem()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;"
+            class="btn btn-huy active pr-4 pl-4">{{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_danh_muc}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.danh_muc}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" id="nf" type="text" minlength="3" #txtcate="ngModel" required
+              [ngModel]="dataUpdate.category_name" name="category_name">
+            <small *ngIf="txtcate.touched && txtcate.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_danh_muc}}
+            </small>
+            <small *ngIf="txtcate.touched && txtcate.errors?.minlength" class="error-message">
+              {{language.danh_muc_co_it_nhat_3_ki_tu}}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="updateForm.invalid">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+
+  <!-- Modal thêm mới  -->
+  <ng-template #insertTemplate>
+    <form (ngSubmit)="addNewItem(insertForm)" #insertForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_danh_muc}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.danh_muc}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtcategory="ngModel" required
+              name="category_name">
+            <small *ngIf="txtcategory.touched && txtcategory.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_danh_muc}}
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="insertForm.invalid"> {{language.them_moi}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <notifier-container></notifier-container>
+  <!-- Kết thúc  Modal thêm mới -->
+</main>

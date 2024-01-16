@@ -1,0 +1,372 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import * as io from 'socket.io-client';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+import { NotifierService } from 'angular-notifier';
+import { BehaviorSubject } from 'rxjs';
+import { language } from '../../admin_language';
+import { language_en } from '../../admin_language_en';
+
+@Component({
+  templateUrl: './companies.component.html',
+  styleUrls: ['./companies.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+@ViewChild(GeneralMenuComponent)
+export class CompaniesComponent implements OnInit {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  can_update = false;
+  module_update: any;
+  private socket: SocketIOClient.Socket;
+  connectSocketIo = localStorage.getItem('connectSocketIo') === '1';
+  private readonly notifier: NotifierService;
+  option_deleted: number;
+  data_update: any;
+  // Khai báo kiểu dữ kiệu
+  organization: any;
+  data: Array<any>;
+  public modalRef: BsModalRef;
+  hidden_select_organization = false;
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  modulelist: Array<any>;
+  dropdownSettings: any;
+  is_admin_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  data_filter: any[];
+  organization_id: any;
+  private subcription: any;
+  webState: BehaviorSubject<any>;
+  tu_khoa: string;
+  oldState: string;
+  error_array: Array<any>;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  language: any;
+  constructor(private router: Router
+    , private route: ActivatedRoute
+    , public appservice: AppService
+    , private modalService: BsModalService
+    , notifierService: NotifierService) {
+    this.type_language === 'vn' ? this.language = language : this.language = language_en;
+    this.dropdownSettings = {
+      singleSelection: false,
+      idField: 'item_id',
+      textField: 'item_label',
+      selectAllText: this.language.chon_tat_ca,
+      unSelectAllText: this.language.bo_chon_tat_ca,
+      itemsShowLimit: 3,
+      allowSearchFilter: true
+    };
+    this.notifier = notifierService;
+    if (this.connectSocketIo) {
+      this.socket = io(environment.UrlSocket);
+    }
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    this.webState = new BehaviorSubject(firstState);
+    this.is_admin();
+    this.show_select_organization();
+    this.get_data();
+    this.setDefaultValue();
+    this.watchStateChange();
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    const oldStateObj = this.webState.getValue();
+    this.oldState = oldStateObj.state;
+    this.webState.next(stateWithData);
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const currentState = res.state;
+      const item = res.data;
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        // Sự kiện nhận dữ liệu về thì bỏ hành động tìm kiếm trước đó
+        this.tu_khoa = null;
+        this.data = item;
+        this.data_filter = this.data;
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.data.push(item);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', this.language.them_moi_thanh_cong);
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        for (let i = 0; i < this.data.length; i++) {
+          if (Number(this.data[i].id) === Number(item.id)) {
+            this.data[i] = item;
+            break;
+          }
+        }
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', this.language.cap_nhat_thanh_cong);
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.data.splice(this.data.findIndex(e => e.id === item.id), 1);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', this.language.xoa_thanh_cong);
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        const string = this.tu_khoa ? this.tu_khoa.toLowerCase() : '';
+        // console.log(string);
+        if (string === '') {
+          this.data_filter = this.data;
+        } else {
+          this.data_filter = this.data.filter(x => x.location_name.toLowerCase().indexOf(string) !== -1);
+        }
+      }
+    });
+  }
+  setDefaultValue() {
+    this.option_deleted = 0;
+    this.data = [];
+    this.data_filter = [];
+    this.data_update = null;
+    this.organization_id = null;
+  }
+  is_admin() {
+    if (this.is_admin_organization.length > 0 || Number(this.user_info.lever) === 0 && Number(this.user_info.organization_id) === 0) {
+      this.can_update = true;
+    }
+  }
+  // giám sát thiết bị
+  got_error(message, callback: Function = null) {
+    let default_message = this.language.co_loi_xay_ra;
+    if (this.user_info.lever === '0') {
+      default_message = message;
+    }
+    this.notifier.notify('error', default_message);
+    if (callback) {
+      callback();
+    }
+  }
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  get_data() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    const data = {};
+    const url = environment.FBA.Administration.get_organization_filter;
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (!environment.production) {
+          // console.log('get_user_page_parametter', param);
+        }
+        if ('message' in param) {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+          return;
+        }
+        this.updateState('retrieve', param.organization_array);
+        this.modulelist = param.index_array;
+      },
+      (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  show_delete(item: any, templates: TemplateRef<any>) {
+    this.data_update = item;
+    this.openModal(templates);
+  }
+  delete_item() {
+    const data = {
+      id: this.data_update.id
+    };
+    if (!environment.production) {
+      console.log(data);
+    }
+    const url = environment.FBA.Administration.delete_organization;
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    this.appservice.post(data, url).subscribe(
+      res => {
+        if (res.message === 1) {
+          this.updateState(environment.STATE.delete, data);
+        } else {
+          this.notifier.notify('error', this.language.co_loi_xay_ra);
+        }
+      }, (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+        this.modalRef.hide();
+      });
+  }
+  show_insert(templates: TemplateRef<any>) {
+    this.error_array = [];
+    this['ImageUrll' + 1] = null;
+    this['ImageUrl' + 1] = null;
+    this.openModal(templates);
+  }
+  preventChange() {
+    this.modalRef.hide();
+    this.notifier.notify('error', this.language.loi_du_lieu_khong_the_thay_doi);
+  }
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    this.error_array = [];
+    const url = environment.FBA.Administration.update_organization + '_get';
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    this.appservice.post(item, url).subscribe(para => {
+      this.data_update = para.organization_array;
+      this.module_update = para.get_module;
+      this.openModal(template);
+      this['ImageUrll' + 2] = null;
+      this['ImageUrl' + 2] = null;
+    },
+      (error) => {
+        this.notifier.notify('error', this.language.khong_the_ket_noi_may_chu);
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // thay đổi tổ chức selected header
+  show_select_organization() {
+    if (Number(this.user_info.lever) === 0 && Number(this.user_info.organization_id) === 0) {
+      this.hidden_select_organization = false;
+    } else {
+      this.hidden_select_organization = true;
+    }
+  }
+  // upload ảnh chất lượng đánh giá
+  uploadimagequality(target: any, number: Number) {
+    this.error_array = [];
+    const file = target.files;
+    const fileload = file[0];
+    const reader = new FileReader();
+    const newImage = new Image();
+    // hiện ảnh
+    newImage.onload = e => {
+      if (newImage.height <= this.appservice.uploadImageHeight && newImage.width <= this.appservice.uploadImageWidth) {
+        reader.readAsDataURL(fileload);
+      } else {
+        this.error_array = ['Kích thước ảnh không hợp lệ'];
+        this['ImageUrll' + number] = null;
+        this['ImageUrl' + number] = null;
+        target.value = '';
+      }
+    };
+    newImage.src = window.URL.createObjectURL(fileload);
+    // hiện ảnh
+    reader.onload = e => {
+      this['ImageUrll' + number] = reader.result;
+      this['ImageUrl' + number] = file.item(0);
+    };
+  }
+  updateform(item) {
+    this.error_array = [];
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    console.log('dữ liệu gửi đi', item.value);
+    if (item.invalid) {
+      this.modalRef.hide();
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+    }
+    if (!item.controls.organization_code.dirty) {
+      delete item.value.organization_code;
+    }
+    const data: FormData = new FormData();
+    if (this['ImageUrl' + 2]) {
+      data.append('company_logo', this['ImageUrl' + 2], this['ImageUrl' + 2].name);
+    }
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.update_organization).subscribe(
+      para => {
+        console.log('dữ liệu gửi về', para);
+        if (para.message === 1) {
+          this.updateState(environment.STATE.update, para.updatedData);
+          if (this.connectSocketIo) {
+            const dataToEmit = {
+              organization_id: para.updatedData.id
+              , tocken_type: environment.Bearer
+              , access_token: localStorage.getItem(environment.access_token)
+            };
+            this.socket.emit('fba_tablet_reload_data', dataToEmit);
+          }
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(para);
+        }
+      },
+      (error) => {
+        this.error_array = [this.language.khong_the_ket_noi_may_chu];
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+
+  insertform(item) {
+    if (item.invalid) {
+      this.modalRef.hide();
+      this.notifier.notify('error', this.language.du_lieu_khong_phu_hop);
+    }
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    console.log('dữ liệu gửi đi', item.value);
+    this.error_array = [];
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    if (this['ImageUrl' + 1]) {
+      data.append('company_logo', this['ImageUrl' + 1], this['ImageUrl' + 1].name);
+    }
+    this.appservice.post(data, environment.FBA.Administration.insert_organization).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.updateState(environment.STATE.insert, res.insertedData);
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.error_array = [this.language.khong_the_ket_noi_may_chu];
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+}
+
+
+

@@ -1,0 +1,199 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// tree node
+import { TreeNode } from 'primeng/components/common/treenode';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import viewchild
+import { AdminstratorMenuComponent } from '../../../viewchild/adminstratormenu/adminstratormenu.component';
+@ViewChild(AdminstratorMenuComponent)
+
+@Component({
+  templateUrl: './company.component.html',
+  styleUrls: ['./company.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class CompanyComponent implements OnInit {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  constructor(private router: Router, private route: ActivatedRoute, private appservice: AppService, private modalService: BsModalService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  organization: any;
+  tu_khoa: string;
+  data2: any;
+  public modalRef: BsModalRef;
+  hidden_select_organization = false;
+  organization_name: string;
+  organization_code: string;
+  organization_shortname: string;
+  organization_description: string;
+  user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+  ngOnInit(): void {
+    this.tu_khoa = '';
+    this.show_select_organization();
+    this.get_data();
+  }
+  // click hiện modal
+  openModal(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('a', item);
+    }
+    this.data2 = item;
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // thay đổi tổ chức selected header
+  show_select_organization() {
+    const userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+    if (!environment.production) {
+      console.log('userInfo', userInfo);
+    }
+    if (userInfo.lever === '0') {
+      this.hidden_select_organization = false;
+    } else {
+      this.hidden_select_organization = true;
+    }
+  }
+  // suibmit form thêm data
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const data = {
+      tu_khoa: this.tu_khoa
+    };
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', data);
+    }
+    this.appservice.post(data, environment.FBA.Administration.get_organization_filter).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.organization = para;
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+  updateform(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.update_organization).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.get_data();
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+
+  insertform(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.insert_organization).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        this.get_data();
+        // this.router.navigate(['/admin/admin']);
+        this.organization_name = '';
+        this.organization_code = '';
+        this.organization_shortname = '';
+        this.organization_description = '';
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+
+  delete_org(id: number) {
+    const c = confirm('Bạn đồng ý xóa?');
+    const data = {
+      id: id
+      // , deleted: 1
+    };
+    if (c) {
+      if (!environment.production) {
+        console.log(data);
+      }
+      this.blockUI.start('Đang xử lý dữ liệu...');
+      this.appservice.post(data, environment.FBA.Administration.delete_organization).subscribe(
+        param => {
+          this.get_data();
+        },
+        (error) => {
+          if (!environment.production) {
+            console.log(error);
+          }
+          this.blockUI.start('Lỗi, không kết nối được máy chủ');
+          this.blockUI.stop();
+        },
+        () => {
+          this.blockUI.stop();
+        }
+      );
+    }
+  }
+
+}
+
+
+

@@ -1,0 +1,25 @@
+export const language = [
+    {
+        collection: [{
+            // tslint:disable-next-line: max-line-length
+            content: 'ACS Analytics hoạt động qua nhiều bước gồm Thu thập dữ liệu – Phân tích – Báo cáo – Cải tiến ACS® Analytics là hệ thống mở, cho phép thu thập, tích hợp trực tiếp từ nhiều nguồn dữ liệu khác nhau như thiết bị đếm người, đánh giá dịch vụ khách hàng, Camera nhận diện khuôn mặt, hệ thống nhân sự, thời tiết, POS, Wifi, …, giúp bạn dễ dàng lựa chọn bất cứ thiết bị của bất cứ hãng nào trên thị trường dựa trên yêu cầu và ngân sách đầu tư.',
+            // tslint:disable-next-line: max-line-length
+            content_en: 'ACS Analytics works through many steps including Data Collection - Analysis - Reporting - Improving ACS® Analytics as an open system, allowing for direct collection and integration from various data sources such as people counting devices , customer service evaluation, face recognition camera, personnel system, weather, POS, Wifi, ..., make it easy to choose any device of any firm on the market based on requirements and investment budget.',
+        }],
+        analysis: [{
+            // tslint:disable-next-line: max-line-length
+            content: 'ACS Analytics được thiết kế để tổ chức, phân tích, và trực quan hóa khối lượng lớn dữ liệu bán lẻ bằng các biểu đồ, bảng biểu. Phần mềm tích lũy dữ liệu từ tất các điểm bán (stores) vào một điểm duy nhất trên hệ thống Cloud hoặc máy chủ của bạn, cung cấp bức trang tổng thể, tức thời về các cửa hàng và khách hàng, trên toàn bộ hệ thống theo thời gian thực.',
+            // tslint:disable-next-line: max-line-length
+            content_en: 'ACS Analytics is designed to organize, analyze, and visualize large volumes of retail data using charts and tables. Software that accumulates data from all stores to a single point on your Cloud system or server, providing an instant, comprehensive page of stores and customers, across the entire system Real-time system.',
+            list_li: [{
+                li1: 'Tích hợp dữ liệu từ tất cả các điểm trên toàn cầu',
+                li2: 'Phù hợp với nhiều qui mô từ vài điểm cho tới hàng trăm, nghìn điểm',
+                li3: 'Không phụ thuộc vào băng thông, đường truyền',
+                li4: 'Cung cấp khả năng truy cập vào hệ thống theo thời gian thực',
+                li5: 'Tích hợp dữ liệu từ tất cả các điểm trên toàn cầu',
+                li6: 'Tích hợp dữ liệu từ tất cả các điểm trên toàn cầu',
+            }]
+        }]
+    }
+];
+

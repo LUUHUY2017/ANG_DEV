@@ -1,0 +1,139 @@
+import { Component, OnInit, ViewEncapsulation, TemplateRef, ViewChild } from '@angular/core';
+import { NotificationService } from '../notification.service';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { FbaMenuComponent } from '../../../viewchild/fbamenu/fbamenu.component';
+
+@Component({
+  selector: 'app-notification',
+  templateUrl: './notification.component.html',
+  styleUrls: ['./notification.component.css'],
+  encapsulation: ViewEncapsulation.Emulated,
+})
+
+export class NotificationComponent implements OnInit {
+  @ViewChild(FbaMenuComponent)
+  public modalRef: BsModalRef;
+  init_table = false;
+  @BlockUI() blockUI: NgBlockUI;
+  message = [];
+  url_img = environment.apiUrl + 'images/fba/';
+  listofnotification: any;
+  userlogged = Number(JSON.parse(localStorage.getItem(environment.UserLoged)).lever);
+  page_id = environment.Pages.fba.fba_notifications;
+  pagination_number = 5;
+  cols = [
+    { field: 'id', header: 'STT'},
+    { field: 'organization_name', header: 'Tổ chức' },
+    { field: 'notification_number', header: 'Điều kiện gửi thông báo'},
+    { field: 'action', header: 'Action' }
+  ];
+  show_edit = false;
+  detail_data: any;
+  page_permission = JSON.parse(localStorage.getItem(environment.expert_page_permission));
+  constructor(private Notification: NotificationService
+    , private appservice: AppService
+    , private modalService: BsModalService) { }
+  ngOnInit() {
+    this.check_edit();
+    // this.get_crud_in_page();
+    this.get_data();
+  }
+  check_edit() {
+    if (!environment.production) {
+      console.log(this.page_permission);
+    }
+    if (this.page_permission.length > 0) {
+      this.show_edit = true;
+    }
+  }
+  openModal(templates: TemplateRef<any>, item) {
+    // console.log(item);
+    this.detail_data = item;
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // get_crud_in_page() {
+  //   const data = {
+  //     page_id: '\'' + this.page_id + '\''
+  //   };
+  //   const url = environment.FBA.ADMIN.get_crud_page;
+  //   this.appservice.post(data, url).subscribe(res => {
+  //     if (!environment.production) {
+  //       console.log(res);
+  //       res.crud_page_array.forEach(element => {
+  //       });
+  //     }
+  //   },
+  //   (error) => {
+  //     this.blockUI.stop();
+  //   },
+  //   () => {
+  //     this.blockUI.stop();
+  //   });
+  // }
+  delete_data(id: number) {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const data = {
+      id: Number(id)
+    };
+    const url = environment.FBA.API.fba_notifications + '_delete';
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      if (res.message === 1) {
+        this.get_data();
+        this.Notification.message.push({
+          message_info: 'Bạn đã xóa thành công',
+          alert: 'success'
+        });
+      }
+    },
+    (error) => {
+      this.blockUI.stop();
+    },
+    () => {
+      this.blockUI.stop();
+    });
+  }
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get(environment.FBA.API.fba_notifications).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.listofnotification = [];
+      let i = 0;
+      res.list_of_notification.forEach(element => {
+        i++;
+        const parameters = JSON.parse(element.parameters);
+        this.listofnotification.push({
+          id: element.id,
+          order: i,
+          organization_name: element.organization_name,
+          notification_number: parameters.notification_number
+        });
+      });
+      // console.log(this.listofnotification);
+    },
+      (error) => {
+        this.blockUI.stop();
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+      },
+      () => {
+        if (this.Notification.message.length > 0) {
+          this.message = this.Notification.message;
+          setTimeout(() => {
+            this.message = [];
+            this.Notification.message = [];
+          }, 3000);
+        }
+        this.blockUI.stop();
+      });
+  }
+}

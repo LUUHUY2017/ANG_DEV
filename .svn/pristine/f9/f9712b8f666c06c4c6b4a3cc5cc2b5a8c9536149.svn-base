@@ -1,0 +1,61 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+
+// Routing
+import { FootfallStoreTrendRoutingModule } from './store-trend-rounting.module';
+import { FootfallStoreTrendComponent } from './store-trend.component';
+
+
+// Ng2-select
+// import { SelectModule } from 'ng-select';
+import { NgSelectModule } from '@ng-select/ng-select';  // group
+// import { ExpandMode, NgxTreeSelectModule } from '../../../../../lib/ngx-tree-select/src';
+
+import { DataTableModule } from 'angular2-datatable';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI, BlockUIModule } from 'ng-block-ui';
+
+// import { MultiSelectModule } from 'primeng/multiselect';
+
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
+// thêm để hiển thị ra dialog
+import { Dialog, DialogModule } from 'primeng/dialog';
+
+import { DropdownModule } from 'primeng/dropdown';
+
+import { MenutreeModule } from '../../viewchild/menutree/menutree.module';
+import { TimeperiodModule } from '../../viewchild/timeperiod/timeperiod.module';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
+@NgModule({
+  imports: [
+    FormsModule,
+    ButtonsModule,
+    FootfallStoreTrendRoutingModule,
+    NgSelectModule,
+    // Dialog,
+    DialogModule,
+    DropdownModule,
+    DataTableModule,
+    CommonModule,
+    BlockUIModule.forRoot(),
+    // MultiSelectModule,
+    NgMultiSelectDropDownModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    MenutreeModule,
+    TimeperiodModule,
+    ModalModule
+  ],
+  declarations: [
+    FootfallStoreTrendComponent,
+
+  ],
+
+})
+export class FootfallStoreTrendModule { }

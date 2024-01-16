@@ -1,0 +1,306 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row m-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 visit-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div> <!-- card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child ">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <!-- <ng-select class="bootstrap selecttimeview select-visits" [options]="indexOption" [allowClear]="false" [(ngModel)]="indexOptionSelected"></ng-select> -->
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                      bindValue="value" groupBy="group" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <!-- <ng-select class="bootstrap selecttimeview starttime" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <!-- <ng-select class="bootstrap selecttimeview endtime" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card-body card-body-bottom">
+              <ng-container *ngIf="!show_error">
+                <div class="row">
+                  <div class="col-sm-5">
+                  </div>
+                  <div class="col-sm-7 d-none d-md-block">
+                    <div class="btn-group btn-group-toggle float-right ml btnngaygio" data-toggle="buttons">
+                      <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                        (click)="get_data()">{{language.gio}}</label>
+                      <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Day" (click)="get_data()">{{language.ngay}}</label>
+                      <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Week" (click)="get_data()">{{language.tuan}}</label>
+                      <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Month" (click)="get_data()">{{language.thang}}</label>
+                      <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Year" (click)="get_data()">{{language.nam}}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row foot-title-show">
+                  <div class="title-show1 ">
+                    {{site_name}} &nbsp;{{title_index}} &nbsp;{{ starttime }}&minus; {{ endtime }} &nbsp;
+                    {{ title_time_period }}: {{ time_period }}, {{language.xem_theo}} {{ view }}
+                  </div>
+                </div>
+              </ng-container>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <ng-container *ngIf="!show_error">
+                <div style="border-top:1px dotted #a7a4a4" class="row">
+                  <table class="table table-striped table-visit">
+                    <thead>
+                      <tr>
+                        <!-- <th style="width: 50%" [hidden]="this.indexOptionSelected !== this.indexOptionSelected"> {{this.indexOptionSelected}} </th> -->
+                        <th style="width: 400px;padding-left: 1.5rem;">{{language.time}}
+                          <br> <span class="spancell"> ({{ show_label_table }})
+                          </span></th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.passerby">
+                          {{indexes.passerby}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                          {{indexes.shoppers}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.visitors">
+                          {{indexes.visitors}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                          {{indexes.turn_in_rate}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                          {{indexes.kids_visitors}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.traffic_flow">
+                          {{indexes.traffic_flow}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.avg_time">
+                          {{indexes.avg_time}} (min)</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.conversion_rate">
+                          {{indexes.conversion_rate}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.atv">{{indexes.atv}}
+                        </th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.avg_items">
+                          {{indexes.avg_items}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.sales_yield">
+                          {{indexes.sales_yield}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.transactions">
+                          {{indexes.transactions}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.sales">{{indexes.sales}}
+                        </th>
+                        <th style="width: 400px"
+                          [hidden]="this.indexOptionSelected !== indexes.missed_sales_opportunity">
+                          {{indexes.missed_sales_opportunity}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.sales_hours">
+                          {{indexes.sales_hours}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.shoppers_on_sales_hour">
+                          {{indexes.shoppers_on_sales_hour}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.sales_on_sales_hour">
+                          {{ indexes.sales_on_sales_hour}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.member_visitors">
+                          {{indexes.member_visitors}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.member_transactions">
+                          {{indexes.member_transactions}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.member_conversion_rate">
+                          {{indexes.member_conversion_rate}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.missed_member_rate">
+                          {{indexes.missed_member_rate}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.cx_index">
+                          {{indexes.cx_index}}</th>
+                        <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexes.nps_index">
+                          {{ indexes.nps_index}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.passerby">
+                          <b>{{this.tt_passer |  number:'1.0-2'}}</b> </td>
+                        <!-- <br><span class="spancell"></span> -->
+                        <td [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                          <b>{{this.tt_shop_visits |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.visitors">
+                          <b>{{this.tt_enter |  number:'1.0-2'}}</b>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                          <b>{{this.tt_kids_visits |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                          <b>{{this.tt_turn_rate |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== 'Traffic Flow'">
+                          <b>{{this.tt_traffic |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.avg_time"><b>{{toHHMMSS(tt_time) }}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== 'Conversion rate'">
+                          <b>{{this.tt_conver |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.atv"><b>{{this.tt_atv |  number:'1.0-2'}}</b>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.avg_items">
+                          <b>{{this.tt_avg_item |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_yield">
+                          <b>{{this.tt_sales_yeild |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.transactions">
+                          <b>{{this.tt_transactions |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales">
+                          <b>{{this.tt_sales |  number:'1.0-2'}}</b>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.missed_sales_opportunity">
+                          <b>{{this.tt_missed_sales |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_hours">
+                          <b>{{this.tt_sales_hour |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.shoppers_on_sales_hour">
+                          <b>{{this.tt_shopper_on_sh |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_on_sales_hour">
+                          <b>{{this.tt_sales_on_sh |  number:'1.0-2'}}</b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_visitors">
+                          <b>{{this.tt_loyal_visits |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_transactions">
+                          <b>{{this.tt_loy_tran |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_conversion_rate">
+                          <b>{{this.tt_loy_conver |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.missed_member_rate">
+                          <b>{{this.tt_missed_loyal |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.cx_index">
+                          <b>{{this.tt_cx_index |  number:'1.0-2'}}
+                            <span class="spancell">(%)</span></b></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.nps_index">
+                          <b>{{this.tt_nps_index |  number:'1.0-2'}}
+                            <span class="spancell">(%)</span></b></td>
+                      </tr>
+                      <tr *ngFor="let item of chart_data">
+                        <td style="padding-left: 2%;">{{item.time_period}}</td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.passerby">
+                          {{item.passer_by |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.passer_by, tt_passer)}}%)</span>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.shoppers">
+                          {{item.shopper_visits |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.shopper_visits, tt_shop_visits)}}%)</span>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.kids_visitors">
+                          {{item.kids_visits |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.kids_visits, tt_kids_visits)}}%)</span>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.turn_in_rate">
+                          {{item.turn_in_rate |  number:'1.0-2'}} <span class="spancell">(%)</span> </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.visitors">
+                          {{item.num_to_enter |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.num_to_enter, tt_enter)}}%)</span>
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== 'Traffic Flow'">{{item.traffic |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.traffic, tt_traffic)}}%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.avg_time">{{toHHMMSS(item.avg_time * 60)}}
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== 'Conversion rate'">
+                          {{item.conversion |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.atv">{{item.atv |  number:'1.0-2'}}</td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.avg_items">
+                          {{item.avg_item |  number:'1.0-2'}}
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_yield">
+                          {{item.sales_yield |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.sales_yield, tt_sales_yeild)}}%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.transactions">
+                          {{item.transactions |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.transactions, tt_transactions)}}%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales">{{item.sales |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.sales, tt_sales)}}%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.missed_sales_opportunity">
+                          {{item.missed_sales |  number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.missed_sales, tt_missed_sales)}}%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_hours">
+                          {{item.sales_hour |  number:'1.0-2'}}
+                        </td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.shoppers_on_sales_hour">
+                          {{item.shopper_on_s_h |  number:'1.0-2'}}</td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.sales_on_sales_hour">
+                          {{item.sales_on_s_h |  number:'1.0-2'}}</td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_visitors">
+                          {{item.loyal_visits |  number:'1.0-2'}}
+                          <span class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_transactions">
+                          {{item.loyal_transactions |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.member_conversion_rate">
+                          {{item.loyal_conversion |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.missed_member_rate">
+                          {{  item.loyal_conversion > 0 ? ((100 - item.loyal_conversion) |  number:'1.0-2') : 0 }} <span
+                            class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.cx_index">{{item.cx_index |  number:'1.0-2'}}
+                          <span class="spancell">(%)</span></td>
+                        <td [hidden]="this.indexOptionSelected !== indexes.nps_index">
+                          {{item.nps_index |  number:'1.0-2'}}
+                          <span class="spancell">(%)</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="show_error">
+                <div class="show_info_error">
+                  <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                  {{language.vui_long}}<a (click)="get_data();" style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}} </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div> <!-- card-body-parent -->
+</div>
+
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông báo!</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Có lỗi xảy ra! Vui lòng nhấn<a style="color: blue; cursor: pointer;" (click)="reset_session()"> vào đây </a> để
+      tải lại</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">Tải lại</button>
+  </div>
+</ng-template>

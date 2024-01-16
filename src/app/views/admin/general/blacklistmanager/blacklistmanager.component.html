@@ -1,0 +1,356 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <notifier-container></notifier-container>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span> <i class="icon-emotsmile" aria-hidden="true"></i> {{language.danh_sach_black_list}} </span>
+          <button *ngIf="canAdd" style="float:right; font-family: Open-semi;" type="button"
+            class="btn btn-them buton-search" (click)="show_insert(insertTemplate)"><i
+              class="fa fa-plus">&nbsp;&nbsp;</i>{{language.them_black_list}}</button>
+        </div>
+        <div class="card-body card-table table-companies">
+          <div class="row">
+            <div class="col-md-3" *ngIf="organizationArray?.length > 0">
+              <ng-select class="bootstrap selectimeview backselect" required [options]="organizationArray"
+                [(ngModel)]="organizationId" [allowClear]="false" (selected)="get_data()">
+              </ng-select>
+            </div>
+            <div class="col-md-3" *ngIf="organizationArray?.length > 0">
+              <select *ngIf="userInfo.organization_id == 0 && userInfo.lever == 0" class="form-control"
+                [(ngModel)]="optionDelete" (ngModelChange)="get_data()">
+                <option [ngValue]=0>{{language.chua_xoa}}</option>
+                <option [ngValue]=1>{{language.da_xoa}}</option>
+              </select>
+            </div>
+            <div class="col-md-4 ml-auto" style="display: flex;
+                  align-items: center;
+                  justify-content: flex-end;">
+              <label for="searchinput" style="margin-bottom: 0px;">{{language.tim_kiem_}}&nbsp;&nbsp;</label>
+              <input type="text" style="padding: 3px 10px;border-radius: 25px; outline: none; font-family: Open-semi;"
+                [(ngModel)]="searchKey" (ngModelChange)="search_item($event)">
+            </div>
+          </div>
+          <span class="float-right"
+            style="color: #7b7b7b;font-size: 12px;font-style: italic;margin: 20px; font-family:'Open-regular'">{{language.du_lieu_duoc_ghi_nhan}}
+            {{recordDate ? recordDate : language.chua_xac_dinh}}. {{language.ban_hay}} <span class="reload-item"
+              (click)="ngOnInit()">{{language.bam_vao_day}}</span> {{language.de_tai_du_lieu_moi}}</span>
+          <div class="table-responsive">
+            <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="15" class="table companies-table table-hover"
+              style="width: 100%;min-width: 900px">
+              <thead>
+                <tr style="font-family: Open-semi;">
+                  <th style="width: 10%">{{language.so_thu_tu}}</th>
+                  <th style="width: 20%">{{language.ten_black_list}}</th>
+                  <th style="width: 10%">{{language.hinh_anh}}</th>
+                  <th style="width: 10%">{{language.trang_thai}}</th>
+                  <th style="width: 10%">{{language.nguoi_cap_nhat}}</th>
+                  <th style="width: 15%; text-align: center;">{{language.xu_ly}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="trhover" *ngFor="let item of mf.data; let i = index">
+                  <td>{{i +1}}</td>
+                  <td>{{item.blacklist_name}}</td>
+                  <td><img src="{{urlImage + item.avatar}}"
+                      style="max-width:70%"></td>
+                  <td class="text-center">
+                    <span *ngIf="item.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                        class="fa fa-check"></i></span>
+                    <span *ngIf="item.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                        class="fa fa-remove"></i></span>
+                  </td>
+                  <td>{{item.username_updated}}</td>
+                  <td style="text-align: center;">
+                    <a *ngIf="item.deleted == 0" style="color: #63c2de;cursor: pointer;"
+                      (click)="getLibraryData(item,uploadform)">
+                      <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.deleted == 0" style="color: #085220;cursor: pointer;"
+                      (click)="show_update(item,updateTemplate)">
+                      <i class="fa fa-edit" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.deleted == 0" style="color: crimson;cursor: pointer;"
+                      (click)="show_delete(item, dialog)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.deleted == 1" style="color: #085220;cursor: pointer;"
+                      (click)="show_delete(item, dialog_rollback)">
+                      <i class="fa fa-recycle" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.deleted == 1" style="color: crimson;cursor: pointer;"
+                      (click)="show_delete(item, dialog_delete)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <!-- <a *ngIf="user_info.lever == 0" style="color: crimson;cursor: pointer;"
+                                 title="Xóa feedback" (click)="delete_item(item.id)"> <i class="fa fa-times"></i>
+                              </a>&nbsp; -->
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="8" *ngIf="dataFilter?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot class="companies_table-tfoot">
+                <tr>
+                  <td colspan="8">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                    <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #insertTemplate>
+    <form (ngSubmit)="insertform(insert_item)" #insert_item="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_black_list}}</h4>
+        <button type=" button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_to_chuc}}<small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="organizationId" readonly
+              (change)="preventChange()" name="organization_id" required>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_black_list}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txtvipname="ngModel" minlength="3" maxlength="100" required
+              type="text" ngModel name="blacklist_name" autocomplete="off">
+            <small *ngIf="txtvipname.touched && txtvipname.errors?.required" class="error-message">
+              {{language.nhap_ten_black_list}}
+            </small>
+            <small *ngIf="txtvipname.touched && txtvipname.errors?.minlength" class="error-message">
+              {{language.ten_black_list_3_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.anh_dai_dien}}
+            <small>({{language.tuy_chon}})</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input style="margin-top:2px;" type="file" class="form-control" (change)="InsertUpload($event)">
+            <img *ngIf="ImageUrll1" class="img-fluid img2" [src]="ImageUrll1" style="width:49%;">
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn  btn-primary" [disabled]="insert_item.invalid">
+          {{language.them}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Model hỏi xóa -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="soft_delete_object()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Model xóa hẳn -->
+  <ng-template #dialog_delete>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_object()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Model rollback -->
+  <ng-template #dialog_rollback>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="rollback_object()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!--  -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateform(update_form)" #update_form="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.chinh_sua_black_list}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_black_list}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="dataUpdate.id" readonly
+              (change)="preventChange()" name="id" required>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_black_list}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" #txtvipname="ngModel" minlength="3" maxlength="100" required
+              type="text" [ngModel]="dataUpdate.blacklist_name" name="blacklist_name" autocomplete="off">
+            <small *ngIf="txtvipname.touched && txtvipname.errors?.required" class="error-message">
+              {{language.nhap_ten_black_list}}
+            </small>
+            <small *ngIf="txtvipname.touched && txtvipname.errors?.minlength" class="error-message">
+              {{language.ten_black_list_3_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.anh_dai_dien}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input style="margin-top:2px;" type="file" class="form-control"
+              (change)="UpdateUpload($event, update_staff_avatar)">
+            <img class="img-fluid img2" #update_staff_avatar [src]="urlImage + dataUpdate.avatar" style="width:49%;"
+              title="{{dataUpdate.blacklist_name}}">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" value=1 [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" value=0 [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="update_form.invalid">
+          {{language.chinh_sua}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+  <ng-template #uploadform>
+    <div class="modal-header" style="background: gray; color:#f3b21c; border-radius: 0px;">
+      <h4 class="modal-title pull-left"><i class="fa fa-picture-o"></i>&nbsp;{{language.anh_nhan_dang}}
+        {{staff_name}}&nbsp;<i class="fa fa-spinner infinity" *ngIf="onloadPopup" style="color: #fff;">&nbsp;</i></h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{item}}</strong>
+      </div>
+      <div class="row" style="background: #fafafa;">
+        <div class="col-md-12" style="height: 300px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;">
+          <h5 *ngIf="library.length == 0">{{language.chua_co_anh_nhan_dang}}</h5>
+          <img *ngIf="activeRecord" style="max-width: 200px;
+               max-height: 200px;" title="{{activeRecord.image_name}}"
+            src="data:image/jpeg;base64,{{activeRecord.img_base64}}">
+        </div>
+        <div class="col-md-12 text-center" style="position: relative;">
+          <input #upload type="file" (change)="getUploadData($event)" class="form-control"
+            style="visibility: hidden; position: absolute;">
+          <i class="fa fa-plus mr-2 iconAddPlus" (click)="trigger_click(upload)"></i>
+          <i (click)="delete_from_library(activeRecord)" class="fa fa-times fa-2x iconRemovePlus"></i>
+        </div>
+      </div>
+      <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+        <strong><i class="icons font-2xl cui-note"></i> {{language.Luu_y_upload_anh}}</strong>
+      </div>
+    </div>
+    <div class="modal-footer" *ngIf="library.length > 0" style="background: #808080;">
+      <div class="col-md-12" style="
+         overflow-y: auto;
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+         justify-content: center;
+         border: 1px solid #ffffff52;
+            border-radius: 2px;
+            padding: 10px 0px;    background: #999;">
+        <img *ngFor="let item of library" title="{{item.image_name}}" src="data:image/jpeg;base64,{{item.img_base64}}"
+          style="padding: 5px;
+         min-height: 80px;
+         width: 80px; cursor: pointer;" (click)="activeRecord = item;"
+          class="{{activeRecord?.id == item.id ? 'actived_record' : null}}">
+      </div>
+    </div>
+  </ng-template>
+</main>

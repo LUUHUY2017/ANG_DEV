@@ -1,0 +1,29 @@
+<div id="headtimeperiod">
+    <div>
+        <div (click)="displaytime=!displaytime" class="text-select vung-kich2">
+            <i class="fa fa-calendar-minus-o location" aria-hidden="true"></i>
+            <span style="font-weight:bold;">&nbsp;{{ time_period_label ? time_period_label : '' }}</span>
+            <i class="fa fa-caret-down"></i>
+        </div>
+    </div>
+    <!-- popup -->
+    <div [hidden]="!displaytime" (clickOutside)="displaytime=false" [exclude]="'.vung-kich2'"
+        class=" khung-time block">
+        <div id="khung-time-scroll">
+            <ul id="ul-time">
+                <li class="{{ltp.innerHTML === time_period_label ? 'active': ''}}">
+                    <span> {{language == 'vn'  ? 'Chọn thời kỳ' : 'Choose a period'}}</span>
+                    <div id="reportrangedaily" style="  margin-top: 2px; cursor: pointer; width: 100%">
+                        <i class="fa fa-calendar"></i>&nbsp;
+                        <span style="font-size: 12px;" #ltp id="label_time_period"></span> <i class="fa fa-caret-down"></i>
+                        <input type="hidden" id="dateReportTempDaily">
+                    </div>
+                </li>
+                <li class="{{item.label === time_period_label ? 'active' : ''}}" *ngFor=" let item of time_period_array" (click)="chonthoigian(item)">
+                    <!-- class="{{item.label === time_period ? 'active' : ''}}" -->
+                    {{item.label}}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

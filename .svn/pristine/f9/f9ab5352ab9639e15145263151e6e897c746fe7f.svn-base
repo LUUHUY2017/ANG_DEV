@@ -1,0 +1,110 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// tree node
+// import viewchild
+import { AdminstratorMenuComponent } from '../../../viewchild/adminstratormenu/adminstratormenu.component';
+@ViewChild(AdminstratorMenuComponent)
+
+@Component({
+  templateUrl: './messages.component.html',
+  styleUrls: ['./messages.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class MessagesComponent implements OnInit {
+  page_id = '\'' + environment.Pages.administration.users + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  constructor(private router: Router, private route: ActivatedRoute, private appservice: AppService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  user_organization: any;
+  organization_arr_option: Array<IOption>;
+  // thay đổi theo sự kiện click
+  organization_arr: Array<IOption>;
+  org_selected: string;
+  org_selectedform: string;
+  tu_khoa: string;
+  data2: any;
+
+  ngOnInit(): void {
+    this.get_data();
+  }
+  // Lấy thông tin tổ chức lên ng-select
+  get_location_time() {
+    this.blockUI.start('Đang tải cấu hình...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        this.organization_arr = param.organization_arr;
+        this.org_selected = String(param.organization_arr[0].value);
+      },
+      (error) => {
+        // console.log(error);
+        this.blockUI.stop();
+        this.blockUI.start('Lỗi, không kết nối được máy chủ');
+      },
+      () => {
+        this.blockUI.stop();
+        this.get_data();
+      }
+    );
+  }
+
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get(environment.FBA.Administration.user_organization).subscribe(res => {
+      // console.log(res);
+      this.user_organization = res;
+    },
+      (error) => {
+        this.blockUI.stop();
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+        // console.log(error);
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+
+  submitform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    this.appservice.post(data, environment.FBA.ADMIN.insert_question).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        // console.log(error);
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        // this.router.navigate(['/admin/admin']);
+      });
+  }
+}
+
+
+

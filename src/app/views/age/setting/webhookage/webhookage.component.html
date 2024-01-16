@@ -1,0 +1,311 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-agemenu></app-agemenu>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"> <i class="cui-layers"
+              aria-hidden="true"></i>{{language.danh_sach_webhook}}</span>
+          <!-- <button *ngIf="can_add" (click)="open_modal_them_moi(templates)" style="float:right"
+            class="btn btn-them buton-search ">
+            <i class="icon-plus">&nbsp;</i>{{language.them_moi}}</button> -->
+        </div>
+        <div class="card-body card-table table-companies">
+          <div class="row">
+            <div class="col-md-2">
+              <ng-select *ngIf="userlogged.organization_id == 0 && userlogged.lever == 0"
+                class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                [(ngModel)]="organization_id" [allowClear]="false" (selected)="search_organization()"
+                placeholder="Chọn tổ chức">
+              </ng-select>
+            </div>
+          </div>
+          <form (ngSubmit)="update_object(updateform)" #updateform="ngForm">
+            <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show mt-3"
+              role="alert">
+              <strong>{{item}}</strong>
+            </div>
+            <div class="row mt-3" style="display: flex;
+          align-items: center;
+          justify-content: center; background: #eee; padding: 50px;">
+              <input type="text" name="organization_id" [ngModel]="organization_id" hidden (change)="preventChange()">
+              <input type="text" name="id" [ngModel]="data_filter[0]?.id || null" hidden (change)="preventChange()">
+              <input type="text" name="module_id" [ngModel]="module_id" hidden (change)="preventChange()">
+              <div class="col-md-6">
+                <div class="row" style="align-items: flex-end;">
+                  <label class="col-md-2" for="cb_url">Callback Url</label>
+                  <input class="col-md-7 form-control" type="text" id="cb_url" name="callback_url"
+                    [ngModel]="data_filter[0]?.callback_url" placeholder="Đây là địa chỉ nhận dữ liệu">
+                  <button class="btn btn-success col-md-2 ml-3" style="border-radius: unset;"
+                    [disabled]="updateform.invalid">{{language.cap_nhat}}</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="table-responsive">
+            <!-- [mfData]="data_filter"  #mf="mfDataTable"  [mfRowsOnPage]="rowsOnPage" -->
+            <table style="width: 100%;min-width: 900px" class="table table-hover fba-tablets_table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">{{language.STT}}</th>
+                  <th style="width: 110px;text-align: left">{{language.su_kien}}</th>
+                  <th style="width: 110px;text-align: left;padding-left:1rem;">{{language.trang_thai}}</th>
+                  <th style="width: 90px;">{{language.xu_ly}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- *ngFor="let items of mf.data;let i = index" -->
+                <tr>
+                  <td>1</td>
+                  <td style="text-align: left;">
+                    {{language.su_kien_nhan_tin_nhan}}
+                  </td>
+                  <!-- <td style="text-align: left;max-width: 200px;padding-left:1rem;">
+                    <a href="javascript:void(0)" (click)="clone_item(items)">Bấm vào đây để copy access token</a>
+                  </td> -->
+                  <td>
+                    <span class="badge badge-success" style="font-size: 10px;"><i class="fa fa-check"></i></span>
+                  </td>
+                  <td style="width: 100px;">
+                    <button class="btn btn-success" style="font-size: 15px;border-radius: unset;"
+                      (click)="open_modal_webhook(code_editor)">Test</button>
+                    &nbsp;
+                  </td>
+                </tr>
+                <!-- <tr></tr> -->
+                <!-- <tr>
+                  <td colspan="8" *ngIf="data_filter?.length === 0"
+                    style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr> -->
+              </tbody>
+              <!-- <tfoot class="fba-tablet-list-tfoot">
+                <tr>
+                  <td colspan="8">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot> -->
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <notifier-container></notifier-container>
+  <!-- Model hỏi xóa -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="soft_delete_item()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;"
+            class="btn btn-huy active pr-4 pl-4">{{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #delete_dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_item()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;"
+            class="btn btn-huy active pr-4 pl-4">{{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #code_editor>
+    <form (ngSubmit)="callWebhookApi(codeform)" #codeform="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.gui_du_lieu_mau}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group mb-0">
+          <label for="">{{language.dia_chi_nhan_duoc}} <b>{{data_filter[0].callback_url}}</b></label>
+        </div>
+        <div class="form-group mb-0">
+          <label for="">{{language.phuong_thuc_gui_di}} <b>POST</b></label>
+        </div>
+        <div class="form-group mb-0">
+          <label for="">{{language.du_lieu_gui_di}}</label>
+          <ace-editor [(text)]="codeText" [options]="codeOptions" #editor
+            style="min-height: 200px; width:100%; overflow: auto;"></ace-editor>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="codeform.invalid"><i class="fa fa-send"></i> Test</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Modal thêm mới -->
+  <ng-template #templates>
+    <form (ngSubmit)="insert_object(insertform)" #insertform="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them}} webhook</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Mã tổ
+            chức</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="organization_id" name="organization_id"
+              readonly required (change)="preventChange()">
+          </div>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Mã
+            miền</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="siteFilterModel.id" name="site_id" readonly
+              required (change)="preventChange()">
+          </div>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Mã
+            module</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="module_id" name="module_id" readonly required
+              (change)="preventChange()">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">{{language.ten_mien}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [value]="siteFilterModel.site_name" readonly>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Webhook</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtwebhook_name="ngModel" name="webhook_name">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Callback Url
+            <small class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" minlength="10" maxlength="255" ngModel
+              #txtcallback="ngModel" required name="callback_url">
+            <small *ngIf="txtcallback.touched && txtcallback.errors?.required" class="error-message">
+              {{language.ban_chua_nhap}} callback url
+            </small>
+            <small *ngIf="txtcallback.touched && txtcallback.errors?.minlength" class="error-message">
+              Callback url {{language.phai_co_it_nhat}}
+            </small>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="insertform.invalid"> {{language.them_moi}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #template>
+    <form (ngSubmit)="update_object(updateform)" #updateform="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat}} webhook</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Mã
+            webhook</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="data_update.id" name="id" readonly required
+              (change)="preventChange()">
+          </div>
+        </div>
+        <!-- <div hidden class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Mã module</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="module_id" name="module_id" readonly
+              required (change)="preventChange()">
+          </div>
+        </div> -->
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">{{language.ten_mien}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [value]="siteSelected.site_name" readonly>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Webhook</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="data_update.webhook_name"
+              #txtwebhook_name="ngModel" name="webhook_name">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="white-space:pre; padding-right:1px;" class="col-md-4 col-4 col-form-label lh-label">Callback Url
+            <small class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" minlength="10" maxlength="255"
+              [ngModel]="data_update.callback_url" #txtcallback="ngModel" required name="callback_url">
+            <small *ngIf="txtcallback.touched && txtcallback.errors?.required" class="error-message">
+              {{language.ban_chua_nhap}} callback url
+            </small>
+            <small *ngIf="txtcallback.touched && txtcallback.errors?.minlength" class="error-message">
+              Callback url {{language.phai_co_it_nhat}}
+            </small>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active"> {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="updateform.invalid"> {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+</main>

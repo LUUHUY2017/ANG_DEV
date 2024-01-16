@@ -1,0 +1,309 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+
+@ViewChild(GeneralMenuComponent)
+@Component({
+  templateUrl: './categories.component.html',
+  styleUrls: ['./categories.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class CategoriesComponent implements OnInit {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  page_id = '\'' + environment.Pages.general.categories + '\'';
+  can_add: boolean;
+  can_update: boolean;
+  can_delete: boolean;
+
+  constructor(private router: Router, private route: ActivatedRoute, private appservice: AppService, private modalService: BsModalService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  public data = [];
+  dataTable: any;
+  data_filter = [];
+  hienkhung = true;
+  data2 = [];
+  status: number;
+  campaign_name: string;
+  organization_id: string;
+  actived: number;
+  viewby: number;
+  deleted: number;
+  organization_arr: Array<IOption>;
+  organization_selected: string;
+  site_id_selected: string;
+  organization_add_id: string;
+  org_selected: string;
+  category_id: string;
+  site_add_id: string;
+  location_id: string;
+  site_id: number;
+  location_selected: string;
+  hidden_select_organization = false;
+  messenger: any = [];
+  show_alert = true;
+  access_token: string;
+  public modalRef: BsModalRef;
+  delete_tablet_id: number;
+  data_insert: any;
+  site_arr: Array<IOption>;
+  location_arr: Array<IOption>;
+  // phân trang bảng
+  rowsOnPage = 15;
+  filterQuery = '';
+  SelectionDisplay = false;
+
+  ngOnInit(): void {
+    this.actived = 0;
+    this.get_crud_on_page();
+    this.get_page_param();
+    this.show_select_organization();
+  }
+
+  // Lấy thông tin tổ chức
+  get_page_param() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_page_param', param);
+        }
+        this.organization_arr = param.organization_arr;
+        this.organization_add_id = this.organization_selected = this.organization_id = this.org_selected = param.organization_arr[0].value;
+      },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.getdata();
+      });
+  }
+  get_crud_on_page() {
+    const data = {
+      page_id: this.page_id
+    };
+    const url = environment.FBA.ADMIN.get_crud_page;
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      res.crud_page_array.forEach(element => {
+        const permission_name = element.permission_name.toLowerCase();
+        if (permission_name === 'add') {
+          this.can_add = true;
+        }
+        if (permission_name === 'update') {
+          this.can_update = true;
+        }
+        if (permission_name === 'delete') {
+          this.can_delete = true;
+        }
+      });
+    },
+    (error) => {
+      this.blockUI.stop();
+    },
+    () => {
+      this.blockUI.stop();
+    });
+  }
+  // thay đổi tổ chức bảng
+  changeorganization_table(event) {
+    if (!environment.production) {
+      console.log('id_or', event);
+    }
+    this.organization_id = event;
+    this.getdata();
+  }
+  // thay đổi tổ chức selected header
+  show_select_organization() {
+    const userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+    if (!environment.production) {
+      console.log('userInfo', userInfo);
+    }
+    if (userInfo.lever === '0') {
+      this.hidden_select_organization = false;
+    } else {
+      this.hidden_select_organization = true;
+    }
+  }
+  // mở modal thêm mới dữ liệu
+  open_modal_them_moi(templates: TemplateRef<any>) {
+    this.org_selected = this.organization_id;
+    this.changeorganization(this.org_selected);
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  //  lấy site theo tổ chức
+  changeorganization(organization_id) {
+    const data = {
+      organization_id: organization_id,
+    };
+    if (!environment.production) {
+      console.log('id', event);
+    }
+    this.appservice.post(data, environment.FBA.ADMIN.get_site_tablets).subscribe(
+      respo => {
+        if (!environment.production) {
+          console.log('data_site', respo);
+        }
+        this.site_arr = respo.site_tablet;
+        if (this.site_arr.length > 0) {
+          this.site_id_selected = respo.site_tablet[0].value;
+          this.category_id = respo.site_tablet[0].value;
+          this.site_add_id = respo.site_tablet[0].value;
+        } else {
+          this.site_id_selected = '0';
+          this.category_id = '0';
+          this.site_add_id = '0';
+        }
+      });
+  }
+  // truyền dữ liệu cho model tương ứng với danh mục
+  dulieuthaydoi(item, template: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data_item', item);
+    }
+    this.data2 = Object.assign({}, item);
+    this.site_id = item.site_id;
+    this.changeorganization(item.organization_id);
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  getdata() {
+    const data = {
+      organization_id: this.organization_id,
+      actived: this.actived,
+      // access_token: environment.Bearer + ' ' + localStorage.getItem(environment.access_token)
+    };
+    if (!environment.production) {
+      console.log('data', data);
+    }
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.categories).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('data category gửi về', param);
+        }
+        this.data = param.categories;
+        this.data_filter = param.categories;
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+
+  // thêm vị trí cho danh mục
+  insert_category(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.categories + '_insert').subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+      },
+      (error) => {
+        this.blockUI.start('Lỗi, không kết nối được máy chủ');
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.getdata();
+      });
+  }
+  // cập nhật danh mục
+  update_category(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.categories + '_update').subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+      },
+      (error) => {
+        this.blockUI.start('Lỗi, không kết nối được máy chủ');
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.getdata();
+      });
+  }
+
+  // tìm kiếm bảng danh mục
+  search_table(value: string) {
+    const string = value.toLowerCase();
+    if (string === '') {
+      this.data = this.data_filter;
+    } else {
+      this.data = this.data_filter.filter(x =>
+        x.category_name.toLowerCase().indexOf(string) !== -1
+      );
+    }
+  }
+  // hỏi xóa modal
+  modal_question(item, dialog: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data_item', item);
+    }
+    this.delete_tablet_id = item;
+    this.modalRef = this.modalService.show(dialog, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // xóa danh mục: chuyển trạng thái sang 1
+  delete_category() {
+    const data = {
+      id: this.delete_tablet_id
+    };
+    if (!environment.production) {
+      console.log(data);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.categories + '_delete').subscribe(
+      param => {
+        this.modalRef.hide();
+        this.getdata();
+      }
+    );
+  }
+}

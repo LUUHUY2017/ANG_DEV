@@ -1,0 +1,629 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, ViewEncapsulation, SimpleChange } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import validate form
+import { FormBuilder, FormGroup, Validators, NgForm, NgModel, FormControl, NgModelGroup } from '@angular/forms';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+import { NotifierService } from 'angular-notifier';
+@Component({
+  templateUrl: './role.component.html',
+  styleUrls: ['./role.component.css'],
+  // chỉnh css angular
+  // encapsulation: ViewEncapsulation.None
+})
+@ViewChild(GeneralMenuComponent)
+export class RoleComponent implements OnInit {
+  private readonly notifier: NotifierService;
+  page_id = '\'' + environment.Pages.general.roles + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  id_deleted: number;
+  modalRef: BsModalRef;
+  data: any;
+  page_array: Array<IOption>;
+  page_selectedform: string;
+  dropdownList_user = [];
+  dropdownList_site = [];
+  dropdownList_page_permission = [];
+  selected_user = [];
+  selected_sites = [];
+  selected_page_permission = [];
+  dropdownSettings = {};
+  page_id_update: number;
+  permission_array: any;
+  permission_selected: string;
+  organization_arr = [];
+  org_selectedform: string;
+  userlogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  role_name: string;
+  role_description: string;
+  id_update: number;
+  data_update: any;
+  old_list_user: any;
+  old_list_sites: any;
+  organization_id: any;
+  site_recusive_array: any[];
+  new_data: any[];
+  _delete_id_array: any[];
+  is_empty: boolean;
+  dropdown_module = [
+    {
+      item_id: 'fba'
+      , item_label: 'Module Fba'
+    },
+    {
+      item_id: 'footfall'
+      , item_label: 'Module Footfall'
+    },
+    {
+      item_id: 'genderage'
+      , item_label: 'Module Genderage'
+    }
+  ];
+  show_page_module: boolean;
+  selected_page_module: any[];
+  organization_arr_filter: any;
+  organization_id_filter: string;
+  is_admin_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  can_add = false;
+  can_delete = false;
+
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private appservice: AppService,
+    private modalService: BsModalService,
+    private fb: FormBuilder
+    , notifierService: NotifierService) {
+      this.notifier = notifierService;
+  }
+
+  ngOnInit(): void {
+    this.is_admin();
+    this.get_page_param();
+  }
+  is_admin() {
+    if (!environment.production) {
+      console.log(this.is_admin_organization);
+    }
+    if (this.is_admin_organization.length > 0 || Number(this.userlogged.lever) === 0) {
+      this.can_add = true;
+      this.can_delete = true;
+    }
+  }
+  // giám sát thiết bị
+  got_error(message, callback: Function = null) {
+    let default_message = 'Có lỗi xảy ra';
+    if (this.userlogged.lever === '0') {
+      default_message = message;
+    }
+    this.notifier.notify('error', default_message);
+    if (callback) {
+      callback();
+    }
+  }
+  customize_error(message, callback: Function = null) {
+    this.notifier.notify('error', message);
+    if (callback) {
+      callback();
+    }
+  }
+  got_success(success_string, callback: Function = null) {
+    this.notifier.notify('success', success_string);
+    if (callback) {
+      callback();
+    }
+  }
+  get_page_param() {
+    this.blockUI.start('Đang tải cấu hình...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        const lever = Number(this.userlogged.lever);
+        const organization_id = Number(this.userlogged.organization_id);
+        if (lever === 0) {
+          this.organization_arr_filter = param.organization_arr.slice(0);
+          this.organization_id_filter = this.organization_arr_filter[0].value;
+        } else {
+          this.organization_arr_filter = param.organization_arr.filter(
+            item => Number(item.value) === Number(organization_id));
+          this.organization_id_filter = this.organization_arr_filter[0].value;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error + '');
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        // this.blockUI.stop();
+        this.get_data();
+      }
+    );
+  }
+  // lấy data thông thường
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const data = {
+      organization_id: this.organization_id_filter
+    };
+    this.appservice.post(data, environment.API.roles).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.data = res.data;
+      // console.log(this.data);
+    },
+      (error) => {
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+        this.blockUI.stop();
+        if (!environment.production) {
+          console.log(error);
+        }
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  empty_model() {
+    this.organization_arr = [];
+    this.dropdownList_page_permission = [];
+    this.dropdownList_site = [];
+    this.dropdownList_user = [];
+    this.selected_user = [];
+    this.selected_sites = [];
+    this.selected_page_permission = [];
+    this.data_update = [];
+  }
+  // click hiện popup
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  // hiện popup xóa
+  show_dialog(dialog: TemplateRef<any>, id: number) {
+    this.id_deleted = id;
+    this.openModal(dialog);
+  }
+  get_setting_multiselect() {
+    this.dropdownSettings = {
+      singleSelection: false,
+      idField: 'item_id',
+      textField: 'item_label',
+      selectAllText: 'Chọn tất cả',
+      unSelectAllText: 'Bỏ chọn tất cả',
+      itemsShowLimit: 2,
+      allowSearchFilter: true,
+    };
+  }
+  show_update(template: TemplateRef<any>, id: number) {
+    this.empty_model();
+    this.id_update = id;
+    this.show_page_module = false;
+    this.selected_page_module = [];
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.API.roles + '_get_update/' + id;
+    this.is_empty = true;
+    this.appservice.get(url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log(param);
+        }
+        // return;
+        if (param.has_data) {
+          this.data_update = param.role;
+          if (!environment.production) {
+            console.log(this.data_update.organization_id);
+          }
+          if ('organization_array' in param) {
+            this.org_selectedform = param.organization_array.filter(item => item.value === this.data_update.organization_id);
+          }
+          this.site_recusive_array = [];
+          this.selected_sites = param.role_site.slice(0);
+          param.sites.forEach((element: { [k: string]: any }) => {
+            element.checked = false;
+            if (this.selected_sites.length > 0) {
+              for (let i = 0; i < this.selected_sites.length; i++) {
+                if (element.item_id === this.selected_sites[i].item_id) {
+                  element.checked = true;
+                }
+              }
+            } else {
+              element.checked = false;
+            }
+          });
+          this.ham_dequy(param.sites);
+          this.dropdownList_site = this.site_recusive_array;
+          if (this.dropdownList_site.length > 0) {
+            this.is_empty = false;
+          }
+          this.dropdownList_user = param.users.map(item => {
+            return {
+              item_id: item.id
+              , item_label: item.name
+            };
+            // });
+          }).concat(param.role_user);
+          this.selected_user = param.role_user;
+          this.get_setting_multiselect();
+          if (this.is_empty) {
+            this.customize_error('Tổ chức chưa tạo site để sử dụng, Vui lòng tạo site.');
+          }
+          this.openModal(template);
+        } else {
+          this.customize_error('Role quản trị cùng cấp chưa cấp quyền sử dụng cho người dùng');
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+  show_insert(template: TemplateRef<any>) {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    this.empty_model();
+    this.is_empty = true;
+    const url = environment.API.roles + '_get_insert';
+    this.appservice.get(url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log(param);
+        }
+        if (this.userlogged.lever === '0') {
+          this.organization_arr = param.organization_array;
+          this.org_selectedform = param.organization_array[0].value;
+        }
+        this.site_recusive_array = [];
+        param.site_array.forEach((element: { [k: string]: any }) => {
+          element.checked = false;
+        });
+        this.ham_dequy(param.site_array);
+        this.dropdownList_site = this.site_recusive_array;
+        if (this.dropdownList_site.length > 0) {
+          this.is_empty = false;
+        }
+        this.openModal(template);
+      },
+      (error) => {
+        this.got_error(error);
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+  check_unselected(item: NgForm) {
+    let a = true;
+    for (let i = 0; i < Object.keys(item.value).length; i ++) {
+      const checkbox = 'checkbox' + i;
+      if (checkbox in item.value) {
+        if (item.value[checkbox] !== '') {
+          a = false;
+        }
+      }
+    }
+    return a;
+  }
+  show_site() {
+    if (Number(this.data_update.created_by) !== 0 && Number(this.data_update.role_type) === 0) {
+      return true;
+    }
+    return false;
+    // const lever = Number(this.userlogged.lever);
+    // nếu người dùng là quản trị
+    // if (lever === 0) {
+    //   if (Number(this.data_update.role_type) !== 0 ) {
+    //     return true;
+    //   }
+    // } else {
+    //   if (Number(this.data_update.role_type) !== 0 ) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // }
+    // return false;
+  }
+  change_organization_filter() {
+    this.get_data();
+  }
+  change_organization(org_id: number) {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.API.roles + '_get_user_site/' + org_id;
+    this.is_empty = true;
+    this.appservice.get(url).subscribe(
+      param => {
+        // console.log(param);
+        // this.dropdownList_site = param.site_array;
+        this.site_recusive_array = [];
+        param.site_array.forEach((element: { [k: string]: any }) => {
+          element.checked = false;
+        });
+        this.ham_dequy(param.site_array);
+        this.dropdownList_site = this.site_recusive_array;
+        if (this.dropdownList_site.length > 0) {
+          this.is_empty = false;
+        }
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+  // Thêm mới
+  insertform(item: NgForm) {
+    const data: { [k: string]: any } = {
+      role_name: item.value.role_name,
+      site_array: []
+    };
+    if ('organization_id' in item.value) {
+      data.organization_id = item.value.organization_id;
+      delete item.value.organization_id;
+    }
+    this.new_data = Object.values(item.value);
+    // console.log(this.new_data);
+    for (let i = 0; i < this.new_data.length; i++) {
+      this._delete_id_array = [];
+      if (typeof (this.new_data[i]) === 'object') {
+        this.recusive_delete_element(Number(this.new_data[i].id));
+        this._delete_id_array.forEach(element => {
+          this.new_data[element] = {};
+        });
+      }
+    }
+    this.new_data.forEach(element => {
+      if (typeof (element) === 'object' && 'id' in element) {
+        data.site_array.push(element);
+      }
+    });
+    if (!environment.production) {
+      console.log(data);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.API.roles + '_add';
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log(param);
+        }
+        if (param.message === 1) {
+          this.got_success('Thêm mới thành công');
+          this.get_data();
+        } else {
+          this.got_error(param.message);
+        }
+      },
+      (error) => {
+        this.got_error(error);
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.modalRef.hide();
+      }
+    );
+  }
+  log(event: NgModel, item: NgForm, index) {
+    const element = document.getElementsByName(event.name).item;
+    // console.log(Number(event.formDirective.value[event.name]));
+    // console.log(Number(index));
+    if (event.formDirective.value[event.name] === false) {
+      event.formDirective.controls[event.name].value = false;
+      event.formDirective.value[event.name] = false;
+      // this.site_recusive_array.forEach(element1 => {
+      //   if (element1.parent_id === index) {
+      //     element1.checked = false;
+      //   }
+      // });
+      this.site_recusive_array.find(item3 => item3.id === index.id).checked = false;
+      this.recusive_unchecked_parent(index.parent_id, false);
+      this.recusive_checked_child(index.id, false);
+      // console.log(this.site_recusive_array);
+    } else {
+      event.formDirective.controls[event.name].value = index.id;
+      event.formDirective.value[event.name] = index.id;
+      this.site_recusive_array.find(item1 => item1.id === index.id).checked = true;
+      this.recusive_checked_child(index.id, true);
+      this.recusive_checked_parent(index);
+      // console.log(event.formDirective.controls[event.name].value);
+      // console.log(event.formDirective.value[event.name]);
+    }
+  }
+  recusive_checked_child(id: number, boolean: boolean) {
+    this.site_recusive_array.forEach(element => {
+      if (element.parent_id === id) {
+        element.checked = boolean;
+        const a_id = element.id;
+        this.recusive_checked_child(a_id, boolean);
+      }
+    });
+  }
+  recusive_unchecked_parent(id: number, boolean: boolean) {
+    this.site_recusive_array.forEach(element => {
+      if (element.id === id) {
+        element.checked = boolean;
+        const a_id = element.parent_id;
+        this.recusive_unchecked_parent(a_id, boolean);
+      }
+    });
+  }
+  recusive_checked_parent(index: any) {
+    let checker = true;
+    const check_array = this.site_recusive_array.filter(item2 => item2.parent_id === index.parent_id);
+    if (check_array.length > 0) {
+      check_array.forEach(element2 => {
+        if (element2.checked === false) {
+          checker = false;
+        }
+      });
+      if (checker) {
+        const data = this.site_recusive_array.find(item3 => item3.id === index.parent_id);
+        if (data) {
+          data.checked = true;
+          const a_index = {
+            id: data.id,
+            parent_id: data.parent_id
+          };
+          this.recusive_checked_parent(a_index);
+        }
+      }
+    }
+    // console.log(check_array);
+  }
+  ham_dequy(array: any, id = 0, space = 0) {
+    array.forEach(element => {
+      if (Number(element.parent_id) === id) {
+        const data = this.site_recusive_array.find(item => Number(item.id) === id);
+        if (data && data.checked === true) {
+          element.checked = true;
+        }
+        // tslint:disable-next-line:no-shadowed-variable
+        const a_id = Number(element.item_id);
+        this.site_recusive_array.push({
+          id: element.item_id,
+          name: element.item_label,
+          parent_id: element.parent_id,
+          scope: space,
+          checked: element.checked
+        });
+        const scope = space + 1;
+        this.ham_dequy(array, a_id, scope);
+      }
+    });
+  }
+  updateform(item: NgForm) {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const data: { [k: string]: any } = {
+      user_array: item.value.user_array
+      , site_array: []
+    };
+    if ('module_array' in item.value) {
+      data.page_module_array = item.value.module_array;
+      delete item.value.module_array;
+    }
+    if ('role_name' in item.value) {
+      data.role_name = item.value.role_name;
+      delete item.value.role_name;
+    }
+    if ('role_description' in item.value) {
+      data.role_description = item.value.role_description;
+      delete item.value.role_description;
+    }
+    if ('actived' in item.value) {
+      data.actived = item.value.actived;
+      delete item.value.actived;
+    }
+    delete item.value.user_array;
+    this.new_data = Object.values(item.value);
+    // console.log(this.new_data);
+    for (let i = 0; i < this.new_data.length; i++) {
+      this._delete_id_array = [];
+      if (typeof (this.new_data[i]) === 'object') {
+        this.recusive_delete_element(Number(this.new_data[i].id));
+        this._delete_id_array.forEach(element => {
+          this.new_data[element] = {};
+        });
+      }
+    }
+    // console.log(this.new_data);
+    // return;
+    this.new_data.forEach(element => {
+      if (typeof (element) === 'object' && 'id' in element) {
+        data.site_array.push(element);
+      }
+    });
+
+    // console.log(data);
+    // return;
+    const url = environment.API.roles + '_post_update/' + this.id_update;
+    // console.log(item);
+    this.appservice.post(data, url).subscribe(
+      param => {
+        console.log(param);
+        if (param.message === 1) {
+          this.got_success('Cập nhật dữ liệu thành công');
+          this.get_data();
+        } else {
+          this.got_error(param.message);
+        }
+      },
+      (error) => {
+        this.got_error(error);
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        if ('role_name' in item.controls && 'role_description' in item.controls) {
+          item.controls['role_name'].reset();
+          item.controls['role_description'].reset();
+        }
+        this.modalRef.hide();
+      }
+    );
+  }
+  recusive_delete_element(parent_id: number) {
+    this.new_data.forEach((element: { [k: string]: any }, index) => {
+      if (typeof (element) === 'object' && Number(element.parent_id) === parent_id) {
+        const a_parent_id = Number(element.id);
+        this._delete_id_array.push(index);
+        this.recusive_delete_element(a_parent_id);
+      }
+    });
+  }
+  // xóa
+  delete_element() {
+    const data = {
+      id: this.id_deleted
+    };
+    if (!environment.production) {
+      console.log(data);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const url = environment.API.roles + '_delete';
+    this.appservice.post(data, url).subscribe(
+      param => {
+        this.modalRef.hide();
+        if (param.message === 1) {
+          this.got_success('Xóa dữ liệu thành công');
+          this.get_data();
+        }
+      },
+      (error) => {
+        this.got_error(error);
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      }
+    );
+  }
+
+}
+
+
+

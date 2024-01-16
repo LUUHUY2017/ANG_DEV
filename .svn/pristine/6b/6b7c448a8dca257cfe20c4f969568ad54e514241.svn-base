@@ -1,0 +1,225 @@
+<block-ui></block-ui>
+<div class="row">
+    <div class="container-fluid">
+        <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+        <div class="animated fadeIn">
+            <div class="card card-parent">
+                <div class="card-header">
+                    <div class="row liveform">
+                        <ul>
+                            <li style="height: 32px;">
+                                <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+                            </li>
+                            <li>
+                                <span class="giomocua" style="margin-right:5px;">Giờ mở cửa:</span>
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin-right:10px;">
+                                    <!-- <ng-select class="bootstrap selecttimeview below giomocua" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="open_time"></ng-select> -->
+                                    <ng-select class="bootstrap selecttimeview below giomocua" [items]="startTimeOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="open_time"></ng-select>
+                                </div>
+                                <button style="border-radius: unset !important;" type="button" class="btn btn-primary buttonview" (click)="get_live()">Áp dụng</button>
+                            </li>
+                            <li>
+
+                                <!-- button xuat pdf -->
+                                <!-- <div class="btn-group float-right" dropdown>
+                  <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnchiase">
+                    Chia Sẻ
+                  </button>
+                  <ul *dropdownMenu class="dropdown-menu float-right " role="menu">
+                    <li role="menuitem"><a class="dropdown-item btn-brand btn-facebook" href="https:www.facebook.com"><i
+                          class="fa fa-facebook"></i>Facebook</a></li>
+                    <li role="menuitem"><a class="dropdown-item btn-brand btn-google-plus" href="https:www.plus.google.com"><i
+                          class="fa fa-google-plus"></i>G+</a></li>
+                    <li role="menuitem"><a class="dropdown-item  " href="#">Email</a></li>
+                  </ul>
+                </div> -->
+                                <div class="btn-group float-right" dropdown>
+                                    <button style="border-radius: unset !important;margin-left: 10px;" dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right dis-645 buttonxuat">
+                    Xuất báo cáo </button>
+                                    <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                                        <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right" (click)="exportExcel()">Xuất ra Excel</a></li>
+                                        <!-- <li role="menuitem"><a class="dropdown-item float-right" href="#">Xuất ra PDF</a></li> -->
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Show cac bieu do -->
+                <div class="card-body card-body-bottom">
+                    <!-- hang 1  -->
+                    <div class="row">
+                        <!-- cot 1 hang 1 -->
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 id="label_now"><span><img id="" src="assets/img/avatars/live.png"></span> Ngay bây giờ</h1>
+                                    <h4 id="">ngày {{curent_year}} tháng {{curent_month}} năm {{curent_day}} , <span style="color: orange">{{curent_hour}}
+                      giờ {{curent_minute}} phút</span></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <span id="1" style="font-size:60px">{{live_occupancy_data  | number:'1.0-2'}} </span>
+                                    <ng-template #tolTemplate>Khách hàng đang mua sắm<label>{{occupancy_str_compare  | number:'1.0-2'}} So với ngày hôm qua</label> </ng-template>
+                                    <span><img id="" src="assets/img/avatars/{{ occupancy_updown }}" placement="right"></span>
+                                    <h6 id="">Khách hàng đang mua sắm trên hệ thống</h6>
+                                </div>
+                                <div #chart_occupancy class="bieudo1 col-md-7"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 d-none d-md-block">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 id="label_now"> &nbsp; </h1>
+                                    <h4> Visitors </h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <span id="1" style="font-size:60px">{{live_enters_data | number:'1.0-2'}} </span>
+                                    <ng-template #contentvisit><label>{{enters_str_compare | number:'1.0-2'}} So với ngày hôm qua</label></ng-template>
+                                    <span><img id="" src="assets/img/avatars/{{enters_updown}}" placement="right"></span>
+                                    <h6 id=""> Số lượng khách hàng tới mua sắm đến thời điểm hiện tại</h6>
+                                </div>
+                                <div #chart_enter class="bieudo1 col-md-7"></div>
+                            </div>
+
+
+
+
+                            <!-- <div class="row">
+                <div class="col-md-6">
+                  <h5 id="">Visitors <br /> <span style="font-size: 80%"> Số lượng khách hàng tới mua sắm đến thời điểm
+                      hiện tại</span></h5>
+                  <span id="" style="font-size:60px">{{live_enters_data  | number}}</span>
+                  <ng-template #contentvisit><label>{{enters_str_compare  | number}} So với ngày hôm qua</label></ng-template>
+                  <span>
+                    <img id="" src="assets/img/avatars/{{enters_updown}}" placement="right">
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <div #chart_enter class="bieudo1 float-right"></div>
+                </div>
+              </div> -->
+
+
+
+                            <!-- <div class="row">
+                <div class="col-md-6">
+                  <h5 id="">Exits<br /> <span style="font-size: 80%"> Số lượng khách hàng tới mua sắm đã rời đi</span>
+                  </h5>
+                  <span id="" style="font-size:60px">{{live_exits_data  | number}}</span>
+                  <ng-template #contentexit><label>{{exits_str_compare  | number}} So với ngày hôm qua</label></ng-template>
+                  <span>
+                    <img id="" src="assets/img/avatars/{{exits_updown}}" placement="right">
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <div #chart_exits class="bieudo1"></div>
+                </div>
+              </div> -->
+
+
+                        </div>
+                        <!--  <table class="tbl1-2">
+                <tr style="height:50%">
+                  <td style="border-left:40px">
+                  </td>
+                  <td style="width:55%; border-right:100px">
+                    <div #chart_exits class="bieudo1"></div>
+                  </td>
+                </tr>
+              </table> -->
+                    </div>
+                </div>
+
+                <div class="card-footer" style="background-color:white;border-top:1px dotted #a7a4a4">
+
+                    <!--them vao history time customer activity  -->
+
+                    <div class="timeview col-md-12">
+                        <ul style="padding-left: 0px; margin:0px;">
+                            <li class="khungchonthoigian">
+                                <!-- <ng-select class="bootstrap selecttimeview" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select> -->
+                                <ng-select class="bootstrap selecttimeview" [items]="startTimeOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                                <span>-</span>
+                                <!-- <ng-select class="bootstrap selecttimeview" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select> -->
+                                <ng-select class="bootstrap selecttimeview" [items]="endTimeOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+
+                            </li>
+                            <li style="padding-left: 5px;" class="cotthoigian">
+                                <div class="select-date-view">
+                                    <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+                                </div>
+                            </li>
+                            <li>
+                                <!-- <ng-select class="bootstrap selectTimePriod" [options]="timePriodOption" [allowClear]="false" [(ngModel)]="level_traffic"></ng-select> -->
+                                <ng-select class="bootstrap selectTimePriod" [items]="timePriodOption" bindLabel="label" bindValue="value" [clearable]=false [(ngModel)]="level_traffic"></ng-select>
+                                <button style="border-radius: unset !important;" type="button" class="btn btn-primary buttonview" (click)="getTrafficDataHistory()">Xem</button>
+                            </li>
+                        </ul>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-5"> </div>
+                        <div class="col-sm-7 d-none d-md-block">
+                            <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
+                                <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 1 ? 'box-shadown' : ''}}" (click)="ClickshowChart(1)"><img src="assets/img/avatars/linechart.jpg"></button>
+                                <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 2 ? 'box-shadown' : ''}}" (click)="ClickshowChart(2)"><img src="assets/img/avatars/barchart.jpg"></button>
+                                <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 3 ? 'box-shadown' : ''}}" (click)="ClickshowChart(3)"><img src="assets/img/avatars/tblchart.jpg"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- button chon bieu do -->
+                    <div class="row">
+                        <!-- div class="col-md-1"> -->
+                        <!-- <button type="button" class="btn btn-primary btn-group" (click)="highclasschart()"> high level class</button> -->
+                        <!-- </div> -->
+                        <div style="min-height:350px;" class="col-12 col-sm-12 col-md-12">
+                            <!-- <div #container5></div> -->
+                            <!-- mặc định hiển thị biểu đồ high level class ở vị trí địa điểm quyền cao nhất ?? -->
+                            <div #container_historyLineChart [hidden]="showChart == 2 || showChart == 3"></div>
+                            <div #container_historyColumnChart [hidden]="showChart == 1 || showChart == 3"></div>
+                            <div style="margin-bottom: -1rem;" [hidden]="showChart == 1 || showChart == 2" class="table-responsive">
+                                <table style="width: 100%;min-width: 900px;" [mfData]="data_history" #mf="mfDataTable" [mfRowsOnPage]="20" id="table" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width:250px"></th>
+                                            <th style="min-width:250px">Visits</th>
+                                            <th style="min-width:250px">Exits</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td><b>{{total_visit | number:'1.0-2'}}</b> <br><span class="spancell">Tổng lượt khách vào</span> </td>
+                                            <td><b>{{total_exit | number:'1.0-2'}}</b><br><span class="spancell">Tổng lượt khách ra</span></td>
+                                        </tr>
+                                        <tr *ngFor="let item of mf.data">
+                                            <td>{{item.time_period}}</td>
+                                            <td>{{item.num_to_enter | number:'1.0-2'}} <span class="spancell">({{Go_number(item.num_to_enter,total_visit)}}%)</span></td>
+                                            <td>{{item.num_to_exit | number:'1.0-2'}} <span class="spancell">({{Go_number(item.num_to_enter,total_visit)}}%) </span></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="fba-tablet-list-tfoot">
+                                        <tr>
+                                            <td colspan="3">
+                                                <mfBootstrapPaginator></mfBootstrapPaginator>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divbaocao" style="float: right; font-size: 11px">Báo cáo này đã được tạo vào {{time_generate_report | date: 'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} -
+                        <span style="color:blue; cursor:pointer;" (click)="reset_session()">làm mới báo cáo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

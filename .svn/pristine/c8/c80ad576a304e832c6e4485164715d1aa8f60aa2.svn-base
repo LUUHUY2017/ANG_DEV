@@ -1,0 +1,55 @@
+<block-ui></block-ui>
+<div class="card" style="margin-bottom: 10px;">
+  <div class="card-body body-breadcumb">
+    <div class="row khungthemmoi">
+      <ul>
+        <li>
+          <i class="fa fa-plus-square"></i><span>&nbsp;{{language.sua_cau_hinh}} Notification</span>
+        </li>
+        <li><i class="fa fa-home"></i>&nbsp;<a>Admin</a>&nbsp;/&nbsp;<a routerLink="/fba/notification">Notification</a>
+          / Edit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<form (ngSubmit)="edit_notification(Form_edit_notification)" #Form_edit_notification="ngForm">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <ng-container *ngIf="userlogged === 0">
+          <div class="col-md-12">
+            <label for="">{{language.ten_to_chuc}</label>
+            <ng-select [options]="organization_array" [allowClear]="false" [(ngModel)]="org_selected"
+              name="organization_id"></ng-select>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="data">
+          <div class="col-md-12">
+            <label for="">{{language.chi_so_dat_dieu_kien_gui}} <small><i>( {{language.phan_tram_)</i></small></label>
+            <input type="number" required (keypress)="checknumber($event)" autocomplete="off" class="form-control"
+              #txtchiso="ngModel" ngModel="{{data.parameters.notification_number}}" name="notification_number">
+            <small *ngIf="txtchiso.touched && txtchiso.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_chi_so}}
+            </small>
+          </div>
+          <div class="col-md-12">
+            <label for="">{{language.khoang_thoi_gian_xu_ly}} <small><i>({{language.don_vi_tieng}} )</i></small></label>
+            <input type="number" required (keypress)="checknumber($event)" class="form-control" #txtthoigian="ngModel"
+              ngModel="{{data.parameters.time_to_fire}}" name="time_to_fire">
+            <small *ngIf="txtthoigian.touched && txtthoigian.errors?.required" class="error-message">
+                    {{language.ban_chua_nhap_thoi_gian}}
+            </small>
+          </div>
+        </ng-container>
+        <div class="col-md-12 mt-4">
+          <a routerLink="/fba/notification" class="btn btn-danger edit-button mr-2"><i
+              class="fa fa-arrow-circle-left"></i>&nbsp;{{language.quay_lai}}</a>
+          <ng-container *ngIf="!Form_edit_notification.invalid">
+            <button type="submit" class="btn btn-primary edit-button"><i class="fa fa-check"></i>&nbsp;{{language.xac_nhan}}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

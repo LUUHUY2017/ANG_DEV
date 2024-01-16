@@ -1,0 +1,23 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FbaListApplicationComponent } from './listapplication.component';
+import { FbaListApplicationRoutingModule } from './listapplication-routing.module';
+import { BlockUIModule } from 'ng-block-ui';
+import { TableModule } from 'primeng/table';
+import { FbaMenuModule } from '../../../../viewchild/fbamenu/fbamenu.module';
+
+@NgModule({
+    declarations: [
+        FbaListApplicationComponent,
+    ],
+    imports: [
+        CommonModule,
+        FbaListApplicationRoutingModule,
+        BlockUIModule,
+        TableModule,
+        FbaMenuModule
+    ],
+    exports: [],
+    providers: [],
+})
+export class FbaListApplicationModule { }

@@ -1,0 +1,182 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row mr-0 ml-0" id="store-comparison-header">
+      <div class="col-sm-12 col-md-6 p-0">
+        <app-menutree #MenuInput (submit_menu)="get_emit_menu($event)"></app-menutree>
+        <span style="padding:0px 10px;">So với</span>
+        <app-menutree #MenuInput_1 (submit_menu)="get_emit_menu_compare($event)"></app-menutree>
+      </div>
+      <div class="col-sm-12 col-md-2 pr-0"></div>
+      <div class="col-sm-12 col-md-4 p-0">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+      <!-- end- ul#headmapmenu -->
+    </div>
+    <!-- end-row -->
+  </div>
+  <!-- end-card header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child">
+            <div class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <div>
+                      <!-- <ng-select style="min-width: 110px;" class="bootstrap selecttimeview select-visits" [options]="indexOption" [allowClear]="false" [(ngModel)]="indexOptionSelected">
+                                 </ng-select> -->
+                      <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                        bindValue="value" groupBy="group" [clearable]=false [(ngModel)]="indexOptionSelected">
+                      </ng-select>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <!-- <ng-select class="bootstrap selecttimeview starttime" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select>
+                                  -->
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 3px 0;">-</span>
+                      <!-- <ng-select class="bootstrap  selecttimeview endtime" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary float-right btnapdung buttoncommand"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat buttoncommand"> {{language.xuat}}
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor:pointer" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                          <!-- <li role="menuitem"><a class="dropdown-item  float-right" href="#">Xuất  ra PDF</a>    </li>
+                                       <li role="menuitem"><a class="dropdown-item  float-right" href="#">Other</a></li> -->
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-body card-body-bottom">
+              <div class="row">
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-7 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                      (click)="change_view()">{{language.gio}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day"
+                      (click)="change_view()">{{language.ngay}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week"
+                      (click)="change_view()">{{language.tuan}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Month"
+                      (click)="change_view()">{{language.thang}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Year"
+                      (click)="change_view()">{{language.nam}}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row foot-title-show">
+                <div class="title-show1 ">
+                  {{site_name}} &nbsp;<span style="border-bottom: 1px dotted #7b7b7b;">{{language.so_voi}}</span> &nbsp;
+                  {{site_name_compare}} &nbsp; {{ title_index }} &nbsp; {{ starttime }} &minus; {{ endtime }}
+                  &nbsp;{{ title_time_period }}:
+                  {{ time_period }}, {{language.xem_theo}} {{ view }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <div class="table-responsive ">
+                  <table style="width: 100%;min-width: 900px" class="table table-striped table-comparation">
+                    <thead>
+                      <tr>
+                        <th style="width:220px;padding-left: 2.5rem;"> {{language.time}} </th>
+                        <th style="width:220px"> {{site_name}} </th>
+                        <th style="width:220px"> {{site_name_compare}} </th>
+                        <th style="width:220px">
+                          <!-- Chênh lệch -->
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <ng-container *ngIf="this.indexOptionSelected === indexes.avg_time">
+                          <td></td>
+                          <td> <b>{{toHHMMSS(column_data_1) }}</b> <br><span
+                              class="spancell">{{language.thoi_gian_trung_binh}}</span> </td>
+                          <td> <b>{{toHHMMSS(column_data_2) }}</b> <br><span
+                              class="spancell">{{language.thoi_gian_trung_binh}}</span> </td>
+                          <td>
+                            <b>{{column_data_1 > column_data_2 ? toHHMMSS((column_data_1 - column_data_2)) : toHHMMSS((column_data_2 - column_data_1)) }}</b>
+                            <br><span class="spancell">{{language.thoi_gian_chenh_lech}}</span>
+                          </td>
+                        </ng-container>
+                        <ng-container *ngIf="this.indexOptionSelected != indexes.avg_time">
+                          <td></td>
+                          <td> <b>{{column_data_1 |  number:'1.0-2'}}{{valueSuffix}}</b> </td>
+                          <td> <b>{{column_data_2 |  number:'1.0-2'}}{{valueSuffix}}</b> </td>
+                          <td>
+                            <b>{{column_data_2 > column_data_1 ? (column_data_2 - column_data_1 | number:'1.0-2') : (column_data_1 - column_data_2 |  number:'1.0-2') }}</b>
+                            <br> <span class="spancell"> {{site_name}} {{language.tuong_duong}}
+                              ({{ get_compar_per(column_data_1,column_data_2)}} {{language.lan}} {{language.so_voi}}
+                              {{site_name_compare}} </span> </td>
+                        </ng-container>
+                      </tr>
+                      <tr *ngFor="let item of all_data">
+                        <ng-container *ngIf="indexOptionSelected !== indexes.avg_time">
+                          <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                          <td> {{item.data | number:'1.0-2'}}
+                            <span [hidden]="is_table_show_percent(indexOptionSelected)"
+                              class="spancell">({{item.data_percent}}%)
+                            </span>
+                            <span class="spancell"> {{valueSuffix}} </span>
+                          </td>
+                          <td> {{item.data_compare | number:'1.0-2'}}
+                            <span [hidden]="is_table_show_percent(indexOptionSelected)"
+                              class="spancell">({{item.data_compare_percent}}%)
+                            </span>
+                            <span class="spancell"> {{valueSuffix}} </span>
+                          </td>
+                          <td
+                            class="{{item.data > item.data_compare ? 'fa-icon-green' : item.data == item.data_compare ? 'fa-icon-gray': 'fa-icon-red'  }}">
+                            {{get_number_int(item.number_compare) | number:'1.0-2'}}
+                          </td>
+                        </ng-container>
+                        <ng-container *ngIf="indexOptionSelected === indexes.avg_time">
+                          <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                          <td> {{ item.data ? (toHHMMSS(item.data *60)) : '00:00:00' }} </td>
+                          <td> {{ item.data_compare ? (toHHMMSS(item.data_compare *60)) : '00:00:00' }} </td>
+                          <td>
+                            {{item.data >= item.data_compare ? toHHMMSS((item.data - item.data_compare)*60 ) : toHHMMSS((item.data_compare - item.data)*60) }}
+                          </td>
+                        </ng-container>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+</div>

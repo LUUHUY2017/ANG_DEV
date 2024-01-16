@@ -1,0 +1,6 @@
+<ul class="header-administration" style="overflow-x: auto;">
+  <li routerLinkActive="active"> <a [routerLink]="['/gender-age/setting/user-mail']"> {{language =='vn'? 'Email nhận báo cáo định kỳ' : '
+    Configure report mail'}}   </a>
+    <!-- <li routerLinkActive="active"> <a [routerLink]="['/gender-age/administration/webhookage']">Webhook <small style="color:crimson">(beta)</small></a> -->
+  </li>
+</ul>

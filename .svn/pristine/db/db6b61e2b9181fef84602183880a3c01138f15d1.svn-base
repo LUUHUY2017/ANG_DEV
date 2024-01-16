@@ -1,0 +1,365 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { AppService } from '../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import validate form
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PasswordValidation } from './user-form.validator';
+
+@Component({
+  templateUrl: './usermail.component.html',
+  styleUrls: ['./usermail.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class UserMailComponent implements OnInit {
+  page_id = '\'' + environment.Pages.administration.users + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private appservice: AppService,
+    private modalService: BsModalService,
+    private fb: FormBuilder) {
+    this.form = fb.group({
+      password: ['', Validators.required],
+      confirmPassword: ['', Validators.required],
+      name: ['', Validators.required],
+      email: ['', Validators.required],
+      organization_id: ['', Validators.required],
+      lever: ['', Validators.required],
+      recerviced_report: ['', Validators.required],
+      recerviced_notification: ['', Validators.required],
+      hqhd_report_dayly: ['', ''],
+      hqhd_report_weekly: ['', ''],
+      poc_report_monthly: ['', ''],
+    }, {
+        validator: PasswordValidation.MatchPassword // your validation method
+      });
+  }
+  // Khai báo kiểu dữ kiệu
+  form: FormGroup;
+  user_organization: any;
+  data_user_organization: any;
+  mail_configuration: any;
+  organization_arr_option: Array<IOption>;
+  organization_arr: Array<IOption>;
+  org_selected: string;
+  org_selectedform: string;
+  tu_khoa: string;
+  data2: any;
+  info_user: any;
+  modalRef: BsModalRef;
+  delete_tablet_id: number;
+  user_id: number;
+  email_logs: any;
+  hidden_select_organization = false;
+  hqhd_report_dayly = false;
+  hqhd_report_weekly = false;
+  hqhd_report_monthly = false;
+  ng_container = 1;
+  // phân trang bảng
+  rowsOnPage = 15;
+  filterQuery = '';
+  type_calculator = '0';
+  userinfo: any = JSON.parse(localStorage.getItem(environment.UserLoged));
+  language = JSON.parse(localStorage.getItem(environment.language));
+  ngOnInit(): void {
+    this.get_page_param();
+    // this.org_selected = '';
+    this.tu_khoa = '';
+    this.show_select_organization();
+  }
+
+  // hiện select tổ chức
+  show_select_organization() {
+    const userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+    if (!environment.production) {
+      console.log('userInfo', userInfo);
+    }
+    if (userInfo.lever === '0') {
+      this.hidden_select_organization = false;
+    } else {
+      this.hidden_select_organization = true;
+    }
+  }
+
+  // Lấy thông tin tổ chức lên ng-select
+  get_page_param() {
+    this.blockUI.start('Đang tải cấu hình...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        this.organization_arr = param.organization_arr;
+        this.org_selectedform = param.organization_arr[0].value;
+        this.get_data();
+      }, (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      }
+    );
+  }
+
+  // truyền dữ liệu popup
+  dulieuthaydoi(item, templates: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data thay đổi', item);
+    }
+    this.data2 = item;
+    this.hqhd_report_dayly = item.hqhd_report_dayly;
+    this.hqhd_report_weekly = item.hqhd_report_weekly;
+    this.hqhd_report_monthly = item.hqhd_report_monthly;
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  // xem thông tin email từng user
+  view_log_mail(item, log_mail_user: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data thay đổi', item);
+    }
+    this.info_user = item;
+    this.email_logs = [];
+    this.get_reports_email_logs(item.id);
+    this.modalRef = this.modalService.show(log_mail_user, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  // xem thông tin email từng user
+  open_modal_test_email(test_email: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(test_email, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  click_show_container(i: number) {
+    this.ng_container = i;
+  }
+
+  // lấy email đã log từng users
+  get_reports_email_logs(user_id: number) {
+    const data = { user_id: user_id };
+    this.user_id = user_id;
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.sp_poc_report_user_email_logs + '_hqhd').subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.email_logs = res;
+    }, (error) => {
+      this.blockUI.stop();
+    }, () => {
+      this.blockUI.stop();
+    });
+  }
+
+  // thay đổi tổ chức bảng
+  changeorganization_table(event) {
+    if (!environment.production) {
+      console.log('id_or', event);
+    }
+    this.org_selectedform = event;
+    this.get_data();
+  }
+
+  // thay đổi tổ chức bảng
+  change_type_caculator(event) {
+    if (!environment.production) {
+      console.log('type_cal', event);
+    }
+    this.type_calculator = event;
+    this.get_data();
+  }
+
+  // lấy data thông thường
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const data = {
+      tu_khoa: this.tu_khoa,
+      module: 1,
+      organization: this.org_selectedform
+    };
+    if (!environment.production) {
+      console.log('data gửi đi', data);
+    }
+    this.appservice.post(data, environment.API.COMMON.mail_configuration + '_get_info').subscribe(
+      res => {
+        if (!environment.production) {
+          console.log(res);
+        }
+        this.user_organization = [];
+        // this.user_organization = res.user_arr;
+        if (this.type_calculator === '0') {
+          this.user_organization = res.user_arr;
+        } else if (this.type_calculator === '1') {
+          this.user_organization = res.user_arr.filter(e => {
+            return e.hqhd_report_dayly === true && e.hqhd_report === '1';
+          });
+        } else if (this.type_calculator === '2') {
+          this.user_organization = res.user_arr.filter(e => {
+            return e.hqhd_report_weekly === true && e.hqhd_report === '1';
+          });
+        } else if (this.type_calculator === '3') {
+          this.user_organization = res.user_arr.filter(e => {
+            return e.hqhd_report_monthly === true && e.hqhd_report === '1';
+          });
+        }
+        this.data_user_organization = res.user_arr;
+        this.mail_configuration = res.mail_confi[0];
+      }, (error) => {
+        this.blockUI.stop();
+        if (!environment.production) {
+          console.log(error);
+        }
+      }, () => {
+        this.blockUI.stop();
+      });
+  }
+
+  // tìm kiếm bảng thiết bị
+  search_table(value: string) {
+    const string = value.toLowerCase();
+    if (string === '') {
+      this.user_organization = this.data_user_organization;
+    } else {
+      this.user_organization = this.data_user_organization.filter(x =>
+        x.email.toLowerCase().indexOf(string) !== -1
+        || x.name.toLowerCase().indexOf(string) !== -1
+      );
+    }
+  }
+
+  save_configuration_mail(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.API.COMMON.mail_configuration + '_update_info').subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+      }, (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      }, () => {
+        this.blockUI.stop();
+        this.get_data();
+      });
+  }
+
+  send_email_test(item) {
+    this.blockUI.start('Đang xử lý...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.API.COMMON.mail_configuration + '_send_email_test').subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+      }, (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      }, () => {
+        this.blockUI.stop();
+        this.get_data();
+      });
+  }
+
+  update_mail_delivery_schedule(item) {
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.API.COMMON.user_send_email + '_hqhd').subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+      }, (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      }, () => {
+        this.blockUI.stop();
+        this.get_data();
+      });
+  }
+
+  // hỏi xóa modal
+  modal_question(item, dialog: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data_item', item);
+    }
+    this.delete_tablet_id = item;
+    this.modalRef = this.modalService.show(dialog, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  // xóa users
+  delete_users(id: number) {
+    const data = { id: this.delete_tablet_id };
+    if (!environment.production) {
+      console.log(data);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.delete_users).subscribe(
+      param => {
+        this.modalRef.hide();
+        this.get_data();
+      }, (error) => {
+        this.blockUI.stop();
+      });
+  }
+
+  // xóa log email
+  delete_log(id: number) {
+    const data = { id: id };
+    if (!environment.production) {
+      console.log(id);
+    }
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.post(data, environment.FBA.Administration.sp_poc_report_user_email_logs + '_delete_hqhd').subscribe(res => {
+      this.get_reports_email_logs(this.user_id);
+    }, (error) => {
+      this.blockUI.stop();
+    });
+  }
+}

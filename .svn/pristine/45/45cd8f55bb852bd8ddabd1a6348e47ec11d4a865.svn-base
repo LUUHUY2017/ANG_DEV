@@ -1,0 +1,12 @@
+<ul class="header-administration" style="overflow-x: auto;">
+  <li routerLinkActive="active"><a [routerLink]="['/general/organization']">{{language.cong_ty}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/site']">{{language.dia_diem}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/locations']">{{language.vi_tri}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/categories']">{{language.danh_muc}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/users']">{{language.nguoi_dung}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/clients']">Access token</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/performance/addministrator/import_pos_sale']" *ngIf="showMenu">{{language.nhap_du_lieu}}</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/zalosender']" *ngIf="showMenu">OA Zalo</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/zalofollower']" *ngIf="showMenu">Zalo Follower</a></li>
+  <li routerLinkActive="active"><a [routerLink]="['/general/emailconfig']">Email Config</a></li>
+</ul>

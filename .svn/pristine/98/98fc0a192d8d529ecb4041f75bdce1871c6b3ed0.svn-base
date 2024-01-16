@@ -1,0 +1,98 @@
+<block-ui></block-ui>
+<app-fbamenu></app-fbamenu>
+<div class="card body-content">
+    <div class="card-header">
+        <span>
+            <i class="cui-layers" aria-hidden="true">&nbsp;</i><span>Application Setting</span>
+        </span>
+        <button class="btn btn-primary edit-button float-right" [routerLink]="['/fba/setting/add']"><i
+                class="fa fa-plus"></i>&nbsp;{{language.them_moi}}</button>
+    </div>
+    <div class="card-body">
+        <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+                <div class="table-responsive">
+                    <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                        <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                            style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">{{language.STT}}</th>
+                                    <th style="width: 150px;text-align: left;text-indent: 1rem;">Tên tổ chức
+                                    </th>
+                                    <th style="width: 120px;text-align: left;text-indent: 1rem;">Logo ứng dụng
+                                    </th>
+                                    <th style="width: 120px;text-align: left;text-indent: 1rem;">Logo công ty trên ứng
+                                        dụng
+                                    </th>
+                                    <th style="width: 120px;text-align: left;text-indent: 1rem;">Hoạt động
+                                    </th>
+                                    <th style="width: 150px;">{{language.xu_ly}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50px;"><button class="btn btn-success noborder"
+                                            style="font-size: 10px;"><i class="fa fa-search"></i></button></td>
+                                    <td><input type="text" name="organization_name" ngModel autocomplete="off"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <select name="actived" ngModel style="padding: 3px 5px 3px 5px;">
+                                            <option value="">Tất cả</option>
+                                            <option value=1>Hoạt động</option>
+                                            <option value=0>Ngừng hoạt động</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 50px;"><button class="btn btn-success noborder"
+                                            style="font-size: 10px;"><i class="fa fa-search"></i></button></td>
+                                </tr>
+                                <tr *ngFor="let items of mf.data;let i = index">
+                                    <td>{{i + 1}}</td>
+                                    <td style="text-align: left;">{{items.organization_name}}</td>
+                                    <td style="text-align: left;">
+                                        <img [src]="items.application_logo" style="width: 80px;">
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <img [src]="items.application_logo" style="width: 80px;">
+                                    </td>
+                                    <td class="text-center">
+                                        <span *ngIf="items.actived == 1" class="badge badge-success"
+                                            style="font-size: 10px;"><i class="fa fa-check"></i></span>
+                                        <span *ngIf="items.actived == 0" class="badge badge-danger"
+                                            style="font-size: 10px;"><i class="fa fa-remove"></i></span>
+                                    </td>
+                                    <td style="width: 100px;">
+                                        <a class="icon-blue" [routerLink]="['/fba/setting/edit/', items.id]">
+                                            <i class="cui-note" aria-hidden="true"></i>
+                                        </a>&nbsp;
+                                        <a class="icon-red" *ngIf="isSuperAdmin">
+                                            <i class="cui-circle-x" aria-hidden="true"></i>
+                                        </a>&nbsp;
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dataFilter?.length === 0">
+                                    <td colspan="8"
+                                        style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                                        <span>{{language.khong_co_du_lieu}}</span>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dataFilter?.length > rowsOnPage">
+                                    <td colspan="8">
+                                        <mfBootstrapPaginator></mfBootstrapPaginator>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+                <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                        style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại
+                    lại
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

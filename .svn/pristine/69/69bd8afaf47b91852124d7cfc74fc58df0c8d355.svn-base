@@ -1,0 +1,372 @@
+<div class="card">
+  <div class="card-header">
+    <div class="row" style="border-radius: 5px; border: 1px">
+      <ul id="fba-ana-head">
+        <li>
+          <label for="">Địa điểm/ khu vực </label>
+          <!-- Nút chọn tổ chức -->
+
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+              <i class="fa fa-map-marker location" aria-hidden="true"></i>
+              <span>&nbsp;{{location}}</span>&nbsp;
+              <i class="fa fa-caret-down"></i> &nbsp;
+            </div>
+            <i style="padding-top:5px;cursor: pointer;font-size: 14px;color: rgb(185, 58, 58);" (click)="locationSelectionDisplay=!locationSelectionDisplay"
+              [hidden]="hidden_menu_location" class="fa fa-dot-circle-o ngoai-tru" aria-hidden="true"></i>
+          </div>
+          <!-- Chọn option tổ chức -->
+          <div style="height: auto;overflow: unset;border-radius: 10px;" [hidden]="!locationSelectionDisplay" class=" khung-location block">
+            <!-- (clickOutside)="locationSelectionDisplay=false" [exclude]="'.ngoai-tru'" -->
+            <div style="margin-bottom: 0" class="card">
+              <div class="card-header">
+                <span>Chọn địa điểm</span>
+              </div>
+              <div class="card-body">
+                <ng-select class="bootstrap selectimeview" [(ngModel)]="organization_id" [options]="organization_arr_option" [allowClear]="false"
+                  (selected)="changeorganization($event)"></ng-select>
+              </div>
+              <div class="card-footer">
+                <div style="float: right;  padding: 0 8px;">
+                  <button type="button" class="btn btn-secondary" (click)="locationSelectionDisplay=!locationSelectionDisplay">Đóng
+                    cửa sổ</button>
+                </div>
+              </div>
+            </div> <!-- card -->
+          </div>
+          <!--  Chọn địa điểm/ khu vực  -->
+          <div [hidden]="!siteSelectionDisplay" class=" khung-location block" (clickOutside)="siteSelectionDisplay=false"
+            [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+              <div style="position: relative;width: 100%;" class="inputgroup">
+                <input (keyup)="search_menu($event.target.value)" style="border:none !important;" type="text" class="form-control" placeholder="Tìm kiếm địa điểm/khu vực">
+                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search"
+                  aria-hidden="true"></i>
+              </div>
+              <ul style="padding-left: 0;">
+                <li (click)="changeitem(item.organization_id, item.id, item.site_name)" *ngFor="let item of menu_tree"
+                  class="menu-{{item.alevel}}">
+                  {{item.site_name}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <!-- kết thúc li thứ nhất -->
+        <li>
+          <label for="">Câu hỏi khảo sát</label>
+          <div dropdown>
+            <div class="text-select">
+              <div dropdownToggle class="overview-survey">
+                <svg class="jss965 jss966" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"
+                  style="width: 20px;margin-bottom: 5px;">
+                  <g>
+                    <path d="M0 0h24v24H0z" style="fill: rgba(1, 1, 1, 0);"></path>
+                    <path d="M20.43 20.6H3.57a2.26 2.26 0 0 1-2.26-2.27V6.2a2.26 2.26 0 0 1 2.27-2.25h16.86A2.26 2.26 0 0 1 22.7 6.2v12.13a2.26 2.26 0 0 1-2.27 2.26zM3.57 5.9a.33.33 0 0 0-.32.3v12.13a.33.33 0 0 0 .32.32h16.86a.33.33 0 0 0 .32-.32V6.2a.33.33 0 0 0-.32-.3z">
+                    </path>
+                    <path d="M16.62 13.76h-2.1v-.2a2.58 2.58 0 0 1 .12-.88 1.92 1.92 0 0 1 .36-.6 11.08 11.08 0 0 1 1.08-1q.45-.37.45-.68a.62.62 0 0 0-.18-.47.77.77 0 0 0-.54-.17.88.88 0 0 0-.64.26 1.52 1.52 0 0 0-.33.9l-2.14-.26a2.92 2.92 0 0 1 .85-1.9 3.2 3.2 0 0 1 2.3-.72 3.4 3.4 0 0 1 1.93.5 2.1 2.1 0 0 1 1 1.8 1.74 1.74 0 0 1-.26.92 4.46 4.46 0 0 1-1.06 1.06 2.83 2.83 0 0 0-.7.7 1.45 1.45 0 0 0-.14.74zm-2.17.56h2.25v2h-2.25zM6.13 9.76h5.2v2h-5.2zM6.13 13.28h6.42v2H6.13z">
+                    </path>
+                  </g>
+                </svg>
+                <span>&nbsp;{{question_name}}</span><i class="fa fa-caret-down"></i>
+              </div>
+            </div>
+            <!-- popup -->
+            <div *dropdownMenu class="dropdown-menu khung-question block">
+              <div id="khung-question-scroll">
+                <div class="ongoing">
+                  <div class="small-metric">Đang diễn ra</div>
+        <li *ngFor=" let item of questions_ongoing" (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+          <div class="questionText">
+            <span style=" display: block;">{{item.question_name}}?</span>
+          </div>
+          <div class="timePeriod">
+            <span>{{item.campaign_name}} tháng {{ item.start_time| date:'MM'}}</span>
+            <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+              date:'dd-MM-yyyy'}}</span>
+          </div>
+        </li>
+    </div>
+    <!-- kết thúc ongoing -->
+    <div class="starting">
+      <div class="small-metric">Sắp diễn ra</div>
+      <li *ngFor=" let item of questions_upcoming" (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} tháng {{ item.start_time| date:'MM'}}</span>
+          <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc sắp diễn ra -->
+    <div class="ending">
+      <div class="small-metric">Kết thúc</div>
+      <li *ngFor=" let item of questions_ended" (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} tháng {{ item.start_time| date:'MM'}}</span>
+          <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc phần kết thúc -->
+  </div>
+</div>
+</div>
+</li>
+<!-- kết thúc li thứ 2 -->
+<li>
+  <label for="">Thời kỳ</label>
+  <div class="overview-period">
+    <div (click)="siteSelectionDisplay2=!siteSelectionDisplay2" class="text-select vung-kich2">
+      <i class="fa fa-calendar-minus-o location" aria-hidden="true"></i>
+      <span>&nbsp;{{time_period}}</span>
+      <i class="fa fa-caret-down"></i>
+    </div>
+  </div>
+  <!-- popup -->
+  <div [hidden]="!siteSelectionDisplay2" (clickOutside)="siteSelectionDisplay2=false" [exclude]="'.vung-kich2'" class=" khung-time block">
+    <div id="khung-time-scroll">
+      <ul id="ul-time">
+        <li>
+          <span>Chọn thời kỳ</span>
+          <div id="reportrangefba" style="  margin-top: 2px; cursor: pointer; width: 100%">
+            <i class="fa fa-calendar"></i>&nbsp;
+            <span style="font-size: 12px;"></span> <i class="fa fa-caret-down"></i>
+            <input type="hidden" id="startDateReportTemp" [(ngModel)]="Indexstart">
+            <input type="hidden" id="endDateReportTemp" [(ngModel)]="IndexEnd">
+          </div>
+        </li>
+        <li *ngFor=" let item of fba_time_period_overview" (click)="chonthoigian(item)" class="{{item.label === time_period ? 'active' : ''}}">
+          {{item.label}}
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>
+<!-- kết thúc li thứ  3 -->
+</ul>
+</div>
+</div><!-- Kết thúc card-header -->
+
+<div class="card-body">
+  <div class="row">
+    <div class="container-fluid">
+      <div class="animated fadeIn">
+        <block-ui></block-ui>
+        <div class="card">
+          <div id="card-header" class="card-header">
+            <div class="row">
+              <ul id="fbametrics_headmapmenu_2">
+                <li>
+                  <!--    <ng-select class="bootstrap selectimeview" [options]="indexOption" [allowClear]="false"
+                       [(ngModel)]="indexOptionSelected"  (selected)="thaydoichart($event)"></ng-select> -->
+                </li> <!-- li-visit -->
+                <li>
+                  <button type="button" class="btn btn-primary float-right btnapdung" (click)="time_change()">
+                    Áp dụng
+                  </button>
+                  <div class="btn-group btn-group-toggle float-right ml" data-toggle="buttons">
+                    <ng-select class="bootstrap selecttimeview" [options]="startTimeOption" [allowClear]="false"
+                      [(ngModel)]="startTime"></ng-select>
+
+                    <span style="padding-top: 4px;">-</span>
+                    <ng-select class="bootstrap selecttimeview " [options]="endTimeOption" [allowClear]="false"
+                      [(ngModel)]="endTime"></ng-select>
+                  </div>
+                </li><!-- Kết thúc li thứ 2 -->
+                <li>
+                  <div>
+                    <div class="btn-group float-right" dropdown>
+                      <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnchiase">
+                        Chia Sẻ
+                      </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right " role="menu">
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-facebook" href="https:www.facebook.com"><i
+                              class="fa fa-facebook"></i>Facebook</a></li>
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-google-plus" href="https:www.plus.google.com"><i
+                              class="fa fa-google-plus"></i>G+</a></li>
+                        <!-- <li role="menuitem"><a class="dropdown-item  " href="#">Email</a></li> -->
+                      </ul>
+                    </div>
+                    <div class="btn-group float-right" dropdown>
+                      <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnxuat">
+                        Xuất
+                      </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                        <li role="menuitem"><a class="dropdown-item float-right cursor-pointer">Xuất
+                            ra Excel</a> <!-- (click)="exportExcel()" -->
+                        </li>
+                        <li role="menuitem"><a class="dropdown-item  float-right cursor-pointer" href="#">Xuất
+                            ra PDF</a>
+                        </li>
+                        <li role="menuitem"><a class="dropdown-item  float-right cursor-pointer" href="#">Other</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </li> <!-- Kết thúc li thứ 3-->
+              </ul>
+            </div> <!-- Kết thúc row-header -->
+          </div> <!-- Kết thúc-card-header con -->
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-5">
+                <!-- <h4 class="card-title mb-0">Khách đến</h4> -->
+                <!-- <div class="small text-muted">1/8/2018 - 5/8/2018</div> -->
+              </div>
+              <!--/.kết thúc cil-md-5 -->
+              <div class="col-sm-7 d-none d-md-block">
+                <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                  <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()"
+                    btnRadio="Hour">Giờ</label>
+                  <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()"
+                    btnRadio="Day">Ngày</label>
+                  <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()"
+                    btnRadio="Week">Tuần</label>
+                  <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()"
+                    btnRadio="Month">Tháng</label>
+                  <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" (click)="change_view()"
+                    btnRadio="Year">Năm</label>
+                </div>
+              </div>
+              <!--/.kết thúccol-md-7-->
+              <div class="fba-body-body">
+                <div style="width:99%;" #container> </div>
+              </div>
+            </div> <!-- Kết thúc row thứ nhất -->
+            <hr>
+            <div class="row">
+              <div class="fba-body-header">
+                <ul style="padding-right: 15px;" id="metric-menu-body2">
+                  <li>
+                    <span> CX Index mục tiêu 80% </span>
+
+                  </li>
+                </ul>
+              </div> <!-- end fba-body-header -->
+              <div class="fba-body-body">
+                <div class="table-responsive">
+                  <table style="width: 100%;min-width: 900px" class="table table-hover table-striped">
+                    <thead>
+                      <tr>
+                        <th style="width: 160px">Nhân viên</th>
+                        <th style="width: 100px">Đánh giá</th>
+                        <th style="width: 100px"><img src="//i.imgur.com/GMnOpaP.png" alt=""></th>
+                        <th style="width: 100px"><img src="//i.imgur.com/sfdjXWT.png" alt=""></th>
+                        <th style="width: 100px"><img src="//i.imgur.com/REDX5WZ.png" alt=""></th>
+                        <th style="width: 100px"><img src="//i.imgur.com/4EG0Bew.png" alt=""></th>
+                        <th style="width: 120px">CX Index</th>
+                        <th style="width: 120px">CX Index hoàn thành</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td></td>
+                        <td>
+                          <div> 50 <span id="percent">(5%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá </span>
+                        </td>
+                        <td>
+                          <div> 50 <span id="percent">(5%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá </span>
+                        </td>
+                        <td>
+                          <div> 40 <span id="percent">(4%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá </span>
+                        </td>
+                        <td>
+                          <div> 20 <span id="percent">(2%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá </span>
+                        </td>
+                        <td>
+                          <div> 20 <span id="percent">(45%)</span> </div>
+                          <span id="text"> trong tổng số 1000 đánh giá </span>
+                        </td>
+                        <td>
+                          <div> 90% <span id="percent"></span> </div>
+                          <span id="text"> trung bình mức độ hài lòng mà tất cả nhân viên đạt được </span>
+                        </td>
+                        <td>
+                          <div> 50% <span id="percent"></span> </div>
+                          <span id="text"> trung bình mức độ hoàn thành nhân viên đạt được </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Đào Thị Thu</td>
+                        <td>3.159</td>
+                        <td>2.326<span>(73%)</span></td>
+                        <td>111<span>(16%)</span></td>
+                        <td>100<span>(4%)</span></td>
+                        <td>219<span>(7%)</span></td>
+                        <td>85</td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="text-align: right;width: 100%;font-size: 12px;" class="card-footer">Báo cáo này đã được tạo
+                  vào 08/11/2018 lúc 08:36:31 - <span style=" color: blue; cursor: pointer;">làm mới báo cáo</span></div>
+              </div>
+            </div> <!-- Kết thúc row body thứ 2 -->
+          </div><!-- Kết thúc card-body -->
+        </div><!-- Kết thúc card -->
+      </div>
+    </div><!-- card-body-parent -->
+  </div>
+</div>

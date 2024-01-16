@@ -1,0 +1,19 @@
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+
+
+@Component({
+    selector: 'app-generalmenu',
+    templateUrl: './generalmenu.component.html',
+    styleUrls: ['./generalmenu.component.css']
+})
+
+export class GeneralMenuComponent implements OnInit {
+    user_info = JSON.parse(localStorage.getItem(environment.UserLoged));
+    constructor(
+        private route: ActivatedRoute
+        , private router: Router) {}
+    ngOnInit() {}
+}

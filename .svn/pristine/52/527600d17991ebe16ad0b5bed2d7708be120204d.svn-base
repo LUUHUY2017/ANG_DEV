@@ -1,0 +1,17 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row" style="border-radius: 5px; border: 1px">
+      <h5>Hướng dẫn sử dụng hệ thống báo cáo ACS Analystics Flatform</h5>
+    </div>
+  </div>
+  <div class="card card-child">
+    <div class="card-body card-body-bottom">
+      <div class="row">
+        <div style="height:100vh" class="container-fluid">
+          <iframe scrolling="no" frameborder="0" style="display:inline-block; width:100%; height:100%"
+            src="https://docs.google.com/viewer?srcid=1M_rFZNK3Ix9iO31lNF8_OUMFQQfPBn0G&pid=explorer&efh=false&a=v&chrome=false&embedded=true"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

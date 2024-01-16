@@ -1,0 +1,468 @@
+<div class="row">
+   <div class="col-md-12">
+      <app-footfallsettingmenu></app-footfallsettingmenu>
+   </div>
+</div>
+<notifier-container></notifier-container>
+<block-ui></block-ui>
+<div class="row">
+   <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+         <div class="card-header card-font">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> <span>Danh sách thiết bị</span>
+            <button (click)="show_insert(insert_template)" style="float:right" class="btn btn-them buton-search ">
+               Thêm mới</button>
+         </div>
+         <div class="card-body card-table table-companies">
+            <div class="row tablets-list_filter_table">
+               <div class="col-md-2">
+                  <ng-select *ngIf="userInfo.organization_id == 0 && userInfo.lever == 0"
+                     class="bootstrap selectimeview backselect" required [options]="organization_array"
+                     [(ngModel)]="organization_id" [allowClear]="false" (selected)="search_organization()"
+                     placeholder="Chọn tổ chức">
+                  </ng-select>
+                  <!-- <select *ngIf="userInfo.organization_id == 0 && userInfo.lever == 0"
+                     class="bootstrap selectimeview backselect" [(ngModel)]="organization_id"
+                     (ngModelChange)="search_organization()">
+                     <option *ngFor="let item of organization_array" [ngValue]="item.value">{{item.label}}
+                     </option>
+                  </select> -->
+               </div>
+               <div class="col-md-2">
+                  <!-- Textbox chọn -->
+                  <div class="config-text">
+                     <div style="display:block;border:1px solid #ddd; padding:5px;background:white; cursor: pointer"
+                        (click)="siteFilterDisplay=!siteFilterDisplay" class="text-select vung-kich">
+                        <span>&nbsp; {{siteFilterModel ? siteFilterModel.site_name : 'Chọn lọc miền' }} <i
+                              style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                           </i></span>
+                     </div>
+                  </div>
+                  <!-- Chọn địa điểm/ khu vực -->
+                  <div [hidden]="siteFilterDisplay" class="khung-location-location block"
+                     (clickOutside)="siteFilterDisplay = true" [exclude]="'.vung-kich'">
+                     <div class="khung-site">
+                        <!-- <div style="position: relative;width: 100%;" class="inputgroup">
+                           <input (keyup)="search_menu($event.target.value)"
+                              style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                              placeholder="Tìm kiếm địa điểm/ khu vực">
+                           <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                              class="fa fa-search" aria-hidden="true"></i>
+                        </div> -->
+                        <ul style="padding-left: 0;">
+                           <li *ngFor="let item of menu_tree" (click)="site_filter(item)"
+                              class="site-{{item.alevel}} {{item.id === siteFilterModel?.id ? 'active' : null}} {{item.enables == 1 ? null : 'disabledMenuItem'}}"  style="float: none;">
+                              {{item.site_name}}
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-md-2">
+                  <select *ngIf="userInfo.organization_id == 0 && userInfo.lever == 0" class="form-control"
+                     [(ngModel)]="option_delete" (ngModelChange)="change_delete_option()">
+                     <option [ngValue]=0>Chưa xóa</option>
+                     <option [ngValue]=1>Đã xóa</option>
+                  </select>
+               </div>
+               <div class="col-md-3 ml-auto" style="display: flex;
+                        align-items: center;
+                        justify-content: flex-end;">
+                  <label for="searchinput" style="margin-bottom: 0px; min-width: 80px;">Tìm kiếm&nbsp;&nbsp;</label>
+                  <input type="text" class="input_filter_table form-control flex-grow: 1;" [(ngModel)]="tu_khoa"
+                     id="searchinput" (ngModelChange)="search_table($event)" placeholder="Tìm theo serial number">
+               </div>
+            </div>
+            <div class="table-responsive">
+               <!-- <h1 *ngIf="device_array.length === 0">Chưa có dữ liệu</h1> -->
+               <table [mfData]="data_filter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                  class="table table-striped companies-table table-hover"
+                  style="width: 100%;overflow: auto;min-width: 900px">
+                  <thead>
+                     <tr>
+                        <th style="min-width: 50px">STT</th>
+                        <th *ngIf="userInfo.lever == 0" style="min-width: 150px">Tên tổ chức</th>
+                        <th style="min-width: 150px">Địa điểm</th>
+                        <th style="min-width: 50px">Vị trí</th>
+                        <th style="min-width: 100px">Tên thiết bị</th>
+                        <th style="min-width: 100px">Serial Number</th>
+                        <th style="min-width: 150px">Last Time Update Socket</th>
+                        <th style="min-width: 150px">Last Time Update Data</th>
+                        <th style="min-width: 150px">Trạng thái</th>
+                        <th style="min-width: 100px">Chế độ</th>
+                        <th style="min-width: 100px">Địa chỉ IP</th>
+                        <th style="min-width: 100px">Địa chỉ WAN IP</th>
+                        <th style="min-width: 100px">Http Port</th>
+                        <th style="min-width: 100px;text-align: center">Xử lý</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr *ngFor="let item of mf.data; let i = index">
+                        <td>{{i +1}}</td>
+                        <td *ngIf="userInfo.lever == 0">{{item.organization_name}}</td>
+                        <td>{{item.site_name}}</td>
+                        <td>{{item.location_name}}</td>
+                        <td>{{item.device_name ? item.device_name : 'Chưa có tên'}}</td>
+                        <td>{{item.serial_number}}</td>
+                        <td>{{item.last_time_update_socket}}</td>
+                        <td>{{item.last_time_update_data}}</td>
+                        <td>
+                           <span *ngIf="item.online == 1" class="online"><i class="fa fa-circle"></i>&nbsp;Đang hoạt
+                              động</span>
+                           <span *ngIf="item.online == 0" class="offline"><i class="fa fa-circle"></i>&nbsp;Ngắt kết
+                              nối</span>
+                        </td>
+                        <td>
+                           <span class="badge badge-success" *ngIf="item.actived == 1"><i
+                                 class="fa fa-check"></i></span>
+                           <span class="badge badge-danger" *ngIf="item.actived == 0"><i
+                                 class="fa fa-stop-circle"></i></span>
+                        </td>
+                        <td><a class="linkhref" (click)="open('http://' + item.ip_address)">{{item.ip_address}}</a></td>
+                        <td><a class="linkhref"
+                              (click)="open('http://' + item.wan_ip_address + ':' + item.http_port)">{{item.wan_ip_address}}</a>
+                        </td>
+                        <td>{{item.http_port}}</td>
+                        <td style="width: 150px;text-align: center">
+                           <i style="color:darkblue;cursor: pointer;" (click)="show_update(update_template, item)"
+                              class="fa fa-edit"></i>
+                           &nbsp;
+                           <i *ngIf="item.deleted == 0" style="color:brown;cursor: pointer;"
+                              (click)="show_delete(delete_template,item.serial_number)" class="fa fa-times"></i>
+                           &nbsp;
+                           <i *ngIf="item.deleted == 1" style="color:brown;cursor: pointer;"
+                              (click)="rollbackData(rollbackTemplate,item.serial_number)" class="fa fa-recycle"></i>
+                           &nbsp;
+                           <i *ngIf="item.deleted == 1" style="color:brown;cursor: pointer;"
+                              (click)="show_delete(delete_template_data,item.serial_number)" class="fa fa-times"></i>
+                           &nbsp;
+                        </td>
+                     </tr>
+                     <tr>
+                        <td colspan="12" *ngIf="data_filter?.length === 0"
+                           style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                           <span>Không có dữ liệu</span>
+                        </td>
+                     </tr>
+                  </tbody>
+                  <tfoot class="companies_table-tfoot">
+                     <tr>
+                        <td colspan="16">
+                           <mfBootstrapPaginator></mfBootstrapPaginator>
+                           <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                        </td>
+                     </tr>
+                  </tfoot>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<ng-template #delete_template>
+   <div class="modal-body box-shadow">
+      <div class="row">
+         <div class="col-md-12 mb-3">
+            <div id="border-remove">
+               <i class="fa fa-remove fa-3x"></i>
+            </div>
+         </div>
+         <div class="col-md-12 text-center">
+            <h3>Bạn có chắc chắn muốn xóa?</h3>
+            <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+         </div>
+         <div class="col-md-12 text-center">
+            <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_method()"
+               style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+            <button (click)="closeModal()" style="margin-right: 8px;" class="btn btn-huy pr-4 pl-4">
+               Đóng</button>
+         </div>
+      </div>
+   </div>
+</ng-template>
+<ng-template #delete_template_data>
+   <div class="modal-body box-shadow">
+      <div class="row">
+         <div class="col-md-12 mb-3">
+            <div id="border-remove">
+               <i class="fa fa-remove fa-3x"></i>
+            </div>
+         </div>
+         <div class="col-md-12 text-center">
+            <h3>Bạn có chắc chắn muốn xóa?</h3>
+            <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+         </div>
+         <div class="col-md-12 text-center">
+            <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_method_data()"
+               style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+            <button (click)="closeModal()" style="margin-right: 8px;" class="btn btn-huy pr-4 pl-4">
+               Đóng</button>
+         </div>
+      </div>
+   </div>
+</ng-template>
+<ng-template #rollbackTemplate>
+   <div class="modal-body box-shadow">
+      <div class="row">
+         <div class="col-md-12 mb-3">
+            <div id="border-remove" style="border-color: forestgreen !important;">
+               <i class="fa fa-undo fa-3x" style="color: forestgreen !important;"></i>
+            </div>
+         </div>
+         <div class="col-md-12 text-center">
+            <h3>Bạn có chắc chắn muốn khôi phục lại dữ liệu?</h3>
+            <p>Xin hãy lưu ý!! Tiến trình này sẽ không thể dừng lại</p>
+         </div>
+         <div class="col-md-12 text-center">
+            <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_method()"
+               style="background:forestgreen; border-color: forestgreen;">Xóa</button>
+            <button (click)="closeModal()" style="margin-right: 8px;" class="btn btn-huy pr-4 pl-4">
+               Đóng</button>
+         </div>
+      </div>
+   </div>
+</ng-template>
+<!-- Modal  cập nhật  -->
+<ng-template #update_template>
+   <form (ngSubmit)="updateform(update_form)" #update_form="ngForm">
+      <div class="modal-header">
+         <h4 class="modal-title pull-left">Cập nhật thiết bị</h4>
+         <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Serial Number</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" name="serial_number" type="text"
+                  [ngModel]="data_update.serial_number" readonly (change)="preventChange()">
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Địa điểm</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <!-- Textbox chọn -->
+               <div class="config-text">
+                  <div style="display:block;border:1px solid #ddd; padding:5px;background:white; cursor: pointer"
+                     (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                     <span>&nbsp; {{selected_site ? selected_site.site_name : 'Chưa chọn'}} <i
+                           style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                        </i></span>
+                  </div>
+               </div>
+               <!-- Chọn địa điểm/ khu vực -->
+               <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+                  (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                  <div id="khung-location-scroll">
+                     <!-- <div style="position: relative;width: 100%;" class="inputgroup">
+                        <input (keyup)="search_menu($event.target.value)"
+                           style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                           placeholder="Tìm kiếm địa điểm/ khu vực">
+                        <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                           class="fa fa-search" aria-hidden="true"></i>
+                     </div> -->
+                     <ul style="padding-left: 0;">
+                        <li *ngFor="let item of menu_tree" (click)="change_site_seleted(item)"
+                           class="site-{{item.alevel}} {{item.site_name === selected_site?.site_name ? 'active' : null}} {{item.enables == 1 && item.store == 1 ? null : 'disabledMenuItem'}}">
+                           {{item.site_name}}
+                        </li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Vị trí</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <ng-select class="bootstrap selectimeview" #txtlocation="ngModel" required [options]="locationSelected"
+                  [allowClear]="false" [(ngModel)]="data_update.location_id" name="location_id">
+               </ng-select>
+               <small *ngIf="txtlocation.touched && txtlocation.errors?.required" class="error-message">
+                  Bạn chưa chọn vị trí
+               </small>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Tên thiết bị</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" #txtdevice_name="ngModel" required
+                  ngModel="{{data_update.device_name}}" name="device_name" autocomplete="off">
+               <small *ngIf="txtdevice_name.touched && txtdevice_name.errors?.required" class="error-message">
+                  Bạn chưa nhập tên thiết bị
+               </small>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label style="width:70%" class="col-md-3 col-3 col-form-label">Kích hoạt</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                  <input class="form-check-input" id="inline-t-ac" type="radio" value="1"
+                     [ngModel]="data_update.actived" name="actived">
+                  <label class="form-check-label" for="inline-t-ac">Có</label>
+               </div>
+               <div class="form-check form-check-inline mr-1">
+                  <input class="form-check-input" id="inline-f-ac" type="radio" value="0"
+                     [ngModel]="data_update.actived" name="actived">
+                  <label class="form-check-label" for="inline-f-ac">Không</label>
+               </div>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Địa chỉ IP</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.ip_address}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Địa chỉ Mac</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.mac_address}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Cổng Http</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.http_port}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Cổng Https</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.https_port}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Timezone</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.timezone}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Hardware</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.hw_platform}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Ngày tạo</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.created_at}}" readonly>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-3 col-3 col-form-label lh-label">Ngày cập nhật</label>
+            <div class="col-md-9 col-9 col-form-label">
+               <input class="form-control color-font" type="text" value="{{data_update.updated_at}}" readonly>
+            </div>
+         </div>
+      </div>
+      <div class="modal-footer">
+         <a (click)="closeModal()" class="btn btn-huy">
+            Đóng</a>
+         <button class="btn btn-success" [disabled]="update_form.invalid">
+            <!-- <button class="btn btn-primary" *ngIf="log_all(txtlocation)"> -->
+            Cập nhật</button>
+      </div>
+   </form>
+</ng-template>
+<!-- Kết thúc  Modal cập nhật-->
+<!-- Modal  Thêm mới  -->
+<ng-template #insert_template>
+   <form (ngSubmit)="insertform(insert_form)" #insert_form="ngForm">
+      <div class="modal-header">
+         <h4 class="modal-title pull-left">Thêm mới thiết bị</h4>
+         <button type="button" class="close pull-right" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+         <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{item}}</strong>
+         </div>
+         <div hidden class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Tên tổ chức</label>
+            <div class="col-md-8 col-8 col-form-label">
+               <ng-select class="bootstrap selectimeview" [options]="organization_array" [allowClear]="false"
+                  [ngModel]="organization_id" name="organization_id" (selected)="preventChange()">
+               </ng-select>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Serial Number <small
+                  class="require-field">(*)</small></label>
+            <div class="col-md-8 col-8 col-form-label">
+               <input class="form-control color-font" type="number" required #txtserial_number="ngModel" ngModel
+                  name="serial_number" autocomplete="off">
+               <small *ngIf="txtserial_number.touched && txtserial_number.errors?.required" class="error-message">
+                  Bạn chưa nhập serial number
+               </small>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Địa điểm <small
+                  class="require-field">(*)</small></label>
+            <div class="col-md-8 col-8 col-form-label">
+               <!-- Textbox chọn -->
+               <div class="config-text">
+                  <div style="display:block;border:1px solid #ddd; padding:5px;background:white; cursor: pointer"
+                     (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                     <span>&nbsp; {{selected_site ? selected_site.site_name : 'Chọn miền' }} <i
+                           style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                        </i></span>
+                  </div>
+               </div>
+               <!-- Chọn địa điểm/ khu vực -->
+               <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+                  (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                  <div id="khung-location-scroll">
+                     <!-- <div style="position: relative;width: 100%;" class="inputgroup">
+                        <input (keyup)="search_menu($event.target.value)"
+                           style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                           placeholder="Tìm kiếm địa điểm/ khu vực">
+                        <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                           class="fa fa-search" aria-hidden="true"></i>
+                     </div> -->
+                     <ul style="padding-left: 0;">
+                        <li *ngFor="let item of menu_tree" (click)="change_site_seleted(item)"
+                           class="site-{{item.alevel}} {{item.id === selected_site?.id ? 'active' : null}} {{item.enables == 1 && item.store == 1 ? null : 'disabledMenuItem'}}">
+                           {{item.site_name}}
+                        </li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Vị trí <small
+                  class="require-field">(*)</small></label>
+            <div class="col-md-8 col-8 col-form-label">
+               <ng-select class="bootstrap selectimeview" #txtlocation="ngModel" required [options]="locationSelected"
+                  [allowClear]="false" [ngModel]="locationSelected[0]?.value" name="location_id">
+               </ng-select>
+               <small *ngIf="txtlocation.touched && txtlocation.errors?.required" class="error-message">
+                  Bạn chưa chọn vị trí
+               </small>
+            </div>
+         </div>
+         <div class="form-group row form-no-marbottom">
+            <label class="col-md-4 col-4 col-form-label lh-label">Tên thiết bị <small
+                  class="require-field">(*)</small></label>
+            <div class="col-md-8 col-8 col-form-label">
+               <input class="form-control color-font" type="text" #txtdevice_name="ngModel" required ngModel
+                  name="device_name" autocomplete="off">
+               <small *ngIf="txtdevice_name.touched && txtdevice_name.errors?.required" class="error-message">
+                  Bạn chưa nhập tên thiết bị
+               </small>
+            </div>
+         </div>
+         <small class="require-field mt-3">(*) yêu cầu bạn hãy nhập đầy đủ thông tin</small>
+      </div>
+      <div class="modal-footer">
+         <a (click)="closeModal()" class="btn btn-huy">
+            Đóng</a>
+         <button class="btn btn-primary" [disabled]="insert_form.invalid">Thêm mới</button>
+      </div>
+   </form>
+</ng-template>
+<!-- Kết thúc  Modal thêm mới-->

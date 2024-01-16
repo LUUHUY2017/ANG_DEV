@@ -1,0 +1,270 @@
+:host ::ng-deep {
+  .giomocua span {
+    font-size: 12px;
+  }
+  .giomocua .toggle {
+    width: 15px;
+  }
+  .giomocua .options ul li {
+    padding: 5px 2px;
+  }
+  .cotthoigian > div > app-timeperiod {
+    padding: 4px 10px;
+    background: white;
+    border: 1px solid #ddd;
+    margin: 0px 3px;
+    display: block;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+    .vung-kich2 > span {
+      font-weight: normal !important;
+    }
+    #headtimeperiod .khung-time {
+      min-height: 180px;
+      top:33px;
+      left: 3px;
+    }
+    .vung-kich2 .fa-caret-down {
+      color: #999;
+    }
+  }
+  .select-date-view {
+    display: block;
+    position: relative;
+    min-width: 120px;
+  }
+  #headtimeperiod[_ngcontent-c4] .khung-time[_ngcontent-c4] {
+    right: 0px !important;
+  }
+  ng-select {
+    width: 120px;
+    display: inline-block;
+  }
+  .ng-select.ng-select-single .ng-select-container {
+    height: 30px;
+  }
+  .khungchonthoigian {
+    span {
+      margin: 0px 5px;
+    }
+  }
+  .selecttimeview {
+    width: 120px;
+  }
+  .pagination {
+    float: right;
+  }
+}
+
+
+.drselect {
+  width: 50%;
+}
+.blockwhite {
+  padding: 5px;
+  background: white;
+  border: 1px solid #999;
+}
+.buttonxuat {
+  margin-left: 40px;
+  margin-right: 5px;
+  width: 80px;
+  height: 25px;
+  border: 0 none;
+  font-size: 9px;
+  text-align: center;
+}
+.bieudo1 {
+  width: 100%;
+  height: 100px;
+}
+.bieudo2 {
+  width: 100%;
+  height: 300px;
+}
+.texthead1 {
+  margin-left: 50px;
+}
+.texthead2 {
+  margin-left: 150px;
+}
+.bottom {
+  align-items: center;
+  text-align: center;
+}
+.hidden {
+  display: none;
+}
+.buttonview {
+  margin-left: 5px;
+  width: 70px;
+  height: 30px;
+  border: 0 none;
+  font-size: 11px;
+  /* float: right; */
+  text-align: center;
+}
+.timeview {
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+.timeview ul li {
+  display: inline-block;
+  list-style: none;
+}
+.btnchart {
+  // color: silver;
+  align-items: center;
+  /*width: 50px;
+    height: 35px;*/
+}
+.box-shadown {
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.3);
+  color: #222;
+  background-image: -webkit-linear-gradient(top, #f0f0f0, #dfdfdf);
+  background-color: #c8ced3;
+  border-color: #ccc;
+  font-weight: 700;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+.tbl1-1 {
+  width: 100%;
+  height: 100%;
+}
+.tbl1-2 {
+  width: 60%;
+  height: 100%;
+  margin-left: 30%;
+}
+.tooltip {
+  font-size: 80%;
+  font-family: Roboto;
+  color: dimgrey;
+  border-radius: 2px;
+}
+.selectTimePriod {
+  width: 130px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.timeview ul li {
+  padding: 5px 0px;
+}
+.buttonxuat {
+  font-size: 13px;
+  padding: 8px;
+  width: auto;
+  height: auto;
+}
+.liveform > ul {
+  width: 100%;
+  padding-left: 0px;
+  margin-bottom: 0px;
+}
+.liveform > ul > li:nth-child(1),
+.liveform > ul > li:nth-child(2) {
+  float: left;
+  list-style: none;
+  margin-left: 10px;
+}
+.liveform > ul > li:last-child {
+  float: right;
+  list-style: none;
+  /*margin-left: 10px;*/
+}
+app-menutree {
+  float: left;
+  margin-top: 5px;
+  margin-right: 3px;
+}
+tfoot.fba-tablet-list-tfoot tr td ul.pagination {
+  float: right !important;
+  margin-bottom: -1rem;
+}
+tfoot.fba-tablet-list-tfoot tr td {
+  padding: 3px 0 3px 3px;
+}
+
+@media only screen and (max-width: 1200px) {
+}
+
+@media only screen and (max-width: 992px) {
+}
+
+@media only screen and (max-width: 768px) {
+  .d-none {
+    display: block !important;
+    padding-left: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 654px) {
+  .liveform ul li:last-child {
+    float: left;
+  }
+  .dis-645 {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 456px) {
+  .liveform ul li:nth-child(2) {
+    margin-right: 10px;
+  }
+
+  .liveform ul li:nth-child(2),
+  .liveform ul li:nth-child(3) {
+    margin-top: 5px;
+  }
+}
+
+/*@media only screen and (max-width: 414px)
+{
+    .liveform ul li:nth-child(1) input[type="text"], .giomocua, .liveform ul li .btn-primary
+    {
+        font-size: 75%;
+    }
+    .liveform ul li:nth-child(3) .btn-group:nth-child(2) button
+    {
+        padding-bottom: 5px;
+        font-size: 72%;
+        padding-top: 7px;
+    }
+    .liveform ul li:nth-child(2)
+    {
+        margin-top: 0px;
+    }
+}*/
+@media only screen and (max-width: 457px) {
+  /* .liveform ul li:nth-child(1) input[type="text"], .giomocua, .liveform ul li .btn-primary
+    {
+        font-size: 2.5vw;
+    }
+    .liveform ul li:nth-child(3) .btn-group:nth-child(2) button
+    {
+        padding-bottom: 5px;
+        font-size: 75%;
+        padding-top: 7px;
+    } */
+  /* .below
+    {
+        width: 15vw!important;
+    } */
+  /* .toggle
+    {
+        width: 4vw;
+    } */
+}
+
+@media only screen and (max-width: 414px) {
+  #label_now {
+    font-size: 2.05rem;
+  }
+
+  /*.liveform ul li:nth-child(1) input[type="text"], .giomocua, .liveform ul li .btn-primary
+    {
+        font-size: 3vw;
+    }*/
+}

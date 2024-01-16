@@ -1,0 +1,88 @@
+.metric-comparison-time > app-timeperiod {
+  float: right;
+}
+:host ::ng-deep {
+  .dropdown-list li{
+    padding: 1px 3px !important;
+    width: 200px!important;
+  }
+  /*Select Visit*/
+  .multiselect-dropdown {
+    position: relative;
+    width: 100%;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12) !important;
+}
+  .multiselect-dropdown .dropdown-btn .dropdown-down {
+    border-top: 7px solid #23282c !important;
+    border-left: 4px solid transparent !important;
+    border-right: 4px solid transparent !important;
+  }
+  .multiselect-dropdown .dropdown-btn .dropdown-up {
+    border-bottom: 7px solid #23282c !important;
+    border-left: 4px solid transparent !important;
+    border-right: 4px solid transparent !important;
+  }
+  .multiselect-dropdown .dropdown-btn .selected-item {
+    border: none !important;
+    margin-right: 4px;
+    background: unset !important;
+    padding: 0px 5px 2px 5px !important;
+    color: black !important;
+  }
+  .multiselect-dropdown .dropdown-btn .selected-item:hover {
+    box-shadow: unset !important;
+  }
+  .multiselect-dropdown .dropdown-btn {
+    display: inline-block;
+    border: 1px solid #dddddd !important;
+    width: 100% !important;
+    min-width: 130px;
+    padding: 5px 2px 2px 2px !important;
+    border-radius: 0px !important;
+    margin-top: 0 !important;
+  }
+  .starttime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .endtime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+ ng-multiselect-dropdown{
+    min-width: 35%;
+    display: inline-block;
+  }
+  .multiselect-dropdown .dropdown-btn .selected-item {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .metric-comparison-time > app-timeperiod {
+    float: left;
+  }
+}
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+  vertical-align: middle!important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}

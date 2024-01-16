@@ -1,0 +1,106 @@
+import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import { Router } from '@angular/router';
+import { NotificationService } from '../notification.service';
+import { IOption } from 'ng-select';
+import { language } from '../../../../language';
+import { language_en } from '../../../../language_en';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+@Component({
+  selector: 'app-addnotification',
+  templateUrl: './addnotification.component.html',
+  styleUrls: ['./addnotification.component.css']
+})
+export class AddNotificationComponent implements OnInit {
+  status = 1;
+  org_selected: string;
+  any_require = true;
+  page_id = '\'' + environment.Pages.fba.fba_notifications + '\'';
+  organization_selected: Array<any>;
+  @BlockUI() blockUI: NgBlockUI;
+  public organization_array: Array<IOption>;
+  order = 1;
+  showbutton_order = false;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  language: any;
+  userlogged = Number(JSON.parse(localStorage.getItem(environment.UserLoged)).lever);
+  constructor(private appservice: AppService, private router: Router, private notificationservice: NotificationService) {
+    this.type_language === 'vn' ? this.language = language : this.language = language_en;
+  }
+  ngOnInit() {
+    if (this.userlogged === 0) {
+      this.get_organization();
+    }
+  }
+  get_organization() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(res => {
+      this.organization_array = res.organization_arr;
+      if (!environment.production) {
+        console.log(this.organization_array);
+      }
+      this.org_selected = res.organization_arr[0].value;
+    },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  change_status(value) {
+    this.status = value;
+  }
+  counter() {
+    return new Array(this.order);
+  }
+  checknumber(event: any) {
+    const pattern = /[0-9\ ]/;
+    const inputChar = String.fromCharCode(event.charCode);
+    if (event.keyCode !== 8 && !pattern.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
+  add_notification(item: any) {
+    if (!environment.production) {
+      console.log(item);
+    }
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    let data = item.value;
+    const organization_id = data.organization_id;
+    delete data.organization_id;
+    // console.log(data);
+    data = {
+      organization_id: organization_id
+      , parameters: JSON.stringify(data)
+    };
+    // console.log(data);
+    this.appservice.post(data, environment.FBA.API.fba_notifications).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      if (res.message === 1) {
+        this.notificationservice.message.push({
+          message_info: this.language.them_moi_thanh_cong,
+          alert: 'success'
+        });
+        this.router.navigate(['/fba/notification']);
+      } else {
+        this.notificationservice.message.push({
+          message_info: this.language.co_loi_xay_ra,
+          alert: 'danger'
+        });
+        this.router.navigate(['/fba/notification']);
+      }
+    },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+}

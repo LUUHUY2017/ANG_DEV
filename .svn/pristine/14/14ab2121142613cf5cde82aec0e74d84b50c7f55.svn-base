@@ -1,0 +1,19 @@
+import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+
+
+@Component({
+    selector: 'app-performancemenu',
+    templateUrl: './performancemenu.component.html',
+    styleUrls: ['./performancemenu.component.css']
+})
+
+export class PerformanceMenuComponent implements OnInit {
+    constructor(
+        private route: ActivatedRoute
+        , private router: Router) {}
+        language = JSON.parse(localStorage.getItem(environment.language));
+    ngOnInit() {}
+}

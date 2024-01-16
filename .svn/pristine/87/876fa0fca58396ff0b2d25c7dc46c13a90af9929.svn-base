@@ -1,0 +1,55 @@
+<main>
+  <app-usermenu></app-usermenu>
+  <div class="row">
+    <div class="container-fluid">
+      <div class="animated fadeIn">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card card-parent">
+              <div class="card-body" style="padding-top: 10px;">
+                <div class="row mb-2">
+                  <div class="col-md-12">
+                    <h3><i class="icon-user" style="color: #f19925">&nbsp;</i>{{language.doi_mat_khau}}</h3>
+                  </div>
+                </div>
+                <ng-container *ngIf="!data">
+                  <div class="row" style="min-height: 300px">
+                    <h4 class="m-auto" style="color: #f19925;"><i class="fa fa-exclamation-circle">&nbsp;</i>{{language.da_co_loi_xay_ra}}</h4>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="data">
+                  <form *ngIf="data" (ngSubmit)="changePasswordFunc(changePassword)" #changePassword="ngForm">
+                    <div *ngFor="let item of errorArray" class="alert alert-danger alert-dismissible fade show" role="alert">
+                      <strong>{{item}}</strong>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 pt-1">
+                        <label for="title_content">{{language.mat_khau_cu}}</label>
+                        <input ngModel type="password" class="form-control" name="oldpassword" id="oldpassword" [placeholder]="language.mat_khau_cu">
+                      </div>
+                      <div class="col-md-12 pt-1">
+                        <label for="title_content">{{language.mat_khau_moi}}</label>
+                        <input ngModel type="password" class="form-control" name="newpassword" id="newpassword" [placeholder]="language.mat_khau_moi">
+                      </div>
+                      <div class="col-md-12 pt-1">
+                        <label for="title_content">{{language.nhap_lai_mat_khau}}</label>
+                        <input ngModel type="password" class="form-control" name="confirmpassword" id="confirmpassword" [placeholder]="language.nhap_lai_mat_khau">
+                      </div>
+                      <div class="col-md-12 mt-3">
+                        <button class="btn btn-primary rounded-0 mr-2" [disabled]="changePassword.invalid"><i
+                            class="cui-note">&nbsp;</i>{{language.cap_nhat}}</button>
+                        <!-- <a class="btn btn-link rounded-0" (click)="resetDefault()">Reset</a> -->
+                      </div>
+                    </div>
+                  </form>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <notifier-container></notifier-container>
+</main>

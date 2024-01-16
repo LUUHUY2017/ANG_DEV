@@ -1,0 +1,261 @@
+<main>
+   <div style="margin-top:15px" class="row">
+      <div class="col-md-12">
+         <app-adminstratormenu></app-adminstratormenu>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset" class="card card-administration">
+            <block-ui></block-ui>
+
+            <div class="card-body " style=" padding-top: 0px;">
+               <div class="row">
+                  <div class="col-lg-3">
+                     <div class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi"> Từ khóa</label>
+                        <input class="form-control select-white nofocus" [(ngModel)]="tu_khoa" name="tu_khoa" type="text"
+                           placeholder="Tìm kiếm...">
+                     </div>
+                  </div>
+                  <div class="col-lg-3">
+                     <div style="width: 110px;" class="form-group col-md-12 formsearch">
+                        <label class="col-form-label label-admi"> &nbsp; </label>
+                        <button (click)=get_data() class="btn btn-them form-control buton-search">
+                           Tìm Kiếm</button>
+                     </div>
+                  </div>
+                  <div class="col-lg-3">
+
+                  </div>
+                  <div class="col-lg-3">
+
+                  </div>
+               </div>
+            </div>
+
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 10px;" class="card">
+            <!-- <div class="card-header card-font">
+               <i class="fa fa-list-alt" aria-hidden="true"></i> <span>Danh sách folder</span>
+            </div> -->
+            <div class="card-body card-table table-companies">
+               <div [hidden]="hidden_select_organization" style="float:right;" class="button-add">
+                  <button *ngIf="user_info.lever == 0" type="button" class="btn btn-them  buton-search " (click)="openModal(templates)">Thêm
+                     công ty</button>
+               </div>
+               <div class="table-responsive">
+                  <table [mfData]="organization" #mf="mfDataTable" [mfRowsOnPage]="6" class="table table-striped companies-table "
+                     style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px">STT</th>
+                           <th style="width: 200px">Công ty</th>
+                           <th style="width: 200px">Mô tả</th>
+                           <th style="width: 150px">Tình trạng</th>
+                           <th style="width: 150px">Ngày tham gia</th>
+                           <th style="width: 150px;text-align: center">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let item of mf.data; let i = index">
+                           <td>{{i +1}}</td>
+                           <td>{{item.organization_name ? item.organization_name : '-'}}</td>
+                           <td>{{item.organization_description ? item.organization_description : '-'}}</td>
+                           <td>
+                              <span *ngIf="item.actived == 1">Đang hoạt động</span>
+                              <span *ngIf="item.actived == 0">Hết hạn</span>
+                           </td>
+                           <td>
+                              {{item.created_at | date: 'dd-MM-yyyy'}}
+                           </td>
+                           <td style="width: 150px;text-align: center">
+                              <a style="color:#333;cursor: pointer;" (click)="dulieuthaydoi(item,template)" title="Sửa tổ chức">
+                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a style="color:#333;cursor: pointer;" routerLink="/administration/users/{{item.id}}"
+                                 title="xem thành viên"> <i class="fa fa-users"></i>
+                              </a>&nbsp;
+                              <a style="color:#333;cursor: pointer;" routerLink="/administration/tablets/{{item.id}}"
+                                 class="" title="Xem thiết bị"> <i class="fa fa-tablet"></i>
+                              </a>&nbsp;
+                              <a style="color:#333;cursor: pointer;" target="_blank" routerLink="/fba/metrics-analytics/{{item.id}}"
+                                 title="Xem nhanh"> <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                              </a>&nbsp;
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="companies_table-tfoot">
+                        <tr>
+                           <td colspan="6">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Modal  thêm mới  -->
+   <ng-template #templates>
+      <form (ngSubmit)="insertform(insert_org)" #insert_org="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Thêm công ty</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div style="display:none" class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">ID_OR</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" [(ngModel)]="id" name="id">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Công ty</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" #txtname="ngModel" required [(ngModel)]="organization_name"
+                     name="organization_name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên công ty
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mã công ty</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf-email" #txtcode="ngModel" required type="text" [(ngModel)]="organization_code"
+                     name="organization_code">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     Bạn chưa nhập mã công ty
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên viết tắt</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" #txtshortname="ngModel" required [(ngModel)]="organization_shortname"
+                     name="organization_shortname">
+                  <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên viết tắt
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mô tả </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" #txtdes="ngModel" required [(ngModel)]="organization_description"
+                     name="organization_description">
+                  <small *ngIf="txtdes.touched && txtdes.errors?.required" class="error-message">
+                     Bạn chưa nhập tên mô tả
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">Hoạt động </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value="1" ngModel="1" name="actived">
+                     <label class="form-check-label" for="inline-t-ac">Có</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value="0" ngModel="1" name="actived">
+                     <label class="form-check-label" for="inline-f-ac">Không</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" (click)="modalRef.hide()" [disabled]="insert_org.invalid">
+               Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+
+   <!-- Modal  cập nhật  -->
+   <ng-template #template>
+      <form (ngSubmit)="updateform(user_update)" #user_update="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Cập nhật công ty</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Công ty</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf" type="text" #txtname="ngModel" required [(ngModel)]="data2.organization_name"
+                     name="organization_name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên công ty
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mã công ty</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" id="nf-email" #txtcode="ngModel" required type="text" [(ngModel)]="data2.organization_code"
+                     name="organization_code">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     Bạn chưa nhập mã công ty
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên viết tắt</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" #txtshortname="ngModel" required [(ngModel)]="data2.organization_shortname"
+                     name="organization_shortname">
+                  <small *ngIf="txtshortname.touched && txtshortname.errors?.required" class="error-message">
+                     Bạn chưa nhập tên viết tắt
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mô tả </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" #txtdes="ngModel" required [(ngModel)]="data2.organization_description"
+                     name="organization_description">
+                  <small *ngIf="txtdes.touched && txtdes.errors?.required" class="error-message">
+                     Bạn chưa nhập tên mô tả
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="width:70%" class="col-md-3 col-3 col-form-label">Hoạt động </label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-ac" type="radio" value="1" [(ngModel)]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-t-ac">Có</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-ac" type="radio" value="0" [(ngModel)]="data2.actived"
+                        name="actived">
+                     <label class="form-check-label" for="inline-f-ac">Không</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" (click)="modalRef.hide()" [disabled]="user_update.invalid">
+               Thêm</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+</main>

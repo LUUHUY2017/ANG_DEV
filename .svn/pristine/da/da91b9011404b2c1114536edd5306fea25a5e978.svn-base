@@ -1,0 +1,32 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { ExpertGuard } from '../../../shared/expert.guard';
+import { SuperAdminGuard } from '../../../shared/superadmin.guard';
+
+
+const routes: Routes = [
+    {
+      path: '',
+      data: {
+        title: 'Admin Config'
+      },
+      loadChildren: './notification/notification.module#NotificationModule'
+    },
+    {
+      canActivate: [SuperAdminGuard],
+      path: 'add',
+      loadChildren: './addnotification/addnotification.module#AddNotificationModule'
+    },
+    {
+      canActivate: [ExpertGuard],
+      path: 'edit/:id',
+      loadChildren: './editnotification/editnotification.module#EditNotificationModule'
+    }
+  ];
+  @NgModule({
+    imports: [
+      RouterModule.forChild(routes)
+    ],
+    exports: [RouterModule]
+  })
+export class NotificationRoutingModule {}

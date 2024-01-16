@@ -1,0 +1,15 @@
+<div class="app-body">
+  <main class="main d-flex align-items-center" *ngIf="!isOnload">
+    <div class="container">
+      <div class="row" style="background-color: #fff;">
+        <div *ngIf="messInstance" class="col-md-12">
+          <div *ngFor="let item of messInstance.content" class="alert alert-{{messInstance.type === 'success' ? 'success' : 'danger' }} alert-dismissible" role="alert">
+            <strong>{{item}}</strong>
+          </div>
+        </div>
+        <div id="htmlTable" *ngIf="dataUpdate" [innerHTML]="getlink(dataUpdate.mail_content)"></div>
+      </div>
+    </div>
+  </main>
+  <block-ui></block-ui>
+</div>

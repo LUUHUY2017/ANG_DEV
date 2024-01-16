@@ -1,0 +1,259 @@
+<block-ui></block-ui>
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px;"> <i class="fa fa-list-alt" aria-hidden="true"></i> Danh sách </span>
+               <button *ngIf="can_add" style="float:right;" type="button" class="btn btn-them buton-search "
+                  (click)="show_insert(template)">Thêm
+                  Role</button>
+            </div>
+            <div class="card-body table-users">
+               <div class="row">
+                  <div class="col-md-3">
+                     <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr_filter"
+                        [(ngModel)]="organization_id_filter" name="organization_id" [allowClear]="false"
+                        (selected)="change_organization_filter()" placeholder="Chọn tổ chức">
+                     </ng-select>
+                  </div>
+               </div>
+               <div class="table-responsive">
+                  <table [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="10" class="table table-striped users_table"
+                     style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px;text-align: center">STT</th>
+                           <th style="width: 150px">Tổ chức</th>
+                           <th style="width: 150px">Tên Role</th>
+                           <th style="width: 120px">Mô tả</th>
+                           <th style="width: 120px">Trạng thái</th>
+                           <th style="width: 100px;text-align: center;">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let item of mf.data; let i = index">
+                           <td style="width: 50px;text-align: center">{{i +1}}</td>
+                           <td>{{item.organization_name}}</td>
+                           <td>{{item.role_name}}</td>
+                           <td>{{item.role_description}}</td>
+                           <td><span class="badge badge-{{item.actived === '1' ? 'primary' : 'danger'}}">{{item.actived
+                                 === '1' ? 'Đang hoạt động' : 'Tạm ngừng'}}</span></td>
+                           <td style="width: 100px;text-align: center" class="">
+                              <a (click)="show_update(templates, item.id)" class="icon-blue" title="Sửa role">
+                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a *ngIf="item.created_by != 0 && can_delete" (click)="show_dialog(dialog, item.id)"
+                                 class="icon-red" title="Xóa role">
+                                 <i class="fa fa-trash" aria-hidden="true"></i>
+                              </a>&nbsp;
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="users_table-tfoot">
+                        <notifier-container></notifier-container>
+                        <tr>
+                           <td colspan="6">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Modal delete dialog -->
+   <ng-template #dialog>
+      <div class="modal-body box-shadow">
+         <div class="row">
+            <div class="col-md-12 mb-3">
+               <div id="border-remove">
+                  <i class="fa fa-remove fa-3x"></i>
+               </div>
+            </div>
+            <div class="col-md-12 text-center">
+               <h3>Bạn có chắc chắn muốn xóa?</h3>
+               <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+            </div>
+            <div class="col-md-12 text-center">
+               <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_element()"
+                  style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+               <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                  Đóng</button>
+            </div>
+         </div>
+      </div>
+   </ng-template>
+   <!-- End -->
+   <!-- Modal  thêm mới  -->
+   <ng-template #template>
+      <form (ngSubmit)="insertform(group)" #group="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Thêm role</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div *ngIf="userlogged.lever === '0'" class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ
+                  chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [(ngModel)]="org_selectedform" name="organization_id" [allowClear]="true"
+                     (selected)="change_organization($event.value)" placeholder="Chọn tổ chức">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên role</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" required #txtrolename ngModel name="role_name">
+                  <small *ngIf="txtrolename.touched && txtrolename.errors?.required" class="error-message">
+                     Bạn chưa nhập tên role
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Chọn Site</label>
+               <div class="col-md-9">
+                  <div class="row mt-2" style="padding: 0px 15px">
+                     <div class="col-md-12"
+                        style="max-height:180px; overflow: auto;border:1px solid #ddd; border-radius: 3px;padding: 5px 10px;">
+                        <ng-container *ngIf="dropdownList_site?.length > 0">
+                           <div class="custom-control custom-checkbox site-{{item.scope}} mt-2"
+                              *ngFor="let item of dropdownList_site; let i = index">
+                              <input type="checkbox" class="custom-control-input" id="checkbox{{i}}"
+                                 [ngModel]="item.checked ? item : ''" (ngModelChange)="log(check_item,insertform,item)"
+                                 #check_item="ngModel" name="checkbox{{i}}">
+                              <label class="custom-control-label" for="checkbox{{i}}">{{item.name}}</label>
+                           </div>
+                        </ng-container>
+                        <ng-container *ngIf="dropdownList_site?.length === 0">
+                           <h6>Chưa có dữ liệu</h6>
+                        </ng-container>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" [disabled]="is_empty ? is_empty : check_unselected(group)">
+               Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal thêm mới-->
+
+   <!-- Modal  cập nhật -->
+   <ng-template #templates>
+      <form (ngSubmit)="updateform(update_form)" #update_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Cập nhật role</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom" *ngIf="data_update.created_by != 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên role</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" name="role_name" id="nf" type="text" #txtrolename
+                     [ngModel]="data_update.role_name" required>
+                  <small *ngIf="txtrolename.touched && txtrolename.errors?.required" class="error-message">
+                     Bạn chưa nhập tên nhóm quyền
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="data_update.created_by == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên role</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control" type="text" value="{{data_update.role_name}}" readonly>
+               </div>
+            </div>
+            <div *ngIf="userlogged.lever === '0'" class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ
+                  chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="org_selectedform"
+                     [(ngModel)]="org_selectedform[0].value" [allowClear]="false" placeholder="Chọn tổ chức"
+                     [ngModelOptions]="{standalone: true}">
+                  </ng-select>
+                  <!-- <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [(ngModel)]="org_selectedform" name="organization_id" [allowClear]="true" (selected)="change_org_on_update($event.value)"
+                     placeholder="Chọn tổ chức">
+                  </ng-select> -->
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Người dùng</label>
+               <div class="col-md-9">
+                  <ng-multiselect-dropdown name="user_array" required [placeholder]="'chọn người dùng'"
+                     [data]="dropdownList_user" [(ngModel)]="selected_user" [settings]="dropdownSettings">
+                  </ng-multiselect-dropdown>
+               </div>
+            </div>
+
+            <div class="form-group row form-no-marbottom" *ngIf="show_site()">
+               <label class="col-md-3 col-3 col-form-label lh-label">Chọn Site</label>
+               <div class="col-md-9">
+                  <div class="row mt-2" style="padding: 0px 15px">
+                     <div class="col-md-12"
+                        style="max-height:180px; overflow: auto;border:1px solid #999; border-radius: 3px;padding: 5px 10px;">
+                        <!-- <ng-multiselect-dropdown name="site_array" required [placeholder]="'chọn site'" [data]="dropdownList_site" [(ngModel)]="selected_sites"
+                     [settings]="dropdownSettings">
+                  </ng-multiselect-dropdown> -->
+                        <ng-container *ngIf="dropdownList_site?.length > 0">
+                           <div class="custom-control custom-checkbox site-{{item.scope}} mt-2"
+                              *ngFor="let item of dropdownList_site; let i = index">
+                              <input type="checkbox" class="custom-control-input" id="checkbox{{i}}"
+                                 [ngModel]="item.checked ? item : ''" (ngModelChange)="log(check_item,update_form,item)"
+                                 #check_item="ngModel" name="checkbox{{i}}">
+                              <label class="custom-control-label" for="checkbox{{i}}">{{item.name}}</label>
+                           </div>
+                        </ng-container>
+                        <ng-container *ngIf="dropdownList_site?.length === 0">
+                           <h6>Chưa có dữ liệu</h6>
+                        </ng-container>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="data_update.created_by != 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mô tả</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <textarea class="form-control" type="text" #txtdes="ngModel" required
+                     [ngModel]="data_update.role_description" name="role_description" cols="30" rows="10"></textarea>
+                  <small *ngIf="txtdes.touched && txtdes.errors?.required" class="error-message">
+                     Bạn chưa nhập tên mô tả
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom" *ngIf="data_update.created_by == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Mô tả</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <textarea class="form-control" type="text" value="{{data_update.role_description}}"
+                     name="role_description" cols="30" rows="10" readonly></textarea>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" [disabled]="is_empty ? is_empty : update_form.invalid">
+               Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+</main>

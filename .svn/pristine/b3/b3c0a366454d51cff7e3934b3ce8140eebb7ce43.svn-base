@@ -1,0 +1,3 @@
+<ul class="header-administration" style="overflow-x: auto;">
+    <li routerLinkActive="active"> <a [routerLink]="['/footfall/setting/user-mail']"> {{language =='vn' ? ' Cấu hình mail báo cáo' : 'Configure report mail' }} </a> </li>
+</ul>

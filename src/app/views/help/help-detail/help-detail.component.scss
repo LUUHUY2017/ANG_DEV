@@ -1,0 +1,76 @@
+.motbaiviet
+{
+    border: 1px solid #eee;
+    padding: 15px;
+    margin: 0px;
+    .khunganhbaiviet
+    {
+        position: relative;
+        cursor: pointer;
+        .khungden
+        {
+            background: #00000042;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+            transition: 0.5s;
+            z-index: 2;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .khungchu
+        {
+            color: #fff;
+            background: transparent;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            content: "";
+            transition: 0.5s;
+            z-index: 2;
+            transform: translateX(-50%) translateY(-50%);
+            border-radius: 3px;
+            padding: 3px 5px;
+            border: 2px solid #fff;
+            text-align: center;
+            font-size: 12px;
+            user-select: none;
+            z-index: 3;
+            opacity: 0;
+            visibility: hidden;
+            transition-delay: 0.2s;
+        }
+    }
+    .khunganhbaiviet:hover .khungden, .khunganhbaiviet:hover .khungchu {
+        opacity: 1;
+        visibility: visible;
+    }
+    .khungchu:focus {
+        background: #20a8d8;
+        border-color: #20a8d8;
+    }
+}
+.tagnumber {
+    position: absolute;
+    right: -15px;
+    top: 0px;
+    content: "";
+    padding: 2px 5px;
+    font-size: 11px;
+    background: #22516d;
+}
+
+@media only screen and (max-width: 1200px) {
+    .themmoibaiviet {
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .thetag {
+        margin-top: 10px;
+    }
+}

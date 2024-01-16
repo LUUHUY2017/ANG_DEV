@@ -1,0 +1,10 @@
+<ul class="header-administration" style="overflow-x: auto;">
+    <li routerLinkActive="active"><a [routerLink]="['/fba/setting/setting']"> Cấu hình </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/question/list-question']"> Câu hỏi </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/notification']"> Thông báo tự động </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/tablets/list-tablets']"> Giám sát thiết bị </a> </li>
+    <!-- <li routerLinkActive="active"><a [routerLink]="['/administration/tablets']"> </a> </li> -->
+    <li routerLinkActive="active "><a [routerLink]="['/administration/tablets']"> Thiết bị Smiley Touch </a> </li>
+    <li routerLinkActive="active "> <a [routerLink]="['/administration/terminals']"> Thiết bị Terminals </a> </li>
+    <li routerLinkActive="active "><a [routerLink]="['/administration/users']">Cấu hình mail báo cáo </a> </li>
+</ul>

@@ -1,0 +1,20 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+// Routing
+import { GeneralRoutingModule } from './general-routing.module';
+import { SuperAdminGuard } from '../../../shared/superadmin.guard';
+
+@NgModule({
+  imports: [
+    // Tablets
+    GeneralRoutingModule,
+    CommonModule
+  ],
+  declarations: [
+  ],
+  providers: [
+    SuperAdminGuard
+  ]
+})
+export class GeneralModule { }

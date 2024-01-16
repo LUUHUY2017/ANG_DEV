@@ -1,0 +1,2506 @@
+<script>
+  $("#customer-daily").tableHeadFixer({
+    head: true,
+    left: 4,
+  });
+</script>
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row m-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 visit-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div> <!-- card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child ">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <!-- <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                      bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select> -->
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="submitChange()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card-body card-body-bottom">
+              <!-- <ng-container *ngIf="!show_error">
+                <div class="row">
+                  <div class="col-sm-5">
+                  </div>
+                  <div class="col-sm-7 d-none d-md-block">
+                    <div class="btn-group btn-group-toggle float-right ml btnngaygio" data-toggle="buttons">
+                      <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                        (click)="get_data()">{{language.gio}}</label>
+                      <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Day" (click)="get_data()">{{language.ngay}}</label>
+                      <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Week" (click)="get_data()">{{language.tuan}}</label>
+                      <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Month" (click)="get_data()">{{language.thang}}</label>
+                      <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
+                        [(ngModel)]="viewDataBy" btnRadio="Year" (click)="get_data()">{{language.nam}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row foot-title-show">
+                  <div class="title-show1 ">
+                    {{site_name}} &nbsp; {{title_index}} &nbsp; {{ starttime }}&minus; {{ endtime }} &nbsp;
+                    {{ title_time_period }}: {{ time_period }}, {{language.xem_theo}} {{ view }}
+                  </div>
+                </div>
+              </ng-container> -->
+              <!-- Biểu đồ -->
+              <!-- <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div> -->
+              <!-- style="border-top:1px dotted #a7a4a4" -->
+              <ng-container *ngIf="!show_error">
+                <div class="row">
+                  <h5 style="text-align: center;width: 100%;font-weight: bold;">Daily Traffic Report on Day /Month
+                    /year.. - Báo cáo khách hàng ngày…../tháng/năm</h5>
+                </div>
+                <div class="row">
+                  <div class="table-responsive ">
+                    <table id="customer-daily" style=" width: 1500px; min-height:750px; "
+                      class="table  table-bordered table-striped table-visit text-nowrap">
+                      <thead>
+                        <!-- Time -->
+                        <tr role="row">
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit;width:80px">Time</th>
+                          <th rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">FLOOR</th>
+                          <th style="text-align: center;width:80px">6F </th>
+                          <th colspan="7" style="text-align: center;">GF</th>
+                          <th colspan="6" style="text-align: center "> B1 </th>
+                          <th colspan="7" style="text-align: center; "> B2</th>
+                          <th colspan="5" style="text-align: center; "> B3</th>
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit; ">Subtotal
+                          </th>
+                        </tr>
+                        <tr role="row">
+                          <!-- GF -->
+                          <th style="width:120px">Moving 6F To PMHT</th>
+                          <th style="width:120px">Gate 1 </th>
+                          <th style="width:120px">Gate 2</th>
+                          <th style="width:120px"> Gate 3 </th>
+                          <th style="width:120px"> Gate 4</th>
+                          <th style="width:120px">Gate 5 </th>
+                          <th style="width:120px">Gate 6</th>
+                          <th style="width:120px">Moving GF To PMHT</th>
+                          <!-- B1 -->
+                          <th style="width:120px">Taxi Gate 1</th>
+                          <th style="width:120px">Taxi Gate 2 </th>
+                          <th style="width:120px">Escalator B2,3 to B1</th>
+                          <th style="width:120px">Gate 6 to B1</th>
+                          <th style="width:120px"> Passenger Lift 5 </th>
+                          <th style="width:120px"> Passenger Lift 6-7</th>
+                          <!-- B2 -->
+                          <th style="width:120px">Passenger Lift 1</th>
+                          <th style="width:120px">Passenger Lift 2 </th>
+                          <th style="width:120px">EPassenger Lift 3</th>
+                          <th style="width:120px">Passenger Lift 4</th>
+                          <th style="width:120px"> Passenger Lift 5 </th>
+                          <th style="width:120px"> Passenger Lift 6-7</th>
+                          <th style="width:120px"> Travellator to B2</th>
+                          <!-- B3 -->
+                          <th style="width:120px">Passenger Lift 1</th>
+                          <th style="width:120px">Passenger Lift 2 </th>
+                          <th style="width:120px">EPassenger Lift 3</th>
+                          <th style="width:120px">Passenger Lift 4</th>
+                          <th style="width:120px"> Passenger Lift 5 </th>
+                        </tr>
+                        <tr role="row">
+                          <th>Number of electric counter</th>
+                          <!-- GF -->
+                          <th style="text-align: center;vertical-align: inherit">6F</th>
+                          <th style="text-align: center;vertical-align: inherit">GF01 </th>
+                          <th style="text-align: center;vertical-align: inherit">GF02</th>
+                          <th style="text-align: center;vertical-align: inherit"> GF03 </th>
+                          <th style="text-align: center;vertical-align: inherit"> GF04</th>
+                          <th style="text-align: center;vertical-align: inherit">GF05 </th>
+                          <th style="text-align: center;vertical-align: inherit">GF06</th>
+                          <th style="text-align: center;vertical-align: inherit">GF07</th>
+                          <!-- B1 -->
+                          <th style="text-align: center;vertical-align: inherit">B1 - T1</th>
+                          <th style="text-align: center;vertical-align: inherit">B1 - T2
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B1 - E</th>
+                          <th style="text-align: center;vertical-align: inherit">B1 - S</th>
+                          <th style="text-align: center;vertical-align: inherit">B1 - PL5
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B1 - PL6,7
+                          </th>
+                          <!-- B2 -->
+                          <th style="text-align: center;vertical-align: inherit">B2 - PL1
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B2 - PL2
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B2 - PL3
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B2 - PL4
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit"> PB2 - PL5
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit"> B2 - PL6,7
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit"> B2 - M</th>
+                          <!-- B3 -->
+                          <th style="text-align: center;vertical-align: inherit">B3 - PL1
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B3 - PL2
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B3 - PL3
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B3 - PL4
+                          </th>
+                          <th style="text-align: center;vertical-align: inherit">B3 - PL5
+                          </th>
+                        </tr>
+                        <!--End Time -->
+                      </thead>
+                      <tbody>
+                        <!-- Total -->
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;font-weight: bold">ToTal
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <!-- End Total -->
+
+                        <!-- Average of In and Out -->
+                        <tr style="font-weight: bold" role="row">
+                          <td colspan="2" style="text-align: left;vertical-align: inherit; ">Average of In and Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <!-- End Average of In and Out -->
+
+                        <!-- Rank of In and Out -->
+                        <tr role="row">
+                          <td colspan="2" style="text-align: left;vertical-align: inherit;font-weight: bold">Rank of In
+                            and Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <!-- End Rank of In and Out -->
+
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">12:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">01:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">02:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">03:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">04:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">05:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">06:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">07:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">08:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">09:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">10:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">11:00 AM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">12:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">01:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">02:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">03:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">04:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">05:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">06:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">07:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">08:00 PM
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">In</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+                        <tr role="row">
+                          <td style="text-align: center;vertical-align: inherit">Out</td>
+                          <td style="text-align: center;vertical-align: inherit">1231 </td>
+                          <td style="text-align: center;vertical-align: inherit">1232</td>
+                          <td style="text-align: center;vertical-align: inherit"> 1233 </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1234</td>
+                          <td style="text-align: center;vertical-align: inherit">1235 </td>
+                          <td style="text-align: center;vertical-align: inherit">1236</td>
+                          <td style="text-align: center;vertical-align: inherit">1237</td>
+                          <!-- B1 -->
+                          <td style="text-align: center;vertical-align: inherit">1238</td>
+                          <td style="text-align: center;vertical-align: inherit">1239
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1201</td>
+                          <td style="text-align: center;vertical-align: inherit">1202</td>
+                          <td style="text-align: center;vertical-align: inherit">1203
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1204
+                          </td>
+                          <!-- B2 -->
+                          <td style="text-align: center;vertical-align: inherit">1205
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1206
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1207
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1208
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1209
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1210
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit"> 1211</td>
+                          <!-- B3 -->
+                          <td style="text-align: center;vertical-align: inherit">1212
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1213
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1214 </td>
+                          <td style="text-align: center;vertical-align: inherit">1215
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1216
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1217
+                          </td>
+                          <td style="text-align: center;vertical-align: inherit">1218
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="show_error">
+                <div class="show_info_error">
+                  <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
+                  {{language.vui_long}}<a (click)="get_data();"
+                    style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
+      {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div> <!-- card-body-parent -->
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông báo!</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Có lỗi xảy ra! Vui lòng nhấn<a style="color: blue; cursor: pointer;" (click)="reset_session()"> vào đây </a> để
+      tải lại</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">Tải lại</button>
+  </div>
+</ng-template>
+
+<notifier-container></notifier-container>
+<app-storereportingschedule (childrenEvent)="sendParamToChildren($event)" [pageId]="page_id"
+  [defaultModule]="defaultModule"></app-storereportingschedule>

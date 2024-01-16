@@ -1,0 +1,219 @@
+/**
+- Update: 02/11/2018;
+*/
+/* 
+body {
+	font-family: Roboto, sans-serif !important;
+} */
+.btnchiase, .btnapdung, .btnxuat {
+	border-radius: unset;
+}
+.btnapdung:hover, .btnchiase:hover, .btnxuat:hover {
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12) !important;
+}
+#headmapmenu_2 .btnchiase {
+	margin-left: 5px;
+	width: 66px;
+	height: 30px;
+	border: 0 none;
+	padding: 0 5px;
+	font-size: 13px;
+	text-align: center;
+}
+
+#headmapmenu_2 .btnxuat {
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 60px;
+	height: 30px;
+	padding: 0 5px;
+	border: 0 none;
+	font-size: 13px;
+	text-align: center;
+}
+
+#headmapmenu_2 .btnapdung {
+	margin-right: 5px;
+	width: 66px;
+	height: 30px;
+	border: 0 none;
+	padding: 0 5px;
+	font-size: 13px;
+	text-align: center
+}
+
+/* độ cao của  headmapmenu_2 li */
+
+#headmapmenu_2 ng-select>div {
+	height: 30px;
+	/* min-width: 90px; */
+}
+
+#headmapmenu_2 .selecttimeview {
+	/* width: 80px;  */
+	margin-left: 5px;
+	margin-right: 5px;
+	font-size: 13px;
+}
+
+#headmapmenu_2 {
+	margin: 0;
+	width: 100%;
+	padding: 0;
+}
+
+#headmapmenu_2 li {
+	list-style: none;
+}
+
+ul#headmapmenu_2>li:nth-child(1) {
+	float: left;
+}
+
+.ml {
+	margin-right: 0.5rem !important;
+}
+
+ng-select>div>div.single>div.value, ng-select>div>div.single>div.placeholder {
+	-webkit-box-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	line-height: 30px;
+	overflow: hidden;
+	padding: 0 5px !important;
+	white-space: nowrap;
+}
+
+@media only screen and (min-width: 1200px) {
+	#headmapmenu_2>li:nth-child(2) {
+		float: left;
+	}
+	#headmapmenu_2>li:nth-child(3) {
+		float: right;
+	}
+	#headmapmenu_2 .btnchiase {
+		font-size: 13px;
+	}
+	#headmapmenu_2 .btnxuat {
+		font-size: 13px;
+	}
+	#headmapmenu_2 .btnapdung {
+		font-size: 13px;
+	}
+}
+
+@media only screen and (max-width: 1200px) {
+	#headmapmenu_2>li:nth-child(2) {
+		float: left;
+	}
+	#headmapmenu_2>li:nth-child(3) {
+		float: right;
+	}
+	#headmapmenu_2 .btnchiase {
+		font-size: 13px;
+	}
+	#headmapmenu_2 .btnxuat {
+		font-size: 13px;
+	}
+	#headmapmenu_2 .btnapdung {
+		font-size: 13px;
+	}
+}
+
+@media only screen and (max-width: 596px) {
+	#headmapmenu_2>li:nth-child(3) {
+		float: right;
+	}
+	#headmapmenu_2 .btnchiase {
+		font-size: 11px;
+	}
+	#headmapmenu_2 .btnxuat {
+		font-size: 11px;
+	}
+	#headmapmenu_2 .btnapdung {
+		font-size: 11px;
+	}
+}
+
+@media only screen and (max-width: 565px) {
+	#headmapmenu_2>li:nth-child(3) {
+		float: right;
+		margin-top: 5px;
+	}
+	/* cuộn lịch */
+	.app .daterangepicker {
+		height: 291px;
+		overflow-y: scroll;
+	}
+	/* fix độ rộng ul visit */
+	#headmapmenu_2>li:nth-child(1) select-dropdown>div.below {
+		width: 85px !important;
+	}
+}
+
+@media only screen and (max-width: 452px) {
+	#headmapmenu_2 .below {
+		/* width: 16vw; */
+		font-size: 3vw;
+	}
+	#headmapmenu_2 .selecttimeview {
+		width: auto;
+	}
+	#headmapmenu_2 .below .toggle.ng-star-inserted {
+		font-size: 2vw;
+		/* width: 5vw; */
+	}
+	#headmapmenu_2 .btnchiase {
+		font-size: 10px;
+		width: 55px;
+	}
+	#headmapmenu_2 .btnxuat {
+		font-size: 10px;
+		width: 55px;
+	}
+	#headmapmenu_2 .btnapdung {
+		font-size: 10px;
+		width: 55px;
+	}
+}
+
+@media only screen and (max-width: 414px) {
+	#headmapmenu_2>li:nth-child(3) {
+		float: right;
+		margin-top: 5px;
+	}
+}
+
+@media only screen and (max-width: 390px) {
+	/* add them class vao thoi gian of ap dung */
+	#headmapmenu_2 .selecttimeview {
+		margin-left: 5px;
+		margin-right: 4px;
+	}
+	#headmapmenu_2>li:nth-child(2)>div {
+		margin-right: 0px!important;
+	}
+	#headmapmenu_2>li:nth-child(3) {
+		margin-top: 5px;
+	}
+	#headmapmenu_2>li:nth-child(3) .btn-group:nth-child(3) button {
+		margin-left: 5px;
+	}
+	/* thanh cuon do rong thoi gian */
+	#headmapmenu_2>li:nth-child(2) .options::-webkit-scrollbar {
+		width: 4px;
+		background-color: darkgray;
+	}
+	#headmapmenu_2>li:nth-child(2) .options::-webkit-scrollbar-thumb {
+		height: 10px;
+	}
+}
+
+/* lịch bị loạn do có class left ml180px */
+
+@media only screen and (max-width: 991px) {
+	.daterangepicker .drp-calendar.left {
+		/*margin-left: 180px!important; */
+		margin-left: 0 !important;
+	}
+}

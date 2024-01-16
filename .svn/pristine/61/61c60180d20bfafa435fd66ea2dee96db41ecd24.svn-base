@@ -1,0 +1,383 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-footfallsettingmenu></app-footfallsettingmenu>
+      </div>
+      <block-ui></block-ui>
+   </div>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <!-- <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px;"> <i class="fa fa-list-alt" aria-hidden="true"></i> Danh sách tài
+                  khoản</span>
+            </div> -->
+            <div class="card-body table-users">
+               <div class="animated fadeIn">
+                  <div class="email-app mb-4">
+                     <main class="inbox">
+                        <nav>
+                           <ul class="nav">
+                              <li class="nav-item">
+                                 <a class="nav-link add-cus_poiter {{ng_container == 1 ? 'active' : ''}}" (click)="click_show_container(1)"><i class="fa fa-user-circle-o"></i>Người nhận</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link add-cus_poiter {{ng_container == 6 ? 'active' : ''}}" (click)="click_show_container(6)"><i class="fa fa-cog"></i>Cấu hình</a>
+                                 <!-- <span class="badge badge-danger">4</span> -->
+                              </li>
+                           </ul>
+                        </nav>
+                        <!-- mail_configuration -->
+                        <ng-container *ngIf="ng_container == 1">
+                           <div class="row fba-user_filter_table">
+                              <ul>
+                                 <li id="showrow">
+                                    <span class="font-span-table">Số dòng: &nbsp;</span>
+                                    <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                                       <option [ngValue]="5"> &nbsp; 5</option>
+                                       <option [ngValue]="15">15</option>
+                                       <option [ngValue]="25">25</option>
+                                       <option [ngValue]="50">50</option>
+                                    </select>
+                                    &nbsp;
+                                    <span class="font-span-table">Lịch:</span>
+                                    <select style="margin-left:10px;" class="input-sm select_cus_table" (change)="change_type_caculator($event.target.value)">
+                                       <option value="0">Tất cả</option>
+                                       <option value="1">Ngày</option>
+                                       <option value="2">Tuần</option>
+                                       <option value="3">Tháng</option>
+                                    </select>
+                                    &nbsp;
+                                    <span class="font-span-table">Tổ chức:</span>
+                                    <select style="margin-left:10px;" class="input-sm select_cus_table" (change)="changeorganization_table($event.target.value)">
+                                       <option *ngFor="let item of organization_arr" value="{{item.value}}">{{item.label}}</option>
+                                    </select>
+                                 </li>
+                                 <li><span class="font-span-table">Tìm kiếm: &nbsp;</span><input type="text" class="input_filter_table" (keyup)="search_table($event.target.value)"></li>
+                              </ul>
+                           </div>
+                           <div class="table-responsive">
+                              <table [mfData]="user_organization" #mf="mfDataTable" [mfRowsOnPage]="10" class="table table-striped users_table " style="width: 100%;min-width: 600px">
+                                 <thead>
+                                    <tr>
+                                       <th style="width: 30px;text-align: center">STT</th>
+                                       <th style="width: 120px">Họ và tên</th>
+                                       <th style="width: 120px">Email</th>
+                                       <th style="width: 130px">Công ty</th>
+                                       <th style="width: 100px;text-align: center;">Xử lý</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr *ngFor="let item of mf.data; let i = index">
+                                       <td style="width: 50px;text-align: center">{{i +1}}</td>
+                                       <td>{{item.name}}</td>
+                                       <td>{{item.email}}</td>
+                                       <td>{{item.organization_name ? item.organization_name : '-'}}</td>
+                                       <td style="width: 100px;text-align: center" class="">
+                                          <a (click)="view_log_mail(item,log_mail_user)" class="icon-green" title="Tin nhắn">
+                                             <i class="fa fa-envelope-open-o" aria-hidden="true"></i>
+                                          </a>&nbsp;
+                                          <a (click)="dulieuthaydoi(item,templates)" class="icon-blue" title="Sửa cấu hình khoản">
+                                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                          </a>&nbsp;
+                                       </td>
+                                    </tr>
+                                    <tr></tr>
+                                    <tr>
+                                       <td colspan="7" *ngIf="user_organization?.length === 0" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                                          <span>Không có dữ liệu</span>
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                                 <tfoot class="fba-tablet-list-tfoot">
+                                    <tr>
+                                       <td colspan="7">
+                                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                                       </td>
+                                    </tr>
+                                 </tfoot>
+                              </table>
+                           </div>
+                        </ng-container>
+                        <!-- List-reports -->
+                        <ng-container *ngIf="ng_container == 6 ">
+                           <form (ngSubmit)="save_configuration_mail(mail_confi)" #mail_confi="ngForm">
+                              <div style="display: none" class="form-group">
+                                 <label for="nf-email">Module</label>
+                                 <input class="form-control" type="text" ngModel="1" name="module">
+                                 <input class="form-control" type="text" [ngModel]="org_selectedform" name="organization_id">
+                              </div>
+                              <div class="form-group">
+                                 <label for="nf-email">Máy chủ thư gửi đi (SMTP)</label>
+                                 <input class="form-control" type="text" [ngModel]="mail_configuration ? mail_configuration.server : 'smtp.gmail.com'" required #txtserver_name="ngModel" name="server" placeholder="ex:smtp.gmail.com">
+                                 <small *ngIf="txtserver_name.touched && txtserver_name.errors?.required" class="error-message">Bạn
+                                    chưa nhập máy chủ</small>
+                              </div>
+                              <div class="form-group">
+                                 <label style="display:inline-block" for="nf-email">Cổng</label>&nbsp;
+                                 <input class="form-control" type="text" [ngModel]="mail_configuration ? mail_configuration.port : '587'" required #txtport="ngModel" name="port" placeholder="ex: 587">
+                                 <small *ngIf="txtport.touched && txtport.errors?.required" class="error-message">Bạn
+                                    chưa nhập cổng</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>Tên người gửi</label>
+                                 <input class="form-control" type="text" [ngModel]="mail_configuration ? mail_configuration.user_name : ''" required #txtusername="ngModel" name="user_name" placeholder="ex: Thomas John">
+                                 <small *ngIf="txtusername.touched && txtusername.errors?.required" class="error-message">Bạn
+                                    chưa tên người gửi</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>Email</label>
+                                 <input class="form-control" type="email" [ngModel]="mail_configuration ? mail_configuration.email : ''" #txtemail="ngModel" required name="email">
+                                 <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">Bạn
+                                    chưa nhập email</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>Mật khẩu</label>
+                                 <input class="form-control" type="password" [ngModel]="mail_configuration ? mail_configuration.pass_word : ''" #txtpassword="ngModel" required name="pass_word">
+                                 <small *ngIf="txtpassword.touched && txtpassword.errors?.required" class="error-message">Bạn
+                                    chưa nhập mật khẩu</small>
+                              </div>
+                              <button [hidden]="button" class="btn btn-custom-huy" [disabled]="mail_confi.invalid"> Lưu cấu hình</button> &nbsp; &nbsp;
+                              <a [hidden]="button" class="btn btn-custom-huy btn-danger" (click)="open_modal_test_email(test_email)"> Kiểm tra gửi mail  <i [tooltip]="content_testmail" class="fa fa-question-circle icon-tooltip"></i> </a>
+                           </form>
+                        </ng-container>
+
+                     </main>
+
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <ng-template #content_baocao>Báo cáo Ngày được gửi lúc 8:00 AM ngày hôm sau!
+      <br>Báo cáo Tuần được gửi lúc 24:00 Chủ Nhật hàng tuần!
+      <br>Báo cáo Tháng được gửi lúc 24:00 ngày cuối của tháng!
+   </ng-template>
+   <ng-template #content_testmail>Cấu hình mail sẽ mặc định, nếu bạn chưa cập nhật mới! </ng-template>
+   <!-- Modal test email -->
+   <ng-template #test_email>
+      <form (ngSubmit)="send_email_test(info_user)" #info_user="ngForm">
+         <div style=" border-bottom:1px solid #ede4e491  !important" class="modal-header">
+            <h4 class="modal-title pull-left">Kiểm tra gửi mail</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom">
+               <div style="display: none" class="form-group">
+                  <label for="nf-email">Module</label>
+                  <input class="form-control" type="text" ngModel="1" name="module">
+                  <input class="form-control" type="text" [ngModel]="org_selectedform" name="organization_id">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Email nhận</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <input style="background-color: #f7f8fa !important;" class="form-control" id="nf" type="email" #txtname="ngModel" required [(ngModel)]="email" name="email">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Bạn chưa nhập email
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Tiêu đề</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <input style="background-color: #f7f8fa !important;" class="form-control" id="nf-email" #txtemail="ngModel" required type="text" [(ngModel)]="tieude" name="tieude">
+                  <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">
+                     Bạn chưa nhập tiêu đề
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Nội dung</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <textarea style="background-color: #f7f8fa !important;" class="form-control" #txtnoidung="ngModel" required (ngModel)="noidung" name="noidung"></textarea>
+                  <small *ngIf="txtnoidung.touched && txtnoidung.errors?.required" class="error-message">
+                     Bạn chưa nhập nội dung
+                  </small>
+               </div>
+            </div>
+         </div>
+         <div style=" border-top:1px solid #ede4e491  !important" class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active"> Đóng</a>
+            <button class="btn  btn-primary" [disabled]="info_user.invalid" (click)="modalRef.hide()">Gửi email</button>
+         </div>
+      </form>
+   </ng-template>
+
+   <!-- Modal hỏi xóa -->
+   <ng-template #dialog>
+      <div class="modal-body box-shadow">
+         <div class="row">
+            <div class="col-md-12 mb-3">
+               <div id="border-remove">
+                  <i class="fa fa-remove fa-3x"></i>
+               </div>
+            </div>
+            <div class="col-md-12 text-center">
+               <h3>Bạn có chắc chắn muốn xóa?</h3>
+               <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+            </div>
+            <div class="col-md-12 text-center">
+               <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_users()" style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+               <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                  Đóng</button>
+            </div>
+         </div>
+      </div>
+   </ng-template>
+
+   <!-- Modal  cập nhật -->
+   <ng-template #templates>
+      <form (ngSubmit)="update_mail_delivery_schedule(user_update)" #user_update="ngForm">
+         <div style=" border-bottom:1px solid #ede4e491  !important" class="modal-header">
+            <h4 class="modal-title pull-left">Cấu hình gửi mail</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div style="display:none" class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">ID_user</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <input class="form-control color-font" id="nf" type="text" [(ngModel)]="data2.id" name="id">
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Họ và tên</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <input style="background-color: #f7f8fa !important;" readonly class="form-control" id="nf" type="text" #txtname="ngModel" required [(ngModel)]="data2.name" name="name">
+                  <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+                     Bạn chưa nhập họ tên
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Email</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <input style="background-color: #f7f8fa !important;" class="form-control" id="nf-email" #txtemail="ngModel" required type="email" readonly email [(ngModel)]="data2.email" name="email">
+               </div>
+            </div>
+            <div style="display:none" class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-4 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr" [(ngModel)]="data2.organization_id" name="organization_id" [allowClear]="true">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label [tooltip]="content_baocao" style="white-space: pre;padding-right: 1px;" class="col-md-3 col-4 col-form-label">Nhận báo cáo <i class="fa fa-question-circle icon-tooltip"></i></label>
+               <div class="col-md-9 col-8 col-form-label">
+                  <div style="  margin-right: 15px !important;" class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-t-rp" type="radio" value="1" [(ngModel)]="data2.poc_report" name="poc_report">
+                     <label class="form-check-label" for="inline-t-rp">Có</label>
+                  </div>
+                  <div class="form-check form-check-inline mr-1">
+                     <input class="form-check-input" id="inline-f-rp" type="radio" value="0" [(ngModel)]="data2.poc_report" name="poc_report">
+                     <label class="form-check-label" for="inline-f-rp">Không</label>
+                  </div>
+               </div>
+            </div>
+            <div [hidden]="data2.poc_report === '0'">
+               <div class="form-group row form-no-marbottom">
+                  <label style="white-space: pre;padding-right: 1px;" class="col-md-3 col-4 col-form-label"></label>
+                  <div class="col-md-9 col-8 col-form-label">
+                     <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" [(ngModel)]="poc_report_dayly" id="inline-k-sr" type="checkbox" value="true" name="poc_report_dayly">
+                        <label class="form-check-label" for="inline-k-sr">Ngày &nbsp; </label>
+                     </div>
+                     <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" [(ngModel)]="poc_report_weekly" id="inline-w-sr" type="checkbox" value="true" name="poc_report_weekly">
+                        <label class="form-check-label" for="inline-w-sr">Tuần &nbsp; </label>
+                     </div>
+                     <div class="form-check form-check-inline mr-1">
+                        <input class="form-check-input" [(ngModel)]="poc_report_monthly" id="inline-m-sr" type="checkbox" value="true" name="poc_report_monthly">
+                        <label class="form-check-label" for="inline-m-sr">Tháng &nbsp; </label>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div style=" border-top:1px solid #ede4e491  !important" class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" (click)="modalRef.hide()"> Cập nhật</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+
+   <!-- Modal  logs -->
+   <ng-template #log_mail_user>
+      <form #user_update="ngForm">
+         <div style=" border-bottom:1px solid #ede4e491  !important" class="modal-header">
+            <h5 class="modal-title pull-left">Email: <span style="color:darkgrey;font-size:13px;">{{info_user.email}}</span></h5>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body modal_table_email">
+            <table [mfData]="email_logs" #mf="mfDataTable" [mfRowsOnPage]="15" class="table table-striped  fba-tablets_table">
+               <thead>
+                  <tr>
+                     <th style="width:23%;">
+                        <mfDefaultSorter by="created_at">Thời gian</mfDefaultSorter>
+                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                     </th>
+                     <th style="width:27%">Địa điểm</th>
+                     <th style="width: 20%">
+                        <mfDefaultSorter by="calendar">Lịch</mfDefaultSorter>
+                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                     </th>
+                     <th style="width:20%">Trạng thái</th>
+                     <th style="width: 10%">Xử lý</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <tr *ngFor="let item of mf.data; let i = index">
+                     <td style="text-align:center">{{item.created_at | date: 'dd/MM/yy hh:mm a'}}</td>
+                     <td style="text-align:center">{{item.organization_name}}</td>
+                     <td style="width: 40px;text-align: center">
+                        <span *ngIf="item.calendar == 1">Ngày</span>
+                        <span *ngIf="item.calendar == 2">Tuần</span>
+                        <span *ngIf="item.calendar == 3">Tháng</span>
+                     </td>
+                     <td *ngIf="item.status == 1" style="text-align:center">
+                        <span style="color:rgb(26, 181, 33)">OK</span>
+                     </td>
+                     <td *ngIf="item.status == 0" style="text-align:center">
+                        <span style="color:rgb(255, 8, 7)">Fail</span>
+                     </td>
+                     <td style="text-align:center">
+                        <a (click)="delete_log(item.id)" class="icon-red">
+                           <i class="fa fa-times" aria-hidden="true"></i>
+                        </a>&nbsp;
+                     </td>
+                  </tr>
+                  <tr></tr>
+                  <tr>
+                     <td colspan="6" *ngIf="email_logs?.length === 0" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                        <span>Không có dữ liệu</span>
+                     </td>
+                  </tr>
+               </tbody>
+               <tfoot class="modal_table_email-tfoot">
+                  <tr>
+                     <td colspan="6">
+                        <mfBootstrapPaginator></mfBootstrapPaginator>
+                        <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                     </td>
+                  </tr>
+               </tfoot>
+            </table>
+         </div>
+         <div style=" border-top:1px solid #ede4e491  !important" class="modal-footer">
+            <a (click)="modalRef.hide()" class="btn btn-huy active">
+               Đóng</a>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal log Email User-->
+</main>

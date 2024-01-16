@@ -1,0 +1,115 @@
+<div class="row">
+    <div class="col-md-12">
+        <app-footfallsettingmenu></app-footfallsettingmenu>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div style=" border:unset;border-radius: 3px;" class="card">
+            <div class="card-header card-font">
+                <i class="fa fa-list-alt" aria-hidden="true"></i> <span>Nhập dữ liệu Data In Out</span>
+            </div>
+            <div class="card-body card-table table-companies">
+                <div class="table-responsive">
+                    <table class="table  import-table " style="width: 100%;overflow: auto;min-width: 850px">
+                        <thead>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="userInfo.lever === '0'">
+                                <td>
+                                    <span>Chọn tổ chức: </span>
+                                </td>
+                                <td>
+                                    <select class="input-sm select_cus_table"
+                                        (change)="changeorganization_table($event.target.value)">
+                                        <option *ngFor="let item of organization_arr" value="{{item.value}}">
+                                            {{item.label}}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span>Chọn địa điểm: </span>
+                                </td>
+                                <td>
+                                    <div (click)="siteSelectionDisplay=!siteSelectionDisplay"
+                                        class=" text-select vung-kich select_cus_table location-_select">
+                                        <span>&nbsp; {{location}} <i
+                                                style="font-size:9px;float: right;padding: 4px 0 4px 0"> ▼
+                                            </i></span>
+                                    </div>
+                                    <!-- Chọn địa điểm/ khu vực -->
+                                    <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+                                        (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                                        <div id="khung-location-scroll">
+                                            <div style="position: relative;width: 100%;" class="inputgroup">
+                                                <input (keyup)="search_menu($event.target.value)"
+                                                    style="border:none !important;padding-left: 7px" type="text"
+                                                    class="form-control" placeholder="Tìm kiếm địa điểm/ khu vực">
+                                                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                                                    class="fa fa-search" aria-hidden="true"></i>
+                                            </div>
+                                            <ul style="padding-left: 0;">
+                                                <li *ngFor="let item of menu_tree"
+                                                    (click)="changeitem(item.id,item.site_name)"
+                                                    class="menu-{{item.alevel}} {{item.site_name === location ? 'active' : ''}} ">
+                                                    {{item.site_name}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:15%">File</td>
+                                <td style="width:85%;">
+                                    <form (ngSubmit)="import_data(pos_sale)" #pos_sale="ngForm">
+                                        <input #myInput style="margin-top:2px;" type="file" name="file"
+                                            (change)="upload_file($event.target.files)"> <br>
+                                        <br>
+                                        <button [hidden]="button" style="border-radius: unset;  height: 30px;  line-height: 15px;"
+                                            class="btn  btn-danger " [disabled]="pos_sale.invalid"> Nhập</button>
+                                        <button *ngIf="loading === true" style="border-radius: unset;  height: 30px;  line-height: 15px;"
+                                            class="btn  btn-danger buttonload" [disabled]="pos_sale.invalid"> <i class="fa fa-refresh fa-spin"></i> Đang xử lý</button>
+                                    </form>
+                                    <div *ngIf="counter > 0">
+                                        <span style="font-size:12px;font-style: italic">Đã cập nhật {{counter}} bản
+                                            ghi</span>
+                                    </div>
+                                    <div *ngIf="counter_fail > 0">
+                                        <span style="font-size:12px;font-style: italic">Có {{counter_fail}} bản ghi bị
+                                            lỗi</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="font-size:13px;">
+                                <td>Định dạng file</td>
+                                <td>
+                                    <div> &minus; File import là file đuôi (.xls, .xlsx, .csv)</div>
+                                    <div>
+                                        &minus; Dữ liệu trong file có dạng: location_code( <span class="icon-stars">*</span>),
+                                        start_time (<span class="icon-stars">*</span>), num_to_enter(
+                                        <span class="icon-stars">*</span>), num_to_exit( <span
+                                            class="icon-stars">*</span>), avg_time( <span class="icon-stars">*</span>),
+                                        passer_by( <span class="icon-stars">*</span>), staff_traffic( <span
+                                            class="icon-stars">*</span>)
+                                    </div>
+                                    <div>  &minus;  File mẫu: <a href="{{url + 'file_import_data_in_out.xlsx'}}">File mẫu</a>
+                                    </div>
+                                    <div> <span style="font-weight:bold">  	&minus; Chú ý:</span> <br>
+                                        <div style="text-indent:3rem">  +  Những thông tin đánh dấu (<span
+                                                class="icon-stars">*</span>) là thông tin nhập liệu bắt buộc </div>
+                                        <div style="text-indent:3rem">  + start_time có dạng: yyyy-mm-dd hh:mm (2019-05-05 9:00:43)</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<notifier-container></notifier-container>
+<block-ui></block-ui>

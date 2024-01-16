@@ -1,0 +1,5 @@
+<ul class="header-administration" style="overflow-x: auto;">
+    <li routerLinkActive="active"><a [routerLink]="['/administration/tablets']"> Smiley Touch </a> </li>
+    <li routerLinkActive="active"> <a [routerLink]="['/administration/users']"> User emails </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/administration/terminals']"> Terminals </a> </li>
+</ul>

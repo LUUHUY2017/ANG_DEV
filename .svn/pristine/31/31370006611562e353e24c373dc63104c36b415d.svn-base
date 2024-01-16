@@ -1,0 +1,48 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+
+// Routing
+import { AgeMetricsAnalyticsRoutingModule } from './age-metrics-analytics-routing.module';
+import { AgeMetricsAnalyticsComponent } from './age-metrics-analytics.component';
+
+// Ng2-select
+// import { SelectModule } from 'ng-select';
+import { NgSelectModule } from '@ng-select/ng-select';  // group
+import { DataTableModule } from 'angular2-datatable';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI, BlockUIModule } from 'ng-block-ui';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+// thêm để hiển thị ra dialog
+import { Dialog, DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+// import clickout side
+import { ClickOutsideModule } from 'ng-click-outside';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
+
+@NgModule({
+    imports: [
+        AgeMetricsAnalyticsRoutingModule,
+        FormsModule,
+        ButtonsModule,
+        NgSelectModule,
+        ClickOutsideModule,
+        BsDropdownModule,
+        DropdownModule,
+        DialogModule,
+        DataTableModule,
+        CommonModule,
+        BlockUIModule.forRoot(),
+        ModalModule
+    ],
+    declarations: [
+        AgeMetricsAnalyticsComponent,
+    ]
+})
+
+export class AgeMetricsAnalyticsModule {
+    constructor() { }
+}

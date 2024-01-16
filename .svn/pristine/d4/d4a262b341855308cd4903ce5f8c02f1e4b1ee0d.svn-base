@@ -1,0 +1,152 @@
+import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import { Router } from '@angular/router';
+import { NotificationService } from '../notification.service';
+import { ActivatedRoute } from '@angular/router';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { IOption } from 'ng-select';
+
+@Component({
+  selector: 'app-editnotification',
+  templateUrl: './editnotification.component.html',
+  styleUrls: ['./editnotification.component.css']
+})
+export class EditNotificationComponent implements OnInit {
+  status = 1;
+  order = 1;
+  @BlockUI() blockUI: NgBlockUI;
+  data: any;
+  url_img = environment.apiUrl + 'images/fba/';
+  showbutton_order = false;
+  snap_email: any;
+  org_selected: string;
+  page_id = '\'' + environment.Pages.fba.fba_notifications + '\'';
+  userlogged = Number(JSON.parse(localStorage.getItem(environment.UserLoged)).lever);
+  public organization_array: Array<IOption>;
+  // tslint:disable-next-line:max-line-length
+  constructor(private appservice: AppService, private router: Router, private notificationservice: NotificationService, private activerouter: ActivatedRoute) { }
+  ngOnInit() {
+    if (this.userlogged === 0) {
+      this.get_organization();
+    }
+    this.getdata();
+  }
+  get_organization() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(res => {
+      this.organization_array = res.organization_arr;
+      if (!environment.production) {
+        console.log(this.organization_array);
+      }
+      this.org_selected = res.organization_arr[0].value;
+    },
+      (error) => {
+        this.blockUI.stop();
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+
+
+  getdata() {
+    this.blockUI.start('Đang tải dữ liệu ...');
+    const url = environment.FBA.API.fba_notifications + '_update/' + this.activerouter.snapshot.params.id;
+    this.appservice.get(url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.data = res.data;
+      this.data.parameters = JSON.parse(this.data.parameters);
+      // this.data.parameters.email = this.data.parameters.email.split(',');
+      // this.snap_email = this.data.parameters.email;
+      // this.order = this.data.parameters.email.length;
+      // console.log(this.data);
+    },
+      (error) => {
+        this.blockUI.stop();
+        this.blockUI.start('Lỗi không tải được dữ liệu');
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  change_status(value) {
+    this.status = value;
+  }
+  reset_email_from_scatch() {
+    this.data.parameters.email = this.snap_email;
+    this.order = this.snap_email.length;
+  }
+  checknumber(event: any) {
+    const pattern = /[0-9\ ]/;
+    const inputChar = String.fromCharCode(event.charCode);
+    if (event.keyCode !== 8 && !pattern.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
+  counter() {
+    return new Array(this.order);
+  }
+  increase_order() {
+    if (this.order < 5) {
+      this.order++;
+      if (this.order === 5) {
+        this.showbutton_order = !this.showbutton_order;
+      }
+    }
+  }
+  decrease_order() {
+    this.order = 1;
+    this.data.parameters.email = [];
+    this.showbutton_order = !this.showbutton_order;
+  }
+  edit_notification(item) {
+    if (!environment.production) {
+      console.log(item);
+    }
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    let data = item.value;
+    const organization_id = data.organization_id;
+    delete data.organization_id;
+    for (let i = 1; i < this.order; i++) {
+      data.email += ',' + data['email_' + i];
+      delete data['email_' + i]; // xóa thuộc tính của một đối tượng.
+    }
+    data = {
+      organization_id: organization_id
+      , parameters: JSON.stringify(data)
+    };
+    // console.log(data);
+    const url = environment.FBA.API.fba_notifications + '_update/' + this.activerouter.snapshot.params.id;
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.blockUI.stop();
+      if (res.message === 1) {
+        this.notificationservice.message.push({
+          message_info: 'Sửa thông tin thành công',
+          alert: 'success'
+        });
+        this.router.navigate(['/fba/notification']);
+      } else {
+        this.notificationservice.message.push({
+          message_info: 'Có lỗi xảy ra',
+          alert: 'danger'
+        });
+        this.router.navigate(['/fba/notification']);
+      }
+    },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+}

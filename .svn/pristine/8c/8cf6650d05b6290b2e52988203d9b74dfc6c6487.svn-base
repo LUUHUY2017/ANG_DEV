@@ -1,0 +1,40 @@
+<div id="menutree">
+    <div style="width: auto; display: inline-block;" (click)="displaylocation=!displaylocation" class="overview-location"><i class="fa fa-map-marker"></i><span style="font-weight: bold;">&nbsp;
+            <!-- <ng-container *ngFor="let item of menu_tree">
+                <ng-container *ngIf="item.id === site_id">{{item.site_name}}</ng-container>
+            </ng-container> -->
+            {{location_label ? location_label : ''}}</span><i class="fa fa-caret-down"></i>
+    </div>
+    <ng-container *ngIf="show_menu_parent">
+        <div style=" display: inline-block; position: relative;" [hidden]="hidden_menu_location">
+            <div id="overview-chonkhuvuc" (click)="popuplocation=!popuplocation">&nbsp;&nbsp;<i class="fa fa-chevron-circle-down"></i></div>
+            <div class="overview-chonkhuvuc-popup" [hidden]="!popuplocation">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Chọn địa điểm</h4>
+                    </div>
+                    <div class="card-body">
+                        <ng-select class="bootstrap selectimeview" [options]="organization_array" [allowClear]="false" [(ngModel)]="organization_id" (selected)="OrgSelected($event)"></ng-select>
+                    </div>
+                    <div class="card-footer">
+                        <div class="float-right">
+                            <button class="btn btn-default" (click)="popuplocation=false">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <div class="overview-location-popup" [hidden]="!displaylocation" (clickOutside)="set_value_empty()" [exclude]="'.overview-location'">
+        <div class="card-body">
+            <ul>
+                <li><input type="text" placeholder="Tìm kiếm địa điểm/khu vực" style="width: 200px;" [(ngModel)]="search_key" (keyup)="search_menu()"><svg class="jss527 searchIcon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                        <path fill="none" d="M0 0h24v24H0z"></path>
+                    </svg></li>
+                <li *ngFor="let item of menu_tree" class="menu-{{item.alevel}} {{item.id === site_id ? 'active' : ''}} {{item.enables == 0 ? 'unlist' : ''}}" (click)="item.enables == 1 ? changemenu(item, $event.target) : ''"> {{item.site_name}}</li>
+
+            </ul>
+        </div>
+    </div>
+</div>

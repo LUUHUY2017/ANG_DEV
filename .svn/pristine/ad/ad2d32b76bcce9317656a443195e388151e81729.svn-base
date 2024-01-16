@@ -1,0 +1,139 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-fbamenu></app-fbamenu>
+      <!-- <ol style="margin-bottom:0px !important;" class="breadcrumb bread-custom">
+        <li class="breadcrumb-item"><a style="color:cornflowerblue" [routerLink]="['/fba/tablets/list-tablets']"><i
+              class="fa fa-home" aria-hidden="true"></i>
+            {{language.giam_sat_thiet_bi}}</a></li>
+      </ol> -->
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <block-ui></block-ui>
+        <div class="card-header">
+          <i class="fa fa-list-alt" aria-hidden="true"></i> <span>{{language.danh_sach_thiet_bi}}</span>
+        </div>
+        <div class="card-body card-table">
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <ng-select class="bootstrap selectimeview" required [options]="organization_arr"
+                  [(ngModel)]="org_selectedform" name="organization_id" [allowClear]="true"
+                  (selected)="changeorganization_table($event)" placeholder="Chọn tổ chức">
+                </ng-select>
+            </div>
+            <!-- <ul>
+              <li id="showrow">
+                <span class="font-span-table">{{language.so_dong}} &nbsp;</span>
+                <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                  <option [ngValue]="15">15</option>
+                  <option [ngValue]="25">25</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+                
+                <select style="margin-left:10px;" class="input-sm select_cus_table"
+                  (change)="changeorganization_table($event.target.value)">
+                  <option *ngFor="let item of organization_arr" value="{{item.value}}">{{item.label}}</option>
+                </select>
+              </li>
+              <li><span class="font-span-table">{{language.tim_kiem}} &nbsp;</span><input type="text"
+                  class="input_filter_table" (keyup)="search_table($event.target.value)"></li>
+            </ul> -->
+          </div>
+          <div style="width:100%" class="question-list list-tablets">
+            <div class="table-responsive">
+              <table [mfData]="tablets" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                style="width: 100%;min-width: 1100px" class="table table-hover">
+                <thead>
+                  <tr>
+                    <!-- <th style="width: 50px;">STT</th> -->
+                    <th style="width: 120px;">{{language.ten_thiet_bi}}</th>
+                    <th style="width: 200px;">{{language.cau_hoi}}</th>
+                    <th style="width: 130px;">{{language.dia_diem}}</th>
+                    <th style="width: 100px;">{{language.vi_tri}}</th>
+                    <th style="width: 120px;">{{language.dung_luong_trong}}<span
+                        style="color:#ddd;font-size:11px !important;">(KB)</span></th>
+                    <th style="text-align: center;width: 70px;">{{language.pin}} </th>
+                    <th style="text-align: center;width: 80px;">{{language.nguon}} </th>
+                    <th style="width: 80px;text-align: center">{{language.mang}}</th>
+                    <th style="width: 100px;text-align: center">App vesion</th>
+                    <th style="width: 150px;word-break: break-all;">Serial number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let item of mf.data;let i = index">
+                    <tr [style.color]="item.monitor  === '0'  ? '#ff0807' :
+                                                 item.monitor  === '1'  ? '#FFA000' :
+                                                 item.monitor  === '2'  ? '#1ab521' : ''"
+                      class="{{item.serial_number  === tablet_seri_dis && red === true    ? 'tablet-color-red':
+                                    item.serial_number  === tablet_seri_connect && green === true    ? 'tablet-color-green' :
+                                    item.serial_number  === tablet_seri_pin && warning === true      ? 'tablet-color-warning' :
+                                    item.serial_number  === tablet_seri_charge0 && warning === true  ? 'tablet-color-warning' :
+                                    item.serial_number  === tablet_seri_charge1 && green === true    ? 'tablet-color-green' : ''}}">
+
+                      <!-- <td>{{i+1}}</td> -->
+                      <td style="text-align: center;">{{item.tablet_name ? item.tablet_name : ' '}}</td>
+                      <td>{{item.question_name_check ? item.question_name_check : ' '}}</td>
+                      <td style="text-align: left;">{{item.site_name ? item.site_name : ' '}}</td>
+                      <td style="text-align: center;">{{item.location_name ? item.location_name : ' '}}</td>
+                      <td>{{item.storage_free ? (item.storage_free | number:'1.0-2') : ' '}}</td>
+                      <td>{{item.pin ? item.pin : ' '}}</td>
+                      <td>{{item.charge=== '1' ? 'Có' : 'Không'}}</td>
+                      <td>{{item.network ? item.network : ' ' }}</td>
+                      <td>{{item.app_version ? item.app_version : ' '}}</td>
+                      <td style="width: 150px;word-break: break-all;">{{item.serial_number}}</td>
+                    </tr>
+                  </ng-container>
+                  <tr></tr>
+                  <tr>
+                    <td colspan="11" *ngIf="tablets?.length === 0"
+                      style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                      <span>{{language.khong_co_du_lieu}}</span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot class="tablets-list-tfoot">
+                  <tr>
+                    <td colspan="11">
+                      <div class="tablets-list-tfoot-block">
+                        <mfBootstrapPaginator></mfBootstrapPaginator>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Model hỏi xóa -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_tablets()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <notifier-container></notifier-container>
+  <!-- Kết thúc row thứ nhất -->
+</main>

@@ -1,0 +1,113 @@
+<app-fbamenu></app-fbamenu>
+<div class="card" style="margin-bottom: 10px;">
+  <div class="card-body body-breadcumb">
+    <div class="row khungthemmoi">
+      <ul>
+        <li>
+          <i class="fa fa-table"></i><span>&nbsp;{{language.bang}} Notification</span>
+        </li>
+        <!-- <li><i class="fa fa-home">&nbsp;</i>Admin / <a>Settings</a></li> -->
+        <li *ngIf="userlogged === 0"><button class="btn btn-primary edit-button"
+            [routerLink]="['/fba/notification/add']"><i class="fa fa-plus"></i>&nbsp;{{language.them_moi}} </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card body-content">
+  <div class="card-body">
+    <div class="row khungthemmoi">
+      <ul style="padding: 0px 10px;">
+        <li id="showphantu">
+          <span>{{language.so_dong}} &nbsp;</span>
+          <!--(click)="click()"-->
+          <select (change)="pagination_number = $event.target.value">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+        </li>
+        <li><span>{{language.tim_kiem}} &nbsp;</span><input type="text" class="input-text"
+            (input)="dt.filterGlobal($event.target.value, 'contains')"></li>
+      </ul>
+    </div>
+    <div class="row no-margin" style="padding-top: 20px;">
+      <div class="col-md-12" *ngIf="message">
+        <div *ngFor="let item of message" class="alert alert-{{item.alert}} alert-dismissible edit-alert" role="alert">
+          <strong>{{item.message_info}}</strong>
+        </div>
+      </div>
+      <div class="table-prime">
+        <p-table #dt [columns]="cols" [scrollable]="true" [value]="listofnotification" [paginator]="true"
+          [rows]="pagination_number" [globalFilterFields]="['organization_name']">
+          <ng-template pTemplate="header">
+            <tr>
+              <th *ngFor="let col of cols" [pSortableColumn]="col.field">{{col.header}}
+                <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-listofnotification>
+            <tr>
+              <td>{{listofnotification.order}}</td>
+              <td *ngIf="show_edit == true">
+                <a routerLink="/fba/notification/edit/{{listofnotification.id}}">
+                  {{listofnotification.organization_name}}
+                </a>
+              </td>
+              <td *ngIf="show_edit == false">
+                {{listofnotification.organization_name}}
+              </td>
+              <td>{{listofnotification.notification_number}}%</td>
+              <td class="text-center">
+                <i class="fa fa-list-ol mr-2" (click)="openModal(show_detail, listofnotification)"
+                  style="cursor:pointer;"></i>
+                <i *ngIf="userlogged === 0" class="fa fa-remove" (click)="delete_data(listofnotification.id)"
+                  style="cursor:pointer;"></i>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+<block-ui></block-ui>
+<!-- Modal  cập nhật  -->
+<ng-template #show_detail>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">{{language.thong_tin_cau_hinh}}</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row form-no-marbottom">
+      <label class="col-md-5 col-5 col-form-label lh-label">{{language.ten_to_chuc}}</label>
+      <div class="col-md-7 col-7 col-form-label">
+        <input class="form-control" type="text" value="{{detail_data.organization_name}}">
+      </div>
+    </div>
+    <div class="form-group row form-no-marbottom">
+      <label class="col-md-5 col-5 col-form-label lh-label">{{language.dieu_kien_gui_thong_bao}}
+        <small>({{language.phan_tram_}} %)</small></label>
+      <div class="col-md-7 col-7 col-form-label">
+        <input class="form-control" type="text" value="{{detail_data.notification_number}}">
+      </div>
+    </div>
+    <div class="form-group row form-no-marbottom">
+      <label class="col-md-5 col-5 col-form-label lh-label"> {{language.thoi_gian_gui_thong_bao}}
+        <small>({{language.gio_}} )</small></label>
+      <div class="col-md-7 col-7 col-form-label">
+        <input class="form-control" type="text" value="{{detail_data.order}}">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a (click)="modalRef.hide()" class="btn btn-huy">
+      {{language.dong}} </a>
+  </div>
+</ng-template>
+<!-- Kết thúc  Modal cập nhật-->
+

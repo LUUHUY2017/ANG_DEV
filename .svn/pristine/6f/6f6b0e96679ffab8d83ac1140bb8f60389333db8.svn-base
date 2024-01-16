@@ -1,0 +1,456 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset" class="card card-administration">
+        <block-ui></block-ui>
+        <div class="card-body " style=" padding-top: 0px;">
+          <div class="row">
+            <div class="col-lg-3 col-4">
+              <div class="form-group col-md-12 formsearch">
+                <label class="col-form-label label-admi">{{language.to_chuc}}</label>
+                <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                  [(ngModel)]="org_selectedform" name="organization_id" [allowClear]="true"
+                  (selected)="thaydoitochuc($event)" placeholder="Chọn tổ chức">
+                </ng-select>
+
+              </div>
+            </div>
+            <div class="col-lg-3 col-4" *ngIf="userlogged.organization_id == 0 && userlogged.lever == 0">
+              <div class="form-group col-md-12 formsearch">
+                <label class="col-form-label label-admi" for="txtSearchUser">{{language.tuy_chon}}</label>
+                <select class="form-control boxShadow noBorderRadius" [(ngModel)]="option_delete"
+                  (ngModelChange)="get_data()">
+                  <option [ngValue]=0>{{language.chua_xoa}}</option>
+                  <option [ngValue]=1>{{language.da_xoa}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-lg-3 col-4">
+              <div class="form-group col-md-12 formsearch">
+                <label class="col-form-label label-admi" for="txtSearchUser">{{language.tu_khoa}}</label>
+                <input class="form-control select-white nofocus" [(ngModel)]="tu_khoa" name="tu_khoa" type="text"
+                  id="txtSearchUser" placeholder={{language.tim_theo_email}} autocomplete="off">
+              </div>
+            </div>
+            <div class="col-lg-3 col-4">
+              <div style="width: 110px;" class="form-group col-md-12 formsearch">
+                <label class="col-form-label label-admi">&nbsp;</label>
+                <button *ngIf="can_search" (click)="search_user()" class="btn btn-them form-control buton-search ">
+                  {{language.tim_kiem}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"><i class="cui-layers"
+              aria-hidden="true"></i>{{language.danh_sach_nguoi_dung}}</span>
+          <button style="float:right;" type="button" class="btn btn-them buton-search" (click)="get_insert(template)"
+            *ngIf="can_add"><i class="cui-user-follow">&nbsp;</i>{{language.them_tai_khoan}}</button>
+        </div>
+        <div class="card-body table-users">
+          <div class="table-responsive">
+            <table [mfData]="user_organization" #mf="mfDataTable" [mfRowsOnPage]="15" class="table table-hover"
+              style="width: 100%;min-width: 900px">
+              <thead>
+                <tr>
+                  <th style="width: 50px;text-align: center">{{language.so_thu_tu}}</th>
+                  <th style="width: 150px">{{language.ho_va_ten}}</th>
+                  <th style="width: 150px">Email</th>
+                  <th style="width: 150px">{{language.ngay_cap_nhat}}</th>
+                  <th style="width: 100px" class="text-center">{{language.tinh_trang}}</th>
+                  <!-- <th style="width: 130px">Quyền</th> -->
+                  <th style="width: 100px;text-align: center;">{{language.xu_ly}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- [@openClose]="item.state" -->
+                <tr *ngFor="let item of mf.data; let i = index">
+                  <td style="width: 50px;text-align: center">{{i +1}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.email}}</td>
+                  <td>{{item.updated_at}}</td>
+                  <td class="text-center">
+                    <span *ngIf="item.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                        class="fa fa-check"></i></span>
+                    <span *ngIf="item.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                        class="fa fa-remove"></i></span>
+                  </td>
+                  <td style="width: 100px;text-align: justify">
+                    <a *ngIf="item.deleted == 0 && item.id != userlogged.id" (click)="chinhsuaquyen(item,Roletemplate)"
+                      class="icon-blue">
+                      <i class="icon-settings" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a (click)="dulieuthaydoi(item,templates)" class="icon-blue" title="Sửa tài khoản {{item.name}}">
+                      <i class="cui-note" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="userlogged.lever == 0 && userlogged.organization_id == 0 || is_admin_of_organization.length > 0 && item.id != userlogged.id"
+                      class="icon-black">
+                      <i (click)="show_dialog_(item,password)" class="icon-lock-open" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.id != userlogged.id && item.deleted == 0" (click)="show_dialog(dialog, item)"
+                      class="icon-red">
+                      <i class="cui-circle-x" aria-hidden="true"></i>
+                    </a>&nbsp;
+                    <a *ngIf="item.deleted == 1" (click)="show_dialog(dialog, item)" class="icon-green">
+                      <i class="fa fa-reply" aria-hidden="true"></i>
+                    </a>&nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" *ngIf="user_organization.length === 0"
+                    style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                    <span>{{language.khong_co_du_lieu}}</span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="7">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #content_email>{{language.cac_email_ngan_cach_nhau}} </ng-template>
+  <!-- Modal delete dialog -->
+  <ng-template #dialog>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_users()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- End -->
+  <!-- Modal  thêm mới  -->
+  <ng-template #template>
+    <form (ngSubmit)="insertform(user_submit)" #user_submit="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.them_tai_khoan}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngFor="let item of error_array">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{item}}</strong>
+          </div>
+        </ng-container>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ho_va_ten}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf3" type="text" ngModel required name="name" autocomplete="off"
+              #txtname="ngModel" minlength="5" maxlength="100">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.vui_long_nhap_ho_ten}}
+            </small>
+            <small *ngIf="txtname.touched && txtname.errors?.minlength" class="error-message">
+              {{language.vui_long_nhap_ho_ten_5_ki_tu}}
+            </small>
+            <small *ngIf="txtname.touched && txtname.errors?.maxlength" class="error-message">
+              {{language.vui_long_nhap_ho_ten_100_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">Email</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf-email" required type="email" email ngModel #txtemail="ngModel"
+              name="email" autocomplete="off" minlength="10">
+            <small *ngIf="txtemail.touched && txtemail.errors?.required" class="error-message">
+              {{language.vui_long_nhap_email}}
+            </small>
+            <small *ngIf="txtemail.touched && txtemail.errors?.email" class="error-message">
+              {{language.vui_long_nhap_email_hop_le}}
+            </small>
+            <div *ngIf="txtemail.touched && txtemail.errors?.minlength">
+              <small class="error-message">
+                {{language.vui_long_nhap_email_10_ki_tu}}
+              </small>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom" [hidden]="!showSelectCrud">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.to_chuc}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+              name="organization_id" [ngModel]="org_selectedform" [allowClear]="true">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.mat_khau}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" type="password" required name="password" #txtpassword="ngModel" ngModel
+              autocomplete="off">
+            <small *ngIf="txtpassword.touched && txtpassword.errors?.required" class="error-message">
+              {{language.ban_chua_nhap_mat_khau}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.nhap_lai_mat_khau}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" type="password" name="confirmPassword" #txtconfirm="ngModel" autocomplete="off"
+              ngModel>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="user_submit.invalid">{{language.cap_nhat}}</button>
+        <!-- [disabled]="form.invalid" -->
+      </div>
+    </form>
+  </ng-template>
+
+  <!-- Modal cập nhật -->
+  <ng-template #templates>
+    <form (ngSubmit)="updateform(user_update)" #user_update="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{language.cap_nhat_tai_khoan}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngFor="let item of error_array">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{item}}</strong>
+          </div>
+        </ng-container>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ma_nguoi_dung}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="id"
+              (ngModelChange)="preventChange()">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">{{language.ho_va_ten}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control" id="nf" type="text" #txtname="ngModel" required [ngModel]="data2.name"
+              name="name">
+            <small *ngIf="txtname.touched && txtname.errors?.required" class="error-message">
+              {{language.vui_long_nhap_ho_ten}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">Email</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control" id="nf-email" #txtemail="ngModel" required type="email" email
+              [ngModel]="data2.email" name="email">
+            <li *ngIf="txtemail.invalid && (txtemail.dirty || txtemail.touched)">
+              <small *ngIf=" txtemail.errors.required" class="error-message">
+                {{language.vui_long_nhap_email}}
+              </small>
+              <small *ngIf=" txtemail.errors.email" class="error-message">
+                {{language.vui_long_nhap_email_hop_le}}
+              </small>
+            </li>
+          </div>
+        </div>
+        <!-- <div class="form-group row form-no-marbottom" hidden>
+               <label class="col-md-3 col-3 col-form-label lh-label">{{language.to_chuc}}</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+                     [ngModel]="data2.organization_id" name="organization_id" [allowClear]="true">
+                  </ng-select>
+               </div>
+            </div> -->
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-3 col-3 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <div style="  margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" value="1" [ngModel]="data2.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" value="0" [ngModel]="data2.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-primary" [disabled]="user_update.invalid">{{language.cap_nhat}}</button>
+        <!-- [disabled]="user_update.invalid" -->
+      </div>
+    </form>
+  </ng-template>
+
+  <!-- Modal cập nhật role -->
+  <ng-template #Roletemplate>
+    <form (ngSubmit)="updaterole(role_update)" #role_update="ngForm">
+      <div class="modal-header">
+        <h5 class="modal-title pull-left">{{language.cap_nhat_quyen_su_dung_cho}} <b>{{data2.username}}</b></h5>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngFor="let item of error_array">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{item}}</strong>
+          </div>
+        </ng-container>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_quyen}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="role_id"
+              (change)="preventChange()">
+          </div>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_nguoi_dung}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [ngModel]="data2.user_id" name="user_id"
+              (change)="preventChange()">
+          </div>
+        </div>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ma_to_chuc}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [ngModel]="data2.organization_id" name="organization_id"
+              (change)="preventChange()">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.mo_ta_nhom_quyen}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [value]="data2.role_description" readonly>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4" for="selectRoleType" style="align-items: center;
+               display: flex;">{{language.nhom_nguoi_dung}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <select name="role_type" id="selectRoleType" class="form-control" [ngModel]="data2.role_type">
+              <option [ngValue]="0">Admin</option>
+              <!-- <option value="1">Member</option> -->
+              <option [ngValue]="2">Report Viewer</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.thuoc_dia_diem}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8">
+            <div class="row mt-2" style="padding: 0px 15px">
+              <div class="col-md-12"
+                style="max-height:180px; overflow: auto;border:1px solid #ddd; border-radius: 3px;padding: 5px 10px;">
+                <ng-container *ngIf="site_recusive_array?.length > 0">
+                  <div class="custom-control custom-checkbox site-{{item.alevel}} mt-2"
+                    *ngFor="let item of site_recusive_array; let i = index">
+                    <input type="checkbox" class="custom-control-input" id="checkbox{{i}}"
+                      [ngModel]="item.enables == 1 ? item.id : null" (ngModelChange)="log(item)" #check_item="ngModel"
+                      name="checkbox{{i}}" [disabled]="item.disabled">
+                    <label class="custom-control-label" for="checkbox{{i}}">{{item.site_name}} <small
+                        *ngIf="item.store == 1" class="require-field">({{language.cua_hang}})</small></label>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="site_recusive_array?.length === 0">
+                  <h6>{{language.khong_co_du_lieu}}</h6>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.nguoi_cap_nhat}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [value]="data2.name" readonly>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ngay_cap_nhat}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control" id="nf" type="text" [value]="data2.updated_at" readonly>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="role_update.invalid">{{language.cap_nhat_quyen}}</button>
+        <!-- [disabled]="user_update.invalid" -->
+      </div>
+    </form>
+  </ng-template>
+  <!-- Modal password  -->
+  <ng-template #password>
+    <form (ngSubmit)="send_password_for_user(user_update)" #user_update="ngForm">
+      <div class="modal-header" style="background: #20a8d8; color: #fff; padding: 15px;">
+        <h6 class="modal-title pull-left">{{language.gui_mat_khau_chac_chan}}</h6>
+        <button type="button" class="close pull-right" aria-label="Close" style="color:#fff" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{data2.email}}</p>
+        <div hidden class="form-group row form-no-marbottom">
+          <label class="col-md-3 col-3 col-form-label lh-label">id,{{language.ho_va_ten}}, Email</label>
+          <div class="col-md-9 col-9 col-form-label">
+            <input class="form-control" id="nf" type="text" [ngModel]="data2.id" name="id"
+              (ngModelChange)="preventChange()">
+            <input class="form-control" id="nf" type="text" #txtname="ngModel" [ngModel]="data2.name" name="name"
+              (ngModelChange)="preventChange()">
+            <input class="form-control" id="nf-email" #txtemail="ngModel" type="email" email [ngModel]="data2.email"
+              name="email" (ngModelChange)="preventChange()">
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label [tooltip]="content_email" style="padding-top: 6px;"
+            class="col-md-3 col-3col-form-label lh-label">{{language.email_khac}} <i
+              class="fa fa-question-circle icon-tooltip"></i></label>
+          <div class="col-md-6 col-9 col-form-label">
+            <input class="form-control" id="nf" type="email" [(ngModel)]="new_email" name="new_email">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-primary">{{language.gui_mat_khau_moi}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <notifier-container></notifier-container>
+</main>

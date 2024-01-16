@@ -1,0 +1,416 @@
+/*----------  CSS  update-question.component.css  ----------*/
+body {
+  font-family: Roboto, sans-serif;
+}
+.cfm-question > .main .container-fluid {
+  padding: 0 30px;
+}
+.cfm-question > .container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.breadcrumb {
+  position: relative;
+  border-radius: 0;
+  border-bottom: 1px solid #c8ced3;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  list-style: none;
+  background-color: #fff;
+  border-radius: 0;
+}
+.breadcrumb li a {
+  color: gray;
+}
+/* .card-font span{
+    font-family: Roboto,sans-serif;
+    font-size: 18px;
+} */
+.card-footer {
+  text-align: right;
+}
+.hien {
+  visibility: visible !important;
+  opacity: 1 !important;
+  text-align: right;
+}
+.form-control:focus {
+  color: #5c6873;
+  background-color: #fff;
+  border-color: #8ad4ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.05);
+}
+/* list- menu*/
+.title-step {
+  text-align: center;
+  height: 45px;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #fff9eb;
+  line-height: 45px;
+  box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  color: #030202;
+  cursor: pointer;
+}
+.text-step {
+  font-family: Roboto, sans-serif;
+  font-size: 17px;
+}
+.title-step.active {
+  background: #ff9739;
+  color: white;
+}
+.showform {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+.card-form {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.button-step {
+  padding: 7px 11px;
+  border: unset;
+  background-color: #fff;
+  cursor: pointer;
+  color: white !important;
+  border-radius: 5px;
+}
+.button-step:hover {
+  box-shadow: 0px 2px 1px #ddd;
+}
+.button-next {
+  background: #f86c6b;
+}
+.button-pre {
+  background: #17a2b8;
+}
+.quality-question {
+  position: relative;
+  height: 68px;
+  width: 100%;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.15);
+}
+.form-parent {
+  margin-bottom: 0 !important;
+}
+.quality-question > img {
+  width: 55px;
+  margin-left: 22px;
+  margin-top: 7px;
+}
+.quality-question > .img2 {
+  float: right;
+  margin-right: 22px;
+}
+.quality-question > input {
+  position: absolute;
+  bottom: 0;
+}
+#label-upload {
+  position: absolute;
+  bottom: 0;
+  right: 3px;
+  color: darkred;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+#label-upload-quality {
+  position: absolute;
+  bottom: 0;
+  right: 3px;
+  color: darkred;
+  cursor: pointer !important;
+}
+.margin-top-quality {
+  padding-top: 12px;
+  height: 90px;
+}
+.margin-top-quality label {
+  font-family: Roboto, sans-serif;
+  font-size: 15px;
+}
+.margin-top-quality input {
+  font-style: italic;
+  font-family: Roboto, sans-serif;
+  color: #4b0101;
+}
+.row-question1 {
+  height: 50px;
+}
+.custom-label {
+  padding: 0 3px;
+}
+/*Tạo nút checkbox đánh giá*/
+.cfm-question > .container {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.cfm-question > .container input {
+  position: absolute;
+  display: none;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  height: 19px;
+  width: 19px;
+  background-color: #ddd;
+}
+
+/* On mouse-over, add a grey background color */
+.cfm-question > .container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+.opacity-check {
+  opacity: 0.75;
+}
+/* When the checkbox is checked, add a blue background */
+.cfm-question > .container input:checked ~ .checkmark {
+  background-color: #2196f3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.cfm-question > .container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.cfm-question > .container .checkmark:after {
+  left: 7px;
+  top: 4px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0px 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+/*Tạo nút checkbox lý do */
+.container-rea {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container-rea input {
+  position: absolute;
+  display: none;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* On mouse-over, add a grey background color */
+.container-rea:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+/* When the checkbox is checked, add a blue background */
+.container-rea input:checked ~ .checkmark {
+  background-color: #2196f3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container-rea input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container-rea .checkmark:after {
+  left: 7px;
+  top: 4px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0px 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.check-reason {
+  margin: -5px 0 0-10px;
+}
+#upload-photo {
+  opacity: 0;
+  position: absolute;
+  z-index: 0;
+  right: 20px;
+  width: 70px;
+  display: none;
+}
+#upload-image-reason {
+  opacity: 0;
+  position: absolute;
+  z-index: 0;
+  right: 18px;
+  height: 19px;
+  width: 40px;
+  bottom: 0;
+}
+.quality-question > input {
+  position: absolute;
+  bottom: 0;
+}
+.title-first input {
+  border: unset;
+  border-radius: unset;
+  width: 35px;
+  z-index: 10;
+  text-align: center;
+  margin-left: 35%;
+  border-bottom: 1px solid #a3cded !important;
+}
+.rea-reaoth-cus > label {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.rea-reaoth-cus {
+  display: block;
+  text-align: center;
+}
+.margin-top-quality input {
+  border: unset;
+  border-radius: unset;
+  border-bottom: 1px solid #ddd !important;
+  position: relative;
+  padding-left: 15px;
+}
+.margin-top-quality input:focus,
+.title-first input:focus,
+.input-reason:focus,
+input.input-child:focus {
+  box-shadow: none;
+  outline: unset;
+  border-bottom-color: rgba(32, 168, 216, 0.25) !important;
+}
+.quality-ml {
+  padding-left: 6%;
+}
+.quality-ml {
+  padding-left: 8%;
+  padding-top: 0;
+}
+.cfm-question {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+}
+.pl-cot2 {
+  padding-left: 1%;
+}
+.width-min {
+  width: 50%;
+}
+.input-reason-table {
+  border-color: unset !important;
+  border: unset;
+  box-shadow: unset;
+}
+.width-check {
+  height: 18px;
+  width: 18px;
+}
+
+.img-text {
+  position: absolute;
+  bottom: 27px;
+  right: 15px;
+  z-index: 1;
+  font-size: 10px;
+}
+.time-out input {
+  width: 180px;
+}
+.time-out-popup {
+  padding: 0.9rem 1.3rem;
+}
+.time-out-popup .form-group {
+  margin-bottom: 0;
+}
+#table-reason thead th {
+  text-align: center;
+  padding: 14px 0;
+}
+#table-reason tbody td {
+  vertical-align: middle;
+  padding: 0.25rem;
+}
+#table-reason tbody td input[type="checkbox"] {
+  position: unset;
+  margin-top: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: 0;
+}
+.noborder-radius input,
+.noborder-radius select {
+  border-radius: 0 !important;
+}
+.title-step i {
+  opacity: 0.5;
+}
+.form-group small,
+tbody td small {
+  color: #d60909fc;
+  padding-left: 0.5rem;
+  font-style: italic;
+}
+
+@media only screen and (max-width: 596px) {
+  .title-step {
+    height: 35px;
+    line-height: 35px;
+  }
+}
+@media only screen and (max-width: 596px) {
+  .text-step {
+    font-size: 13px;
+  }
+}

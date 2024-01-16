@@ -1,0 +1,54 @@
+#headtimeperiod2 .text-select
+{
+	cursor: pointer;
+}
+#headtimeperiod2 .khung-time
+{
+	position: absolute;
+	right: -15%;
+	border-radius: 3px;
+	width: 205px;
+	height: 270px;
+	overflow: hidden ;
+	background: white;
+	z-index: 10;
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
+#headtimeperiod2 #khung-time-scroll #ul-time li.active
+{
+	color: #00a8ff;
+}
+#headtimeperiod2 .khung-time #khung-time-scroll{
+	height: 100%;
+	overflow-y: scroll;
+}
+#headtimeperiod2 .khung-time li{
+	padding: 8px 0 8px 8px; ;
+	cursor: pointer;
+	padding-left: 10px ;
+	list-style: none;
+}
+#headtimeperiod2 .khung-time li:hover{
+	background-color: rgba(0, 0, 0, 0.08);
+}
+#headtimeperiod2 ul#ul-time{
+	padding: 0;
+	margin: 0;
+}
+#headtimeperiod2 .cursor-pointer{
+	cursor: pointer;
+}
+#headtimeperiod2 .time-period-block>div {
+	float: right;
+	width: fit-content;
+	cursor: pointer;
+	position:relative;
+}
+@media only screen and (max-width: 756px) {
+	#headtimeperiod2[_ngcontent-c3][_ngcontent-c3] .khung-time[_ngcontent-c3][_ngcontent-c3] {
+	  right: 0 !important;
+	  left: 0 !important;
+	  width: 100%;
+	  min-width: 300px !important;
+	}
+  }

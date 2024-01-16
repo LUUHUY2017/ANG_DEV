@@ -1,0 +1,16 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+// Routing
+import { TabletsRoutingModule } from './tablets-routing.module';
+
+@NgModule({
+  imports: [
+    // Tablets
+    TabletsRoutingModule,
+    CommonModule
+  ],
+  declarations: [
+  ]
+})
+export class TabletsModule { }

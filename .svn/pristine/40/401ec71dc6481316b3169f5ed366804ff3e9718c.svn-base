@@ -1,0 +1,520 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef, OnDestroy, Renderer2 } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+import { GeneralMenuComponent } from '../../../viewchild/generalmenu/generalmenu.component';
+// import notification
+import { NotifierService } from 'angular-notifier';
+import { BehaviorSubject } from 'rxjs';
+
+@ViewChild(GeneralMenuComponent)
+@Component({
+  templateUrl: './zalosender.component.html',
+  styleUrls: ['./zalosender.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+export class ZaloSenderComponent implements OnInit, OnDestroy {
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  private readonly notifier: NotifierService;
+  private subcription: any;
+  page_id = '\'' + environment.Pages.general.location + '\'';
+  can_add: boolean;
+  can_update: boolean;
+  can_delete: boolean;
+  // Khai báo kiểu dữ kiệu
+  data: Array<any>;
+  data_filter: Array<any>;
+  data_update: any;
+  organization_id: string;
+  organization_arr: Array<IOption>;
+  hidden_select_organization: boolean;
+  modalRef: BsModalRef;
+  siteSelectionDisplay = false;
+  rowsOnPage = 15;
+  menu_tree: Array<any>;
+  snap_menu_tree: Array<any>;
+  webState: BehaviorSubject<any>;
+  tu_khoa: string;
+  oldState: string;
+  showSelectCrud: boolean;
+  userLogged = JSON.parse(localStorage.getItem(environment.UserLoged));
+  delete_object: any;
+  error_array: Array<string>;
+  option_delete: any;
+  siteArray: any;
+  siteSelected: any;
+  accountArrayUpdate: any[];
+  eventArray: any;
+  selectedEvent: any;
+  dropdownSettings = {
+    singleSelection: false,
+    idField: 'item_id',
+    textField: 'item_text',
+    selectAllText: 'Chọn tất cả',
+    unSelectAllText: 'Bỏ chọn tất cả',
+    itemsShowLimit: 2,
+    allowSearchFilter: true
+  };
+  followerArray: any;
+  selectedfollowerArray: any;
+  selectedItem: any;
+  status: number;
+  snapfollowerArray: any;
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    notifierService: NotifierService,
+    private appservice: AppService,
+    private modalService: BsModalService,
+    private renderer: Renderer2) {
+    this.notifier = notifierService;
+  }
+  ngOnInit(): void {
+    const firstState = {
+      data: null
+      , state: null
+    };
+    this.webState = new BehaviorSubject(firstState);
+    this.get_organization();
+    this.setDefaultValue();
+    this.watchStateChange();
+    this.set_default_crud(false);
+  }
+  setDefaultValue() {
+    this.data_filter = [];
+    this.data = [];
+    this.data_update = null;
+    this.error_array = [];
+    this.option_delete = 0;
+    this.accountArrayUpdate = [];
+  }
+  // Lấy thông tin tổ chức lên ng-select
+  get_organization() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const url = environment.API.userGetOrg;
+    this.appservice.get(url).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        if ('message' in param) {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+          return;
+        }
+        const org = param.organization_arr.slice(0);
+        this.organization_arr = org;
+        this.organization_id = param.organization_arr[0].value;
+        this.get_data();
+      },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+        this.blockUI.stop();
+      });
+  }
+  // lấy data thông thường
+  get_data() {
+    this.blockUI.start('Đang tải dữ liệu...');
+    const data = {
+      organization_id: this.organization_id
+      , deleted: this.option_delete
+    };
+    if (!environment.production) {
+      // console.log('data gửi đi', data);
+    }
+    this.appservice.post(data, environment.API.sp_get_oa_zalo).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.set_default_crud(true);
+      this.updateState('retrieve', res.accountArray);
+    },
+      (error) => {
+        if (!environment.production) {
+          // console.log(error);
+        }
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  watchStateChange() {
+    this.subcription = this.webState.asObservable();
+    this.subcription.subscribe(res => {
+      const currentState = res.state;
+      const item = res.data;
+      // Đây là sự kiện khi vừa load trang get data về
+      if (currentState === environment.STATE.retrieve) {
+        // Sự kiện nhận dữ liệu về thì bỏ hành động tìm kiếm trước đó
+        this.tu_khoa = null;
+        this.data = item;
+        this.data_filter = this.data;
+        // Nếu là sự kiện thêm mới
+      } else if (currentState === environment.STATE.insert) {
+        this.data.push(item);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Thêm mới dữ liệu thành công');
+        // nếu là sự kiện sửa
+      } else if (currentState === environment.STATE.update) {
+        for (let i = 0; i < this.data.length; i++) {
+          if (Number(this.data[i].id) === Number(item.id)) {
+            this.data[i] = item;
+            break;
+          }
+        }
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Cập nhật dữ liệu thành công');
+        // Nếu là sự kiện xóa
+      } else if (currentState === environment.STATE.delete) {
+        this.data.splice(this.data.findIndex(e => e.id === item.id), 1);
+        // Nếu trạng thái trước đó là search
+        if (this.oldState === environment.STATE.search) {
+          this.updateState(environment.STATE.search);
+        }
+        this.notifier.notify('success', 'Xóa dữ liệu thành công');
+        // Nếu có sự kiện tìm kiếm
+      } else if (currentState === environment.STATE.search) {
+        const string = this.tu_khoa ? this.tu_khoa.toLowerCase() : '';
+        // console.log(string);
+        if (string === '') {
+          this.data_filter = this.data;
+        } else {
+          this.data_filter = this.data.filter(x => x.account_name.toLowerCase().indexOf(string) !== -1);
+        }
+      }
+    });
+  }
+  showSelectFunc() {
+    this.showSelectCrud = false;
+    const lever = Number(this.userLogged.lever);
+    const org_id = Number(this.userLogged.organization_id);
+    if (lever === 0 && org_id === 0) {
+      this.showSelectCrud = true;
+    }
+  }
+  updateState(stateString: string, data = null) {
+    const stateWithData = {
+      state: stateString
+      , data: data
+    };
+    const oldStateObj = this.webState.getValue();
+    this.oldState = oldStateObj.state;
+    this.webState.next(stateWithData);
+  }
+  // thay đổi tổ chức bảng
+  changeorganization_table(event) {
+    if (!environment.production) {
+      console.log('id_or', event);
+    }
+    this.organization_id = event;
+    this.get_data();
+  }
+  // mở modal thêm mới dữ liệu
+  open_modal_them_moi(templates: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+    this.siteSelected = null;
+  }
+  changesite(item: any) {
+    if (!environment.production) {
+      console.log('id', item.id);
+    }
+    if (item.store === '0' || item.enables === '0') {
+      this.modalRef.hide();
+      this.notifier.notify('error', 'Đã có lỗi xảy ra');
+      return;
+    }
+    this.siteSelected = item;
+    this.siteSelectionDisplay = false;
+  }
+  show_update(item: any, template: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data_item', item);
+    }
+    this.data_update = Object.assign({}, item);
+    // const site_id = this.data_update.site_id;
+    // this.siteSelected = this.menu_tree.find(index => index.id === site_id);
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  set_default_crud(bool: boolean) {
+    this.can_add = bool;
+    this.can_update = bool;
+    this.can_delete = bool;
+  }
+  // thêm vị trí cho thiết bị
+  insert_object(item) {
+    if (item.invalid) {
+      this.notifier.notify('error', 'Nhập liệu gặp sự cố');
+      return;
+    }
+    // const data = {...item.value, site_id: this.siteSelected.id, site_name: this.siteSelected.site_name};
+    // xét error về rỗng.
+    this.error_array = [];
+    this.blockUI.start('Đang thêm dữ liệu...');
+    const url = environment.API.sp_get_oa_zalo + '_insert';
+    this.appservice.post(item.value, url).subscribe(
+      res => {
+        if (!environment.production) {
+          // console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.updateState(environment.STATE.insert, res.insertedData);
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+          // console.log(this.error_array);
+        }
+      },
+      (error) => {
+        this.error_array.push('Không thể kết nối dữ liệu');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  // cập nhật thiết bị
+  update_object(item) {
+    if (item.invalid) {
+      this.notifier.notify('error', 'Nhập liệu gặp sự cố');
+      return;
+    }
+    if (!item.dirty) {
+      this.modalRef.hide();
+      this.notifier.notify('warning', 'Thông tin không thay đổi');
+      this.blockUI.stop();
+      return;
+    }
+    this.error_array = [];
+    this.blockUI.start('Đang cập nhật dữ liệu...');
+    this.appservice.post(item.value, environment.API.sp_get_oa_zalo + '_update').subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.updateState(environment.STATE.update, res.updatedData);
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.error_array.push('Không thể kết nối dữ liệu');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  preventChange() {
+    this.modalRef.hide();
+    this.notifier.notify('error', 'Lỗi dữ liệu không được thay đổi');
+  }
+  // tìm kiếm bảng thiết bị
+  search_table(searchString: string) {
+    this.tu_khoa = searchString;
+    this.updateState(environment.STATE.search);
+  }
+  // hỏi xóa modal
+  show_delete(item: Object, dialog: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('data_item', item);
+    }
+    this.delete_object = item;
+    this.modalRef = this.modalService.show(dialog, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  delete_location() {
+    this.blockUI.start('Đang xử lý dữ liệu...');
+    const data = {
+      id: this.delete_object.id
+      , deleted: this.delete_object.deleted
+    };
+    const url = environment.API.sp_get_oa_zalo + '_delete';
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.updateState('delete', this.delete_object);
+        } else {
+          this.notifier.notify('error', param.message);
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', 'Đã có lỗi xảy ra');
+      }).add(() => {
+        this.modalRef.hide();
+        this.blockUI.stop();
+      });
+  }
+  ngOnDestroy() {
+    this.webState.complete();
+  }
+  openModal(temple: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(temple, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+  openBigModal(temple: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(temple, {
+      backdrop: true,
+      ignoreBackdropClick: true,
+      class: 'gray modal-lg'
+    });
+  }
+  changeActivedItem(item: any) {
+    console.log(item);
+  }
+  checkedItem(item: any, selected: number, event: ElementRef) {
+    if (this.selectedItem.length > 0) {
+      const current = this.selectedItem.find(i => i.item_id === item.item_id);
+      if (current) {
+        this.renderer.removeClass(event, 'actived');
+        this.selectedItem.splice(this.selectedItem.findIndex(e => e.item_id === item.item_id), 1);
+      } else {
+        this.renderer.addClass(event, 'actived');
+        this.selectedItem.push(item);
+      }
+    } else {
+      this.renderer.addClass(event, 'actived');
+      this.selectedItem.push(item);
+    }
+    this.status = selected;
+  }
+  get_event_module(item: any, temple: TemplateRef<any>) {
+    this.error_array = [];
+    const data = {
+      id: item.id
+      , official_account: item.official_account
+    };
+    this.data_update = item;
+    this.status = 0;
+    this.selectedItem = [];
+    this.followerArray = [];
+    this.snapfollowerArray = [];
+    this.selectedfollowerArray = [];
+    this.blockUI.start('Đang tải dữ liệu...');
+    const url = environment.API.sp_get_oa_zalo + '_get_event_module';
+    this.appservice.post(data, url).subscribe(
+      param => {
+        if (param.message === 1) {
+          this.eventArray = param.event_array;
+          // this.optGroupMenu(param.event_array);
+          this.selectedEvent = param.event_array;
+          this.openBigModal(temple);
+        } else {
+          this.notifier.notify('error', 'Đã có lỗi xảy ra');
+        }
+      },
+      (error) => {
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  to_selected_array() {
+    if (this.selectedItem.length === 0 || this.status === 0) {
+      this.modalRef.hide();
+      this.notifier.notify('error', 'Lỗi quá trình dữ liệu không được phép thay đổi');
+    }
+    const newItem = this.selectedItem.slice(0);
+    newItem.forEach(element => {
+      this.selectedfollowerArray.unshift(element);
+      this.followerArray.splice(this.followerArray.findIndex(e => e.item_id === element.item_id), 1);
+    });
+    this.selectedItem = [];
+  }
+  to_unselected_array() {
+    if (this.selectedItem.length === 0 || this.status === 1) {
+      this.modalRef.hide();
+      this.notifier.notify('error', 'Lỗi quá trình dữ liệu không được phép thay đổi');
+    }
+    const newItem = this.selectedItem.slice(0);
+    newItem.forEach(element => {
+      this.followerArray.unshift(element);
+      this.selectedfollowerArray.splice(this.selectedfollowerArray.findIndex(e => e.item_id === element.item_id), 1);
+    });
+    this.selectedItem = [];
+  }
+  update_event(item: any) {
+    const data = {
+      ...item.value
+      , follower_array: this.selectedfollowerArray
+    };
+    if (item.invalid) {
+      this.notifier.notify('error', 'Nhập liệu gặp sự cố');
+      return;
+    }
+    this.error_array = [];
+    if (!environment.production) {
+      console.log(data);
+    }
+    const url = environment.API.sp_get_oa_zalo + '_insert_event_and_follower';
+    this.blockUI.start('Đang xử lý dữ liệu');
+    this.appservice.post(data, url).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', res);
+        }
+        if (res.message === 1) {
+          this.notifier.notify('success', 'Cập nhật thành công');
+          this.modalRef.hide();
+        } else {
+          this.error_array = this.appservice.validate_error(res);
+        }
+      },
+      (error) => {
+        this.error_array.push('Không thể kết nối dữ liệu');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+  getFollowerEvent(item: any) {
+    const data = {
+      event_id: item
+      , account_id: this.data_update.id
+    };
+    this.followerArray = [];
+    this.snapfollowerArray = [];
+    this.selectedfollowerArray = [];
+    this.selectedItem = [];
+    this.blockUI.start('Đang tải dữ liệu');
+    const url = environment.API.sp_get_oa_zalo + '_get_follower_in_event';
+    this.appservice.post(data, url).subscribe(
+      param => {
+        this.snapfollowerArray = param.zalo_follower_array;
+        this.followerArray = this.snapfollowerArray.slice(0);
+        this.selectedfollowerArray = param.followed_array;
+        console.log(param);
+      },
+      (error) => {
+        this.notifier.notify('error', 'Không thể kết nối máy chủ');
+      }).add(() => {
+        this.blockUI.stop();
+      });
+  }
+}

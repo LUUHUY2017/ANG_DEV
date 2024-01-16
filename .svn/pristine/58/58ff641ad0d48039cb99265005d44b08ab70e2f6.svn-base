@@ -1,0 +1,324 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-generalmenu></app-generalmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <block-ui></block-ui>
+      <div style="border:unset;border-radius: 3px;" class="card">
+        <div style="height: 55px;" class="card-header">
+          <span style="line-height:33px;"> <i class="cui-layers" aria-hidden="true"></i>
+            {{language.danh_sach_tai_khoan_zalo}}</span>
+        </div>
+        <div class="card-body">
+          <ng-container *ngIf="isOnload === false">
+            <ng-container *ngIf="errorMess === null">
+              <div class="row mb-3" *ngIf="isSuperAdmin">
+                <div class="col-md-2">
+                  <ng-select class="bootstrap selectimeview" required [options]="orgArray" [ngModel]="organizationId"
+                    [allowClear]="false" (selected)="changeOrg($event)" placeholder="Chọn tổ chức">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <form (ngSubmit)="submitToSearch(searchForm)" #searchForm="ngForm">
+                  <table [mfData]="dataFilter" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">{{language.STT}}</th>
+                        <th style="width: 80px;text-align: left;">Tên hiển thị</th>
+                        <th style="width: 80px;text-align: left;">Tên Zalo</th>
+                        <th style="width: 80px;text-align: left;">Địa điểm</th>
+                        <th style="width: 80px;text-align: left;">Giới tính</th>
+                        <th style="width: 80px;text-align: left;">Ảnh đại diện</th>
+                        <th style="width: 80px;text-align: left;">Hoạt động</th>
+                        <th style="width: 150px;">{{language.xu_ly}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                        <td><input type="text" name="display_name" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="follower_name" ngModel autocomplete="off"></td>
+                        <td><input type="text" name="site_name" ngModel autocomplete="off"></td>
+                        <td>
+                          <select name="gender" ngModel style="padding: 3px 5px 3px 5px;">
+                            <option value="">Tất cả</option>
+                            <option value=1>Nam</option>
+                            <option value=0>Nữ</option>
+                          </select>
+                        </td>
+                        <td></td>
+                        <td>
+                          <select name="actived" ngModel style="padding: 3px 5px 3px 5px;">
+                            <option value="">Tất cả</option>
+                            <option value=1>Hoạt động</option>
+                            <option value=0>Ngừng hoạt động</option>
+                          </select>
+                        </td>
+                        <td style="width: 50px;"><button class="btn btn-success noborder" style="font-size: 10px;"><i
+                              class="fa fa-search"></i></button></td>
+                      </tr>
+                      <tr *ngFor="let items of mf.data;let i = index">
+                        <td>{{i + 1}}</td>
+                        <td style="text-align: left;">{{items.display_name}}
+                        </td>
+                        <td style="text-align: left;">{{items.follower_name}}
+                        </td>
+                        <td style="text-align: left;">{{items.site_name}}
+                        </td>
+                        <td class="text-center">
+                          <span *ngIf="items.gender == 1" class="badge badge-success"
+                            style="font-size: 10px;">Nam</span>
+                          <span *ngIf="items.gender == 0" class="badge badge-danger" style="font-size: 10px;">Nữ</span>
+                        </td>
+                        <td style="text-align: center;">
+                          <img [src]="items.avatar" class="card-img-top rounded-circle" style="width: 60px;">
+                        </td>
+                        <td class="text-center">
+                          <span *ngIf="items.actived == 1" class="badge badge-success" style="font-size: 10px;"><i
+                              class="fa fa-check"></i></span>
+                          <span *ngIf="items.actived == 0" class="badge badge-danger" style="font-size: 10px;"><i
+                              class="fa fa-remove"></i></span>
+                        </td>
+                        <td style="width: 100px;">
+                          <a (click)="openPopupUpdateCurrentItem(items,updateTemplate)" class="icon-blue"
+                            title="Sửa vị trí">
+                            <i class="cui-note" aria-hidden="true"></i>
+                          </a>&nbsp;
+                          <a (click)="openPopupDeleteItem(items,deleteTemplate)" class="icon-red" title="Xóa vị trí">
+                            <i class="cui-circle-x" aria-hidden="true"></i>
+                          </a>&nbsp;
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length === 0">
+                        <td colspan="8" style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                          <span>{{language.khong_co_du_lieu}}</span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="dataFilter?.length > rowsOnPage">
+                        <td colspan="8">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <!-- <tfoot class="fba-tablet-list-tfoot">
+                  
+                </tfoot> -->
+                  </table>
+                </form>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="errorMess !== null">
+              <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                  style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại lại
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <notifier-container></notifier-container>
+  <!-- Model hỏi xóa -->
+  <ng-template #deleteTemplate>
+    <div class="modal-body box-shadow">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div id="border-remove">
+            <i class="fa fa-remove fa-3x"></i>
+          </div>
+        </div>
+        <div class="col-md-12 text-center">
+          <h3>{{language.ban_co_chac_chan_muon_xoa}}</h3>
+          <p>{{language.xac_nhan_xoa}}</p>
+        </div>
+        <div class="col-md-12 text-center">
+          <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="deleteCurrentItem()"
+            style="background:#9c1b1b; border-color: #9c1b1b;">{{language.xoa}}</button>
+          <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+            {{language.dong}}</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <!-- Modal  cập nhật -->
+  <ng-template #updateTemplate>
+    <form (ngSubmit)="updateCurrentItem(updateForm)" #updateForm="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left"><i class="icon-note"
+            style="font-size: 15px;color: #20a8d8;">&nbsp;</i>{{language.cap_nhat_tai_khoan}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_zalo}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [value]="dataUpdate.display_name" readonly>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_hien_thi}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" [ngModel]="dataUpdate.follower_name"
+              #txtfollower="ngModel" required name="follower_name" minlength="3" maxlength="100" autocomplete="off">
+            <small *ngIf="txtfollower.touched && txtfollower.errors?.required" class="error-message">
+              {{language.nhap_ten_he_thong}}
+            </small>
+            <small *ngIf="txtfollower.touched && txtfollower.errors?.minlength" class="error-message">
+              {{language.ten_he_thong_3_ki_tu}}
+            </small>
+            <small *ngIf="txtfollower.touched && txtfollower.errors?.maxlength" class="error-message">
+              {{language.ten_he_thong_60_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.dia_diem}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <!-- Textbox chọn -->
+            <div class="config-text-location">
+              <div style="display:block;border:1px solid #ddd; padding:5px;background:white"
+                (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+                <span>&nbsp; {{siteSelected ? siteSelected.site_name : language.chua_chon}} <i
+                    style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                  </i></span>
+              </div>
+            </div>
+            <!-- Chọn địa điểm/ khu vực -->
+            <div [hidden]="!siteSelectionDisplay" class="khung-location-location block"
+              (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+              <div id="khung-location-scroll">
+                <ul style="padding-left: 0;">
+                  <li *ngFor="let item of menuTree" (click)="changeSite(item)"
+                    class="menu-{{item.alevel}} {{item.site_name === siteSelected?.site_name ? 'active' : ''}} {{item.enables == 1 ? null : 'disabledMenuItem'}}">
+                    {{item.site_name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label style="width:70%" class="col-md-4 col-4 col-form-label">{{language.hoat_dong}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <div style="margin-right: 20px !important;" class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-t-ac" type="radio" [value]="'1'" [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-t-ac">{{language.co}}</label>
+            </div>
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="inline-f-ac" type="radio" [value]="'0'" [ngModel]="dataUpdate.actived"
+                name="actived">
+              <label class="form-check-label" for="inline-f-ac">{{language.khong}}</label>
+            </div>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn btn-success" [disabled]="updateForm.invalid || siteSelected === null">
+          {{language.cap_nhat}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal cập nhật-->
+
+  <!-- Modal thêm mới  -->
+  <ng-template #templates>
+    <form (ngSubmit)="insert_object(object_form)" #object_form="ngForm">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left"><i class="icon-plus"
+            style="font-size: 15px;color: #20a8d8;">&nbsp;</i>{{language.them_tai_khoan}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let item of error_array" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{item}}</strong>
+        </div>
+        <div class="form-group row form-no-marbottom" hidden>
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.to_chuc}}</label>
+          <div class="col-md-8 col-8 col-form-label">
+            <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr"
+              [ngModel]="organization_id" name="organization_id" [allowClear]="false">
+            </ng-select>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">{{language.ten_tai_khoan}} <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtdisplayname="ngModel" required
+              name="display_name" minlength="3" maxlength="60" autocomplete="off">
+            <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.required" class="error-message">
+              {{language.nhap_ten_tai_khoan}}
+            </small>
+            <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.minlength" class="error-message">
+              {{language.ten_tai_khoan_3_ki_tu}}
+            </small>
+            <small *ngIf="txtdisplayname.touched && txtdisplayname.errors?.maxlength" class="error-message">
+              {{language.ten_tai_khoan_60_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">OA ID <small class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtloca="ngModel" required
+              name="official_account" minlength="3" maxlength="60" autocomplete="off">
+            <small *ngIf="txtloca.touched && txtloca.errors?.required" class="error-message">
+              {{language.nhap_ma_OA}}
+            </small>
+            <small *ngIf="txtloca.touched && txtloca.errors?.minlength" class="error-message">
+              {{language.ma_OA_3_ki_tu}}
+            </small>
+            <small *ngIf="txtloca.touched && txtloca.errors?.maxlength" class="error-message">
+              {{language.ma_OA_60_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <div class="form-group row form-no-marbottom">
+          <label class="col-md-4 col-4 col-form-label lh-label">SECRET KEY <small
+              class="require-field">(*)</small></label>
+          <div class="col-md-8 col-8 col-form-label">
+            <input class="form-control color-font" type="text" ngModel #txtsecret="ngModel" required name="secret"
+              minlength="3" maxlength="60">
+            <small *ngIf="txtsecret.touched && txtsecret.errors?.required" class="error-message">
+              {{language.nhap_secret}}
+            </small>
+            <small *ngIf="txtsecret.touched && txtsecret.errors?.minlength" class="error-message">
+              {{language.secret_3_ki_tu}}
+            </small>
+            <small *ngIf="txtsecret.touched && txtsecret.errors?.maxlength" class="error-message">
+              {{language.secret_60_ki_tu}}
+            </small>
+          </div>
+        </div>
+        <small class="require-field mt-3">{{language.yeu_cau_nhap_day_du_thong_tin}}</small>
+      </div>
+      <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn btn-huy active">
+          {{language.dong}}</a>
+        <button class="btn  btn-primary" [disabled]="object_form.invalid">
+          {{language.them_moi}}</button>
+      </div>
+    </form>
+  </ng-template>
+  <!-- Kết thúc  Modal thêm mới -->
+</main>

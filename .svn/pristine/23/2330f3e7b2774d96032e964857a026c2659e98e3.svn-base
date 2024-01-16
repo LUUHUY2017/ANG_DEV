@@ -1,0 +1,165 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { LoginService } from './login.service';
+import { navItems } from '../../_nav';
+import { AppService } from '../../app.service';
+import { Location } from '@angular/common';
+import { language } from '../../language';
+import { language_en } from '../../language_en';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: 'login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent implements OnInit {
+  isLoginError = false;
+  errMes = '';
+  url = environment.apiUrl + 'images/';
+  @BlockUI() blockUI: NgBlockUI;
+  logo_source: any; language: any;
+  language_bi = 'vn';
+  constructor(private router: Router, private service: LoginService, private appservice: AppService, private loc: Location) {
+  }
+
+  ngOnInit() {
+    // Lấy logo với điều kiện là trên server
+    if (environment.production) {
+      this.get_logo();
+    }
+    this.language_bi === 'vn' ? this.language = language : this.language = language_en;
+    // Nếu có localstorage
+    const access_token = localStorage.getItem(environment.access_token);
+    if (access_token) {
+      // Gửi thông tin để thực hiện xóa access_token cũ
+      this.appservice.get(environment.API.logout).subscribe(res => {
+        console.log('Đăng xuất thành công');
+      }, (error) => {
+        console.log('Không thể kết nối tới máy chủ');
+      });
+      // Xóa tại client.
+      this.service.logout();
+    }
+  }
+
+  get_logo() {
+    const source = window.location.hostname; // Lấy tên miền ví dụ: bi.acs.vn
+    // Gửi thông tin để lấy logo
+    this.blockUI.start('Đang tải thông tin cấu hình...');
+    const url = environment.API.get_organization_for_login;
+    const data = {
+      name: source
+    };
+    this.appservice.post(data, url).subscribe(res => {
+      console.log(res);
+      this.logo_source = res.data;
+    }, (error) => {
+      // nothing to do
+    }).add(() => {
+      this.blockUI.stop();
+    });
+  }
+
+  change_language(event) {
+    if (!environment.production) {
+      console.log(event.target.value);
+    }
+    this.language_bi = event.target.value;
+    this.language_bi === 'vn' ? this.language = language : this.language = language_en;
+
+    localStorage.setItem(environment.language, event.target.value);
+  }
+
+  OnSubmit(email, password) {
+    this.blockUI.start('Loading...'); // Start blocking
+    this.service.login(email, password)
+      .subscribe(
+        res => {
+          localStorage.setItem(environment.language, JSON.stringify(this.language_bi));
+          localStorage.setItem(environment.oauth_token, res);
+          localStorage.setItem(environment.access_token, res.access_token);
+        },
+        (error) => {
+          if (error === 'Server error') {
+            this.errMes = 'Máy chủ không trả lời, kiểm tra máy chủ hoặc đường truyền internet';
+          } else if (error === 'invalid_credentials') {
+            this.errMes = 'Tên đăng nhập hoặc mật khẩu không đúng';
+          } else {
+            this.errMes = 'Lỗi không rõ nguyên nhân';
+          }
+          this.isLoginError = true;
+        }, () => {
+          this.service.getUser().subscribe(res => {
+            const userInfo = res.userInfo;
+            localStorage.setItem(environment.UserLoged, JSON.stringify(userInfo));
+            if (res.page_module_array.length === 0) {
+              this.errMes = 'Bạn chưa được phân quyền sử dụng';
+              this.isLoginError = true;
+            } else {
+              // Lưu module vào client storage
+              localStorage.setItem(environment.module_array, JSON.stringify(res.page_module_array));
+              // Lưu menu vào client storage
+              this.Get_module(res.page_module_array);
+              // Check xem là quản trị hệ thống không
+              localStorage.setItem(environment.is_admin_organization, JSON.stringify(res.is_admin));
+              // Lấy các page thành viên có quyền truy cập
+              localStorage.setItem(environment.expert_page_permission, JSON.stringify(res.expert_page_permission));
+              // check xem có được kết nối socket io không
+              localStorage.setItem('connectSocketIo', environment.connectSocketIo);
+              // lấy version
+              localStorage.setItem('version', environment.version);
+              this.router.navigate(['/dashboard']);
+              // this.get_data_necessary();
+            }
+          }, (error) => {
+            // Nếu không hợp lệ
+            this.service.logout();
+          });
+        }
+      ).add(() => {
+        this.blockUI.stop();
+      });
+  }
+
+  Get_module(page_module_array) {
+    const nav = [];
+    navItems.forEach(element => {
+      const element_title = element.module_title.toLowerCase();
+      if (element_title === 'default' || element_title === 'about') {
+        nav.push(element);
+      } else {
+        page_module_array.forEach(index => {
+          const index_title = index.page_module.toLowerCase();
+          if (element_title === index_title) {
+            if (element_title !== 'all') {
+              nav.push(element);
+            } else {
+              const data = {
+                name: element.name,
+                name_en: element.name_en,
+                module_title: element.module_title,
+                url: element.url,
+                icon: element.icon,
+                children: []
+              };
+              for (let i = 0; i < element.children.length; i++) {
+                const e_title = element.children[i].title;
+                page_module_array.forEach(index2 => {
+                  const index_title2 = index2.page_module.toLowerCase();
+                  if (e_title === index_title2) {
+                    data.children.push(element.children[i]);
+                  }
+                });
+              }
+              nav.push(data);
+            }
+          }
+        });
+      }
+    });
+    localStorage.setItem(environment.Left_menu_array, JSON.stringify(nav));
+  }
+}

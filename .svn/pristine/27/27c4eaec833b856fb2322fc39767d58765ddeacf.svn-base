@@ -1,0 +1,239 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-fbamenu></app-fbamenu>
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a style="color:cornflowerblue"
+                  [routerLink]="['/fba/question/list-question']"><i class="fa fa-home" aria-hidden="true"></i>
+                  Admin</a></li>
+            <li class="breadcrumb-item">
+               <!-- <a [routerLink]="['/admin/question']">Question</a> -->
+            </li>
+            <!-- <li class="breadcrumb-item active">Dashboard</li> -->
+            <li class="breadcrumb-menu ">
+               <div class="btn-group" role="group" aria-label="Button group">
+                  <!-- <a class="btn" href="#">
+                  <i class="icon-speech"></i>
+                  </a> -->
+                  <a *ngIf="can_add" class="btn add-question" [routerLink]="['/fba/question/add-question']">
+                     <i style="color: white" class="fa fa-plus" aria-hidden="true"></i> &nbsp;Thêm câu hỏi
+                  </a>
+                  <!--   <a  style="background: green; color: white; border-radius: 5px; width: auto; padding: 3px 14px;"  class="btn" [routerLink]="['/admin/question']">
+                <i style="color:white " class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp;Thêm  mới
+                  </a> -->
+               </div>
+            </li>
+         </ol>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-md-12">
+         <div class="card card-parent">
+            <block-ui></block-ui>
+            <div class="card-body header-admin-question" style=" padding: 0px;">
+               <div class="row">
+                  <div class="col-md-4 col-4">
+                     <div class="form-group col-md-12">
+                        <label class="col-form-label" for="password">Tên tổ chức</label>
+                        <ng-select class="bootstrap selectimeview" [options]="organization_arr"
+                           [(ngModel)]="org_selected" (selected)="thaydoitochuc($event)" [allowClear]="true">
+                        </ng-select>
+                        <!-- [(ngModel)]="org_selected"  -->
+                     </div>
+                  </div>
+                  <div class="col-md-4 col-4">
+                     <div class="form-group col-md-12">
+                        <label class="col-form-label" for="password">Tình trạng câu hỏi</label>
+                        <ng-select class="bootstrap selectimeview" [options]="status_question"
+                           [(ngModel)]="status_question_selected" (selected)="thaydoistatus($event)"
+                           [allowClear]="true"></ng-select>
+                     </div>
+                  </div>
+                  <div class="col-md-4  col-4">
+                     <div class="form-group col-md-12">
+                        <label class="col-form-label" for="password"> Trạng thái câu hỏi </label>
+                        <ng-select class="bootstrap selectimeview" (selected)="changedeted($event)"
+                           [options]="deleted_question" [(ngModel)]="deleted_question_selected" [allowClear]="true">
+                        </ng-select>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="popup-table" [hidden]="hienkhung">
+         <div class="card">
+            <span class="table-quality-close" (click)="hienkhung=true">×</span>
+            <div style=" padding: 0.25rem 1.25rem 1.25rem 1.25rem;" class="card-body">
+               <table style=" margin-bottom: 0 !important;width:100%"
+                  class="table table-bordered datatable table-striped table-sm">
+                  <tbody>
+                     <tr style="text-align: center;">
+                        <td><img *ngIf="data2.very_positive_img" class="img-responsive" style="width:40px;"
+                              [src]="'data:image/png;base64,'+data2.very_positive_img" alt=""></td>
+                        <td><img *ngIf="data2.positive_img" class="img-responsive" style="width:40px;"
+                              [src]="'data:image/png;base64,'+data2.positive_img" alt=""></td>
+                        <td><img *ngIf="data2.negative_img" class="img-responsive" style="width:40px;"
+                              [src]="'data:image/png;base64,'+data2.negative_img" alt=""></td>
+                        <td><img *ngIf="data2.very_negative_img" class="img-responsive" style="width:40px;"
+                              [src]="'data:image/png;base64,'+data2.very_negative_img" alt=""></td>
+                     </tr>
+                     <tr style="text-align: center;">
+                        <td>{{data2.very_positive}}</td>
+                        <td>{{data2.positive}}</td>
+                        <td>{{data2.negative}}</td>
+                        <td>{{data2.very_negative}}</td>
+                     </tr>
+
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+      <!-- khung popup-table -->
+      <div class="khung-black" [hidden]="hienkhung" (click)="hienkhung =true">
+      </div>
+      <!-- khung popup-table -->
+   </div>
+   <!-- Kết thúc header -->
+   <div class="row">
+      <div class="col-lg-12">
+         <!-- <div [hidden]="show_alert" *ngFor="let item of messenger" class="alert alert-success" role="alert">
+                 {{item.id}}
+          </div> -->
+         <div class="card card-parent">
+            <div class="card-header card-font">
+               <i class="fa fa-list-alt" aria-hidden="true"></i> <span>Danh sách câu hỏi</span>
+            </div>
+            <div class="card-body card-table">
+               <div style="width:100%" class="question-list table-responsive">
+                  <div class="row question-list_filter_table">
+                     <ul>
+                        <li id="showrow">
+                           <span class="font-span-table">Số dòng: &nbsp;</span>
+                           <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                              <option [ngValue]="5"> &nbsp; 5</option>
+                              <option [ngValue]="15">15</option>
+                              <option [ngValue]="30">30</option>
+                              <option [ngValue]="50">50</option>
+                           </select>
+                        </li>
+                        <li><span class="font-span-table">Tìm kiếm: &nbsp;</span><input type="text"
+                              class="input_filter_table" (keyup)="search_table($event.target.value)"></li>
+                     </ul>
+                  </div>
+                  <table [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                     style="width: 100%;min-width: 900px" class="table  table-striped">
+                     <thead>
+                        <tr>
+                           <th style="width: 50px;text-align:center">STT</th>
+                           <th style="width: 190px;text-align:center">Chiến dịch
+
+                           </th>
+                           <th style="width: 210px;;text-align:center">Tên câu hỏi</th>
+                           <th style="width: 110px;;text-align:center">
+                              <mfDefaultSorter by="start_time">Thời gian bắt đầu <i
+                                    style="color:#c8ced3;font-size: 12px" class="fa fa-sort">&nbsp;</i>
+                              </mfDefaultSorter>
+                           </th>
+                           <th style="width: 110px;text-align:center">
+                              <mfDefaultSorter by="end_time">Thời gian kết thúc <i style="color:#c8ced3;font-size: 12px"
+                                    class="fa fa-sort"></i></mfDefaultSorter>
+                           </th>
+                           <th style="width: 90px;text-align:center">Trạng thái</th>
+                           <th style="width: 120px;text-align:center"> Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let item of mf.data;let i = index">
+                           <td style="width: 40px;text-align:center">{{i+1}}</td>
+                           <td>{{item.campaign_name}}</td>
+                           <td style="color: cornflowerblue;cursor: pointer;padding-left: 10px"
+                              (click)="dulieuthaydoi(item)"><a title="Chi tiết đánh giá">{{item.question_name}}</a></td>
+                           <td class="table-td-start-time">{{item.start_time | date:'dd/MM/yyyy'}}</td>
+                           <td class="table-td-end-time">{{item.end_time | date: 'dd/MM/yyyy'}}</td>
+                           <td class="table-td-bat-tat"> <span
+                                 class="badge {{item.actived == true ? 'badge-success' : 'badge-danger'}}">{{item.actived
+                                 == true ? 'Bật' : 'Tắt'}}</span></td>
+                           <td class="table-td-xu-ly">
+                              <a class="btn btn-info" routerLink="/fba/question/update-question/{{item.id}}"
+                                 title="Sửa câu hỏi">
+                                 <i class="fa fa-edit"></i> </a> &nbsp;
+                              <a *ngIf="item.deleted == 0 && can_delete && item.organization_id !== 0" class="btn btn-danger"
+                                 (click)="modal_question(item.id,dialog)" title="Xóa câu hỏi"> <i
+                                    class="fa fa-trash-o"></i>
+                              </a>
+                              <a *ngIf="item.deleted == 1 && can_delete" class="btn btn-danger"
+                                 (click)="modal_recycle_question(item.id,dialogs)" title="Khôi phục câu hỏi"> <i
+                                    class="fa fa-recycle" aria-hidden="true"></i>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                           <td colspan="7" *ngIf="data?.length === 0"
+                              style="color:gray;font-style:italic; text-align: center; white-space: pre;">
+                              <span>Không có dữ liệu</span>
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="question-list-tfoot">
+                        <tr>
+                           <td colspan="7">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <!-- Model hỏi xóa -->
+         <ng-template #dialog>
+            <div class="modal-body box-shadow">
+               <div class="row">
+                  <div class="col-md-12 mb-3">
+                     <div id="border-remove">
+                        <i class="fa fa-remove fa-3x"></i>
+                     </div>
+                  </div>
+                  <div class="col-md-12 text-center">
+                     <h3>Bạn có chắc chắn muốn xóa?</h3>
+                     <p>Bạn có thật sự muốn xóa bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+                  </div>
+                  <div class="col-md-12 text-center">
+                     <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="delete_question()"
+                        style="background:#9c1b1b; border-color: #9c1b1b;">Xóa</button>
+                     <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                        Đóng</button>
+                  </div>
+               </div>
+            </div>
+         </ng-template>
+         <!-- Model hỏi khôi phục -->
+         <ng-template #dialogs>
+            <div class="modal-body box-shadow">
+               <div class="row">
+                  <div class="col-md-12 mb-3">
+                     <div id="border-remove">
+                        <i class="fa fa-remove fa-3x"></i>
+                     </div>
+                  </div>
+                  <div class="col-md-12 text-center">
+                     <h3>Bạn có chắc chắn muốn khôi phục?</h3>
+                     <p>Bạn có thật sự muốn khôi phục bản ghi? Tiến trình này sẽ không thể dừng lại</p>
+                  </div>
+                  <div class="col-md-12 text-center">
+                     <button class="btn btn-danger pr-4 pl-4 mr-2" (click)="recycle_question()"
+                        style="background:#9c1b1b; border-color: #9c1b1b;">Khôi
+                        phục</button>
+                     <button (click)="modalRef.hide()" style="margin-right: 8px;" class="btn btn-huy active pr-4 pl-4">
+                        Đóng</button>
+                  </div>
+               </div>
+            </div>
+         </ng-template>
+      </div>
+   </div>
+</main>

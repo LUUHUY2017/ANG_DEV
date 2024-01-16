@@ -1,0 +1,826 @@
+<block-ui></block-ui>
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row mr-0 ml-0" id="time-comparison-header">
+      <div class="col-sm-12 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-sm-12 col-md-8 p-0">
+        <div class="time-period-comparison">
+          <app-timeperiod class="time_input1 time_no_input1 input_no_time1" #TimeInput
+            (submit_date)="get_date_from_emit($event,1)">
+          </app-timeperiod>
+          <span style="padding: 0px 10px;font-size:11px;">{{language.so_voi}}</span>
+          <app-timeperiod2 class="time_input2 time_no_input2" #TimeInput_2 (submit_date2)="get_date_from_emit($event,2)">
+          </app-timeperiod2>
+        </div>
+      </div>
+    </div>
+  </div> <!-- end-card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <script src="ace-builds/src-min/ace.js"></script>
+        <div class="animated fadeIn">
+          <div class="card card-child">
+            <div class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li style="margin-right:5px;">
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                      bindValue="value" groupBy="group" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 3px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}}
+                        </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor:pointer" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div> <!-- card-header -->
+            <div class="card-body card-body-bottom">
+              <div class="row">
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-7 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right " data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                      (click)="change_view()">{{language.gio}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day"
+                      (click)="change_view()">{{language.ngay}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week"
+                      (click)="change_view()">{{language.tuan}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Month"
+                      (click)="change_view()">{{language.thang}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Year"
+                      (click)="change_view()">{{language.nam}}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row foot-title-show"> {{site_name}} &nbsp; {{ title_index }} &nbsp; {{ starttime }}
+                &nbsp;&minus;&nbsp; {{ endtime }} &nbsp; {{ title_time_period }}: {{ time_period }} &nbsp; <i
+                  style="border-bottom: 1px dotted #7b7b7b;"> {{language.so_voi}} </i> &nbsp; {{time_period_compare}}
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container1></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div style="border-top:1px dotted #a7a4a4" class="row">
+                    <div class="table-responsive">
+                      <table style="width: 100%;min-width: 900px" id="table"
+                        class="table table-striped table-comparation">
+                        <thead>
+                          <tr>
+                            <th style="width:200px;padding-left: 2.5rem;">{{language.time}}</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.visitors ">
+                              {{indexes.visitors}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.visitors ">
+                              {{indexes.visitors}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              {{indexes.traffic_flow}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              {{indexes.traffic_flow}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.passerby">
+                              {{indexes.passerby}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.passerby">
+                              {{indexes.passerby}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.shoppers">
+                              {{indexes.shoppers}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.shoppers">
+                              {{indexes.shoppers}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.kids_visitors">
+                              {{indexes.kids_visitors}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.kids_visitors">
+                              {{indexes.kids_visitors}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.turn_in_rate">
+                              {{indexes.turn_in_rate}} (%)</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.turn_in_rate">
+                              {{indexes.turn_in_rate}} Compared (%)</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              {{indexes.avg_time}} (min) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              {{indexes.avg_time}} Compared (min)</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              {{indexes.conversion_rate}} (%)</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              {{indexes.conversion_rate}} Compared (%)</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.atv"> {{indexes.atv}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.atv"> {{indexes.atv}}
+                              Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.avg_items">
+                              {{indexes.avg_items}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.avg_items">
+                              {{indexes.avg_items}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              {{indexes.sales_yield}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              {{indexes.sales_yield}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.transactions">
+                              {{indexes.transactions}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.transactions">
+                              {{indexes.transactions}} Compared </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales"> {{indexes.sales}}
+                            </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales"> {{indexes.sales}}
+                              Compared</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.missed_sales_opportunity">
+                              {{indexes.missed_sales_opportunity}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.missed_sales_opportunity">
+                              {{indexes.missed_sales_opportunity}} Compared</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              {{indexes.sales_hours}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              {{indexes.sales_hours}} Compared</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              {{indexes.shoppers_on_sales_hour}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              {{indexes.shoppers_on_sales_hour}} Compared</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              {{indexes.sales_on_sales_hour}} </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              {{indexes.sales_on_sales_hour}} Compared</th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              {{indexes.member_visitors}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              {{indexes.member_visitors}} Compared (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              {{indexes.member_transactions}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              {{indexes.member_transactions}} Compared (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              {{indexes.member_conversion_rate}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              {{indexes.member_conversion_rate}} Compared (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              {{indexes.missed_member_rate}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              {{indexes.missed_member_rate}} Compared (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.cx_index">
+                              {{indexes.cx_index}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.cx_index">
+                              {{indexes.cx_index}} Compared (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.nps_index">
+                              {{indexes.nps_index}} (%) </th>
+                            <th style="width:250px" [hidden]="indexOptionSelected !==indexes.nps_index">
+                              {{indexes.nps_index}} Compared (%) </th>
+                            <th style="width:250px;font-size:22px;line-height: 20px;">
+                              <span class="fa-icon-green "><i class="fa fa-caret-up"></i></span>
+                              <span class="fa-icon-red pdl-5"><i class="fa fa-caret-down"></i></span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td></td>
+                            <!-- tổng số lượng visit -->
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              <b>{{total_num_to_enter  |  number:'1.0-2'}}</b><br> </td>
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              <b>{{total_num_to_enter_compare > 0 ? ( total_num_to_enter_compare  |  number:'1.0-2') : 0}}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              <b>{{get_number_int(total_num_to_enter_compare,total_num_to_enter) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech,total_num_to_enter_compare ) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng PasserBy -->
+                            <td [hidden]="indexOptionSelected !==indexes.passerby ">
+                              <b>{{total_passer_by  |  number:'1.0-2'}}</b> </td>
+                            <td [hidden]="indexOptionSelected !==indexes.passerby ">
+                              <b>{{total_passer_by_compare > 0 ? ( total_passer_by_compare  |  number:'1.0-2') : 0}}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.passerby ">
+                              <b>{{get_number_int(total_passer_by_compare,total_passer_by) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech,total_passer_by_compare ) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Kids Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors ">
+                              <b>{{total_kids  |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors ">
+                              <b>{{total_kids_compare > 0 ? ( total_kids_compare  |  number:'1.0-2') : 0}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors ">
+                              <b>{{get_number_int(total_kids_compare,total_kids) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech,total_kids_compare ) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Turn in rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate ">
+                              <b>{{total_turn_rate  |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate ">
+                              <b>{{total_turn_rate_compare > 0 ? ( total_turn_rate_compare  |  number:'1.0-2') : 0}}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate ">
+                              <b>{{get_number_int(total_turn_rate_compare,total_turn_rate) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech,total_turn_rate_compare ) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Shopper Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers ">
+                              <b>{{total_shopper_visits  |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers ">
+                              <b>{{total_shopper_visits_compare > 0 ? ( total_shopper_visits_compare  |  number:'1.0-2') : 0}}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers ">
+                              <b>{{get_number_int(total_shopper_visits_compare,total_shopper_visits) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech,total_shopper_visits_compare ) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+
+                            <!-- tổng số lượng traffic -->
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              <b>{{total_num_to_traffic |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              <b>{{ total_num_to_traffic_compare > 0 ? (total_num_to_traffic_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              <b>{{get_number_int(total_num_to_traffic_compare,total_num_to_traffic) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, total_num_to_traffic_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- time trung bình  -->
+                            <td [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              <b>{{toHHMMSS(total_avgtime)}}</b><br> <span class="spancell">Thời gian trung bình</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              <b>{{toHHMMSS(total_avgtime_compare)}}</b><br> <span class="spancell">Thời gian trung bình
+                                được so sánh</span></td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_time">
+                              <b>{{toHHMMSS(get_number_int(total_avgtime,total_avgtime_compare))}}</b><br>
+                              <span class="spancell">{{language.thoi_gian_chenh_lech}}</span>
+                            </td>
+                            <!-- tổng số lượng Conversion rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              <b>{{tt_conver |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              <b>{{ tt_conver_compare > 0 ? (tt_conver_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              <b>{{get_number_int(tt_conver_compare,tt_conver) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_conver_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng ATV -->
+                            <td [hidden]="indexOptionSelected !==indexes.atv"><b>{{tt_atv |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.atv">
+                              <b>{{ tt_atv_compare > 0 ? (tt_atv_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.atv">
+                              <b>{{get_number_int(tt_atv_compare,tt_atv) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_atv_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Avg Items -->
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              <b>{{tt_avg_item |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              <b>{{ tt_avg_item_compare > 0 ? (tt_avg_item_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              <b>{{get_number_int(tt_avg_item_compare,tt_avg_item) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_avg_item_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Sales Yield -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              <b>{{tt_sales_yeild |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              <b>{{ tt_sales_yeild_compare > 0 ? (tt_sales_yeild_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              <b>{{get_number_int(tt_sales_yeild_compare,tt_sales_yeild) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_sales_yeild_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Transactions -->
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              <b>{{tt_transactions |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              <b>{{ tt_transactions_compare > 0 ? (tt_transactions_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              <b>{{get_number_int(tt_transactions_compare,tt_transactions) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_transactions_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Sales -->
+                            <td [hidden]="indexOptionSelected !=='Sales'"><b>{{tt_sales |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !=='Sales'">
+                              <b>{{ tt_sales_compare > 0 ? (tt_sales_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !=='Sales'">
+                              <b>{{get_number_int(tt_sales_compare,tt_sales) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_sales_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Missed Sales Opportunity -->
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              <b>{{tt_missed_sales |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              <b>{{ tt_missed_sales_compare > 0 ? (tt_missed_sales_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              <b>{{get_number_int(tt_missed_sales_compare,tt_missed_sales) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_missed_sales_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Sales hours -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              <b>{{tt_sales_hour |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              <b>{{ tt_sales_hour_compare > 0 ? (tt_sales_hour_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              <b>{{get_number_int(tt_sales_hour_compare,tt_sales_hour) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_sales_hour_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Shoppers on sales hour -->
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              <b>{{tt_shopper_on_sh |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              <b>{{ tt_shopper_on_sh_compare > 0 ? (tt_shopper_on_sh_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              <b>{{get_number_int(tt_shopper_on_sh_compare,tt_shopper_on_sh) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_shopper_on_sh_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Sales on sales hour -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              <b>{{tt_sales_on_sh |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              <b>{{ tt_sales_on_sh_compare > 0 ? (tt_sales_on_sh_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              <b>{{get_number_int(tt_sales_on_sh_compare,tt_sales_on_sh) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_sales_on_sh_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Loyal Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              <b>{{tt_loyal_visits |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              <b>{{ tt_loyal_visits_compare > 0 ? (tt_loyal_visits_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              <b>{{get_number_int(tt_loyal_visits_compare,tt_loyal_visits) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_loyal_visits_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Loyal Transactions -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              <b>{{tt_loy_tran |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              <b>{{ tt_loy_tran_compare > 0 ? (tt_loy_tran_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              <b>{{get_number_int(tt_loy_tran_compare,tt_loy_tran) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_loy_tran_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Loyal Conversion rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              <b>{{tt_loy_conver |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              <b>{{ tt_loy_conver_compare > 0 ? (tt_loy_conver_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              <b>{{get_number_int(tt_loy_conver_compare,tt_loy_conver) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_loy_conver_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng Missed Loyal rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              <b>{{tt_missed_loyal |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              <b>{{ tt_missed_loyal_compare > 0 ? (tt_missed_loyal_compare |  number:'1.0-2') : 0 }}</b>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              <b>{{get_number_int(tt_missed_loyal_compare,tt_missed_loyal) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_missed_loyal_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng CX Index -->
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              <b>{{tt_cx_index |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              <b>{{ tt_cx_index_compare > 0 ? (tt_cx_index_compare |  number:'1.0-2') : 0 }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              <b>{{get_number_int(tt_cx_index_compare,tt_cx_index) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_cx_index_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                            <!-- tổng số lượng{{indexes.nps_index}} -->
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              <b>{{tt_nps_index |  number:'1.0-2'}}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              <b>{{ (tt_nps_index_compare |  number:'1.0-2')  }}</b></td>
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              <b>{{get_number_int(tt_nps_index_compare,tt_nps_index) | number:'1.0-2'}}</b>
+                              <div class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, tt_nps_index_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr *ngFor="let item of chart_data">
+                            <td style="padding-left: 2.5rem;">{{item.time_period}} </td>
+                            <!-- hiển thị giá trị visit -->
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              {{ item.num_to_enter ? (item.num_to_enter |  number:'1.0-2') : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.num_to_enter ? '(' + Go_number(item.num_to_enter, total_num_to_enter) + '%)' : ''}}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              {{item.num_to_enter_compare ? (item.num_to_enter_compare |  number:'1.0-2') : '' }}
+                              <span class="spancell">
+                                {{ item.num_to_enter_compare ? '('+ Go_number(item.num_to_enter_compare, total_num_to_enter_compare)+'%)' : '&minus;'}}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.visitors ">
+                              {{ get_number_int(item.num_to_enter_compare,item.num_to_enter) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech , item.num_to_enter_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị traffic -->
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              {{ item.traffic ? (item.traffic |  number:'1.0-2')  : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.traffic ? '('+ Go_number(item.traffic, total_num_to_traffic) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              {{item.traffic_compare ?  (item.traffic_compare  |  number:'1.0-2') : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.traffic_compare ? '(' + Go_number(item.traffic_compare, total_num_to_traffic_compare) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.traffic_flow">
+                              {{ get_number_int(item.traffic_compare,item.traffic) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.traffic_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị PasserBy -->
+                            <td [hidden]="indexOptionSelected !==indexes.passerby">
+                              {{ item.passer_by ? (item.passer_by |  number:'1.0-2')  : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.passer_by ? '('+ Go_number(item.passer_by, total_passer_by) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.passerby">
+                              {{item.passer_by_compare ?  (item.passer_by_compare  |  number:'1.0-2') : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.passer_by_compare ? '(' + Go_number(item.passer_by_compare, total_passer_by_compare) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.passerby">
+                              {{ get_number_int(item.passer_by_compare,item.passer_by) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.passer_by_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Kids Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors">
+                              {{item.kids_visits ? (item.kids_visits |  number:'1.0-2')  : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.kids_visits ? '('+ Go_number(item.kids_visits, total_kids) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors">
+                              {{item.kids_visits_compare ?  (item.kids_visits_compare  |  number:'1.0-2') : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.kids_visits_compare ? '('+ Go_number(item.kids_visits_compare, total_kids_compare) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.kids_visitors">
+                              {{ get_number_int(item.kids_visits_compare,item.kids_visits) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.kids_visits_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Turn in rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate">
+                              {{item.turn_in_rate ? (item.turn_in_rate |  number:'1.0-2')  : '&minus; '}}</td>
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate">
+                              {{item.turn_in_rate_compare ?  (item.turn_in_rate_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.turn_in_rate">
+                              {{ get_number_int(item.turn_in_rate_compare,item.turn_in_rate) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.turn_in_rate_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Shopper Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers">
+                              {{item.shopper_visits ? (item.shopper_visits |  number:'1.0-2')  : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.shopper_visits ? '('+ Go_number(item.shopper_visits, total_shopper_visits) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers">
+                              {{item.shopper_visits_compare ?  (item.shopper_visits_compare  |  number:'1.0-2') : '&minus; '}}
+                              <span
+                                class="spancell">{{ item.shopper_visits_compare ? '(' + Go_number(item.shopper_visits_compare, total_shopper_visits_compare) + '%)' : '' }}</span>
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers">
+                              {{ get_number_int(item.shopper_visits_compare,item.shopper_visits) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.shopper_visits_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!-- hiển thị thời gian -->
+                            <td class="{{item.avg_time  ? '' : 'td_center'}}"
+                              [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              {{item.avg_time ? toHHMMSS(item.avg_time *60) :  '&minus; ' }}</td>
+                            <td class="{{item.avg_time_compare  ? '' : 'td_center'}}"
+                              [hidden]="indexOptionSelected !==indexes.avg_time ">
+                              {{item.avg_time_compare ? toHHMMSS(item.avg_time_compare *60) : '&minus; ' }}</td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_time">
+                              {{ toHHMMSS( (get_number_int(item.avg_time_compare, item.avg_time)) * 60) }}
+                            </td>
+                            <!--  hiển thị giá trị Conversion rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              {{ item.conversion ? (item.conversion |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              {{item.conversion_compare ? (item.conversion_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.conversion_rate">
+                              {{ get_number_int(item.conversion_compare,item.conversion) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.conversion_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị ATV -->
+                            <td [hidden]="indexOptionSelected !==indexes.atv">
+                              {{ item.atv ? (item.atv |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.atv">
+                              {{item.atv_compare ? (item.atv_compare  |  number:'1.0-2') : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.atv">
+                              {{ get_number_int(item.atv_compare,item.atv) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.atv_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Avg Items -->
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              {{ item.avg_item ? (item.avg_item |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              {{item.avg_item_compare ? (item.avg_item_compare  |  number:'1.0-2') : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.avg_items">
+                              {{ get_number_int(item.avg_item_compare,item.avg_item) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.avg_item_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Sales Yield -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              {{ item.sales_yield ? (item.sales_yield |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              {{item.sales_yield_compare ? (item.sales_yield_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_yield">
+                              {{ get_number_int(item.sales_yield_compare,item.sales_yield) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.sales_yield_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Transactions -->
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              {{ item.transactions ? (item.transactions |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              {{item.transactions_compare ? (item.transactions_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.transactions">
+                              {{ get_number_int(item.transactions_compare,item.transactions) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.transactions_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Sales -->
+                            <td [hidden]="indexOptionSelected !=='Sales'">
+                              {{ item.sales ? (item.sales |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !=='Sales'">
+                              {{item.sales_compare ? (item.sales_compare  |  number:'1.0-2') : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !=='Sales'">
+                              {{ get_number_int(item.sales_compare,item.sales) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.sales_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Missed Sales Opportunity -->
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              {{ item.missed_sales ? (item.missed_sales |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              {{item.missed_sales_compare ? (item.missed_sales_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !=='Missed Sales Opportunity'">
+                              {{ get_number_int(item.missed_sales_compare,item.missed_sales) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.missed_sales_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Sales hours -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              {{ item.sales_hour ? (item.sales_hour |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              {{item.sales_hour_compare ? (item.sales_hour_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_hours">
+                              {{ get_number_int(item.sales_hour_compare,item.sales_hour) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.sales_hour_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Shoppers on sales hour -->
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              {{ item.shopper_on_s_h ? (item.shopper_on_s_h |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              {{item.shopper_on_sh_compare ? (item.shopper_on_sh_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.shoppers_on_sales_hour">
+                              {{ get_number_int(item.shopper_on_sh_compare,item.shopper_on_s_h) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.shopper_on_sh_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Sales on sales hour -->
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              {{ item.sales_on_s_h ? (item.sales_on_s_h |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              {{item.sales_on_s_h_compare ? (item.sales_on_s_h_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.sales_on_sales_hour">
+                              {{ get_number_int(item.sales_on_s_h_compare,item.sales_on_s_h) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.sales_on_s_h_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Loyal Visits -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              {{ item.loyal_visits ? (item.loyal_visits |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              {{item.loyal_visits_compare ? (item.loyal_visits_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_visitors">
+                              {{ get_number_int(item.loyal_visits_compare,item.loyal_visits) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.loyal_visits_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Loyal Transactions -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              {{ item.loyal_transactions ? (item.loyal_transactions |  number:'1.0-2')  : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              {{item.loyal_transactions_compare ? (item.loyal_transactions_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_transactions">
+                              {{ get_number_int(item.loyal_transactions_compare,item.loyal_transactions) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.loyal_transactions_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Loyal Conversion rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              {{ item.loyal_conversion ? (item.loyal_conversion |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              {{item.loyal_conversion_compare ? (item.loyal_conversion_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.member_conversion_rate">
+                              {{ get_number_int(item.loyal_conversion_compare,item.loyal_conversion) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.loyal_conversion_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị Missed Loyal rate -->
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              {{ item.loyal_conversion > 0  ? (( 100 - item.loyal_conversion) |  number:'1.0-2')  : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              {{item.missed_loyal_compare ? (item.missed_loyal_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.missed_member_rate">
+                              {{ get_number_int(item.missed_loyal_compare,item.loyal_conversion > 0  ? (( 100 - item.loyal_conversion) |  number:'1.0-2') :0) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.missed_loyal_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị CX Index -->
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              {{ item.cx_index ? (item.cx_index |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              {{item.cx_index_compare ? (item.cx_index_compare  |  number:'1.0-2') : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.cx_index">
+                              {{ get_number_int(item.cx_index_compare,item.cx_index) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.cx_index_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                            <!--  hiển thị giá trị{{indexes.nps_index}} -->
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              {{ item.nps_index ? (item.nps_index |  number:'1.0-2')  : '&minus; '}} </td>
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              {{item.nps_index_compare ?  (item.nps_index_compare  |  number:'1.0-2') : '&minus; '}}
+                            </td>
+                            <td [hidden]="indexOptionSelected !==indexes.nps_index">
+                              {{ get_number_int(item.nps_index_compare,item.nps_index) | number:'1.0-2' }}
+                              <span class="spancell">
+                                ({{ get_compar_per(number_chenh_lech, item.nps_index_compare) | number:'1.0-2' }}%)
+                                <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+</div>

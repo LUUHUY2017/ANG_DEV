@@ -1,0 +1,10 @@
+<ul class="header-administration" style="overflow-x: auto;">
+    <li routerLinkActive="active"><a [routerLink]="['/fba/setting/setting']"> {{language == 'vn' ? 'Cấu hình' : 'Configuration' }}  </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/question/list-question']"> {{language == 'vn' ? ' Câu hỏi ' : 'Question' }}</a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/notification']"> {{language == 'vn' ? ' Thông báo tự động ' : 'Automatic notifications' }}  </a> </li>
+    <li routerLinkActive="active"><a [routerLink]="['/fba/tablets/list-tablets']"> {{language == 'vn' ? ' Giám sát thiết bị ' : 'Monitoring equipment' }}   </a> </li>
+    <!-- <li routerLinkActive="active"><a [routerLink]="['/administration/tablets']"> </a> </li> -->
+    <li routerLinkActive="active "><a [routerLink]="['/administration/tablets']"> {{language == 'vn' ? ' Thiết bị Smiley Touch ' : 'Smiley Touch device' }}  </a> </li>
+    <li routerLinkActive="active "> <a [routerLink]="['/administration/terminals']">   {{language == 'vn' ? ' Thiết bị Terminals ' : 'Device Terminals' }}  </a> </li>
+    <li routerLinkActive="active "><a [routerLink]="['/administration/users']">  {{language == 'vn' ? '  Cấu hình mail báo cáo' : 'Configure report mail' }} </a> </li>
+</ul>

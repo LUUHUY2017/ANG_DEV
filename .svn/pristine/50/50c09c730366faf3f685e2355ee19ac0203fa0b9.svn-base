@@ -1,0 +1,25 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminSettingComponent } from './setting.component';
+import { AdminSettingRoutingModule } from './setting-routing.module';
+import { SettingService } from '../setting.service';
+import { BlockUIModule } from 'ng-block-ui';
+import { TableModule } from 'primeng/table';
+import { FbaMenuModule } from '../../../viewchild/fbamenu/fbamenu.module';
+
+@NgModule({
+    declarations: [
+        AdminSettingComponent,
+    ],
+    imports: [
+        CommonModule,
+        AdminSettingRoutingModule,
+        BlockUIModule,
+        TableModule,
+        FbaMenuModule
+        // SettingService
+    ],
+    exports: [],
+    providers: [SettingService],
+})
+export class AdminSettingModule { }

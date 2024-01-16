@@ -1,0 +1,83 @@
+<div class="app-body">
+  <main class="main d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <div class="card-group">
+            <div class="card p-4">
+              <div class="card-body">
+                <block-ui></block-ui>
+                <div *ngIf="isLoginError" class="alert alert-danger" role="alert">
+                  {{ errMes }}
+                </div>
+                <form class="form-validate" #frmSignIn="ngForm" (ngSubmit)="OnSubmit(email.value, password.value)">
+
+
+                  <h1>Login</h1>
+                  <p class="text-muted">Sign In to your account</p>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="icon-user"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" type="email" #email ngModel name="email" placeholder="Email" required>
+                  </div>
+                  <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="icon-lock"></i>
+                      </span>
+                    </div>
+                    <input class="form-control" type="password" #password ngModel name="password" placeholder="Password"
+                      required>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <button [disabled]="!frmSignIn.valid" type="submit" class="btn btn-primary px-4">Login</button>
+                    </div>
+                    <div class="col-6 text-right">
+                      <button type="button" class="btn btn-link px-0">Forgot password?</button>
+                    </div>
+                  </div>
+                  <span class="language-css">
+                    <img style="width: 20%;margin: 0 2px 1px 0;" src="assets/lang.jpg" alt="Language">
+                    <select class="" (change)="change_language($event)">
+                      <option value="vn">Việt Nam</option>
+                      <option value="en">English</option>
+                    </select>
+                  </span>
+
+                </form>
+
+              </div>
+            </div>
+            <div class="card text-white bg-primary py-5 d-md-down-none" style="width: 44%;
+            padding: 10px 0px !important;
+            background: #eea820 !important;border-color: transparent;">
+              <div class="card-body text-center gioithieu">
+                <div>
+                  <img [src]="logo_source ? 'data:image/png;base64,'+ logo_source: url + 'fba/logo_acs_small.jpg'"
+                    alt="" style="
+                  width: 40%;
+                  margin-bottom: 15px;
+                  ">
+                  <p class="noidunggioithieu">{{language.slug_login1}}</p>
+                  <p class="noidunggioithieu">{{language.slug_login2}}</p>
+                </div>
+              </div>
+              <span style="position: absolute;
+                  bottom: -1px;
+    right: -1px;
+              display: inline;
+              text-align: right;
+              font-size: 11px;
+              color: #232f3f;">{{language.mot_san_pham_login}} <img style="width: 20%;"
+                  src="{{url + 'admin/logo_acs_small_white.jpg'}}" alt=""></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,90 @@
+.time-period-comparison > app-timeperiod {
+  width: fit-content;
+  display: inline-block;
+  position: relative;
+}
+.time-period-comparison {
+  width: fit-content;
+  float: right;
+}
+:host ::ng-deep {
+  .starttime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .endtime {
+    width: fit-content !important;
+    > div {
+      width: 100px;
+      min-width: 100px;
+    }
+  }
+  .select-visits {
+    width: fit-content !important;
+    > div {
+      width: 130px;
+      min-width: 130px;
+    }
+  }
+  .time_no_input1 #headtimeperiod ul#ul-time li:first-child {
+    display: none !important;
+  }
+  .time_no_input2 #headtimeperiod ul#ul-time li:first-child {
+    display: none !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .time-period-comparison {
+    float: left;
+  }
+}
+
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+}
+.foot-title-show {
+  line-height: 19px;
+  color: #7b7b7b;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Roboto", sans-serif;
+  padding: 8px 0 8px 20px;
+}
+.foot-title-show .title-show2 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.td_center {
+  text-indent: 1rem;
+}
+span.spancell .fa-caret-down {
+  color: red !important;
+  float: left;
+  font-size: 13px;
+  line-height: 20px;
+}
+span.spancell .fa-caret-up {
+  color: green !important;
+  float: left;
+  font-size: 13px;
+  line-height: 20px;
+}
+span.spancell .fa-sort {
+  color: #c8ced3 !important;
+  float: left;
+  font-size: 11px;
+  line-height: 20px;
+}
+.table-comparation tr th {
+  border-bottom: 1px solid #e4eaef !important;
+  border-top: unset !important;
+}
+.table-comparation tr td {
+  vertical-align: middle;
+}

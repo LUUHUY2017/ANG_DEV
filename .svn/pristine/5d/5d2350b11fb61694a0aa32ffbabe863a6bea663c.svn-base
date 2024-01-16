@@ -1,0 +1,1148 @@
+import { IOption } from 'ng-select';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { AppService } from '../../../app.service';
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import Hightcharts from 'highcharts';
+import { TimeperiodComponent } from '../../viewchild/timeperiod/timeperiod.component';
+import { MenutreeComponent } from '../../viewchild/menutree/menutree.component';
+@Component({
+    templateUrl: 'effect-time.component.html',
+    styleUrls: ['effect-time.component.scss'],
+    // encapsulation: ViewEncapsulation.None
+})
+
+export class FootfallEffectTimeComponent implements OnInit {
+    @ViewChild('TimeInput') TimeInput: TimeperiodComponent;
+    @ViewChild('TimeInput_2') TimeInput_2: TimeperiodComponent;
+    @ViewChild(MenutreeComponent) MenuInput: MenutreeComponent;
+    page_id = environment.Pages.footfall.performance_time;
+    @BlockUI() blockUI: NgBlockUI;
+    @ViewChild('container1', { read: ElementRef }) container1: ElementRef;
+    organizations = [];
+    organization_id: string;
+    organization_selected = '';
+    siteSelectionDisplay = false;
+    site_id: any;
+    start_time: string;
+    end_time: string;
+    start_date: any;
+    end_date: any;
+    start_date_compare: any;
+    end_date_compare: any;
+    public startTimeOption: Array<IOption>;
+    public endTimeOption: Array<IOption>;
+    viewDataBy: string;
+    num_to_enter = 0;
+    num_to_enter_compare = 0;
+    total_num_to_enter = 0;
+    total_num_to_enter_compare = 0;
+    total_num_to_traffic = 0;
+    total_num_to_traffic_compare = 0;
+    total_num_to_exit = 0;
+    total_num_to_exit_compare = 0;
+    total_avgtime = 0;
+    total_avgtime_compare = 0;
+    indexOption: Array<IOption>;
+    btnApplyValid = false;
+    // Index compare
+    indexOptionSelected: string;
+    // public navItems = navItems;
+    public sidebarMinimized = true;
+    private changes: MutationObserver;
+    public element: HTMLElement = document.body;
+    public chart_data: any;
+    time_value = '';
+    time_value_compare = '';
+    public userinfo: any = JSON.parse(localStorage.getItem(environment.UserLoged));
+    time_period_array: any;
+    organization_array: any;
+    menu_tree: any[];
+    url_api = environment.apiUrl + 'exports/';
+    name_of_excel: any;
+    time_generate_report = new Date();
+    site_name: string;
+    title_start_date: string;
+    title_end_date: string;
+    time_period: string;
+    title_time_period: string;
+    title_start_date_compare: string;
+    title_end_date_compare: string;
+    time_period_compare: string;
+    title_time_period_compare: string;
+    starttime: string;
+    title_index: string;
+    endtime: string;
+    operator = 'SUM';
+    total_passer_by = 0;
+    total_shopper_visits = 0;
+    total_passer_by_compare = 0;
+    total_shopper_visits_compare = 0;
+    total_kids_compare = 0;
+    total_kids = 0;
+
+    total_turn_rate = 0;
+    tt_conver = 0;
+    tt_atv = 0;
+    tt_avg_item = 0;
+    tt_sales_yeild = 0;
+    tt_transactions = 0;
+    tt_sales = 0;
+    tt_missed_sales = 0;
+    tt_loyal_visits = 0;
+    tt_loy_tran = 0;
+    tt_loy_conver = 0;
+    tt_cx_index = 0;
+    tt_nps_index = 0;
+
+    total_turn_rate_compare = 0;
+    tt_conver_compare = 0;
+    tt_atv_compare = 0;
+    tt_avg_item_compare = 0;
+    tt_sales_yeild_compare = 0;
+    tt_transactions_compare = 0;
+    tt_sales_compare = 0;
+    tt_missed_sales_compare = 0;
+    tt_loyal_visits_compare = 0;
+    tt_loy_tran_compare = 0;
+    tt_loy_conver_compare = 0;
+    tt_cx_index_compare = 0;
+    tt_nps_index_compare = 0;
+    miss_loyal_conversion = 0;
+    up_or_down: string;
+    number_chenh_lech: number;
+    tt_missed_loyal: number;
+    tt_missed_loyal_compare: number;
+    type: string;
+    view: string;
+    tt_sales_hour: number;
+    tt_shopper_on_sh: number;
+    tt_sales_on_sh: number;
+    tt_sales_hour_compare: number;
+    tt_shopper_on_sh_compare: number;
+    tt_sales_on_sh_compare: number;
+
+    constructor(private router: Router, private appservice: AppService) {
+        // thêm mới
+        this.changes = new MutationObserver((mutations) => {
+            this.sidebarMinimized = document.body.classList.contains('sidebar-minimized');
+        });
+        this.changes.observe(<Element>this.element, {
+            attributes: true
+        });
+    }
+    ngOnInit() {
+        this.get_page_param();
+    }
+    get_page_param() {
+        this.blockUI.start('Đang tải cấu hình...');
+        this.appservice.get_user_page_parametter(this.page_id).subscribe(
+            param => {
+                if (!environment.production) {
+                    console.log('get_user_page_parametter', param);
+                }
+                let para = null;
+                if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
+                    // console.log('trong if');
+                    para = param.user_page_parametter;
+                } else {
+                    // console.log('ngoai if');
+                    para = this.set_default();
+                }
+                if (!environment.production) {
+                    console.log(para);
+                }
+                this.indexOption = param.performance_index;
+                this.time_period_array = param.fba_time_period_metrics;
+                this.organization_array = param.organization_arr;
+                this.startTimeOption = param.start_time_list;
+                this.endTimeOption = param.end_time_list;
+                this.organization_id = para.organization_id;
+                if ('site_id' in para) {
+                    this.site_id = para.site_id;
+                }
+                this.start_time = para.start_time;
+                this.end_time = para.end_time;
+                if (para.time_value && para.time_value_compare) {
+                    this.get_date(para.time_value, 1);
+                    this.get_date(para.time_value_compare, 2);
+                } else if (para.start_date && para.end_date && para.start_date_compare && para.end_date_compare) {
+                    this.start_date = para.start_date;
+                    this.end_date = para.end_date;
+                    this.start_date_compare = para.start_date_compare;
+                    this.end_date_compare = para.end_date_compare;
+                    this.start_time = this.start_time.replace(/[']/g, '');
+                    this.end_time = this.end_time.replace(/[']/g, '');
+                }
+                this.viewDataBy = para.view_by;
+                this.indexOptionSelected = para.indexOptionSelected;
+                this.TimeInput.get_data(para, this.time_period_array);
+                this.TimeInput_2.get_data_compare(para, this.time_period_array);
+            },
+            (error) => {
+                if (!environment.production) {
+                    console.log(error);
+                }
+                this.blockUI.stop();
+            },
+            () => {
+                this.get_sitetree();
+                // this.blockUI.stop();
+            }
+        );
+    }
+    get_date(time, id) {
+        const time_array = this.TimeInput.get_time(time);
+        switch (id) {
+            case 1: {
+                this.start_date = this.appservice.convert_date_tostring(time_array.ngaybatdau);
+                this.end_date = this.appservice.convert_date_tostring(time_array.ngayketthuc);
+                this.time_value = time;
+                break;
+            }
+            case 2: {
+                this.start_date_compare = this.appservice.convert_date_tostring(time_array.ngaybatdau);
+                this.end_date_compare = this.appservice.convert_date_tostring(time_array.ngayketthuc);
+                this.time_value_compare = time;
+                break;
+            }
+        }
+    }
+    set_default() {
+        const organization_id = this.userinfo.organization_id === '0' ? 6 : Number(this.userinfo.organization_id);
+        return {
+            organization_id: organization_id
+            // , site_id: 0
+            , start_time: '00:00'
+            , end_time: '23:59'
+            , time_value: 'today'
+            , time_value_compare: 'yesterday'
+            , view_by: 'Hour'
+            , indexOptionSelected: 'Visits'
+        };
+    }
+    reset_session() {
+        const data = [];
+        this.appservice.save_user_page_parametter_by_nghia(this.page_id, JSON.stringify(data)).subscribe(res => {
+            this.get_page_param();
+        });
+    }
+    get_sitetree() {
+        this.blockUI.start('Đang tải dữ liệu...');
+        const url = environment.API.sites + '_get_site_for_report';
+        const data = {
+            organization_id: this.organization_id
+        };
+        this.appservice.post(data, url).subscribe(res => {
+            // console.log(res);
+            this.menu_tree = res.site_array.slice(0);
+            if (!this.site_id) {
+                this.site_id = this.menu_tree.find(item => Number(item.enables) === 1).id;
+            }
+            this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+            this.blockUI.stop();
+        },
+            (error) => {
+                this.blockUI.stop();
+                if (!environment.production) {
+                    console.log(error);
+                }
+            },
+            () => {
+                this.blockUI.stop();
+                this.get_data();
+
+            }
+        );
+    }
+    // Nghĩa thêm function get emit data
+    get_date_from_emit(event, id) {
+        switch (id) {
+            case 1: {
+                if (event[0].start_date && event[0].end_date) {
+                    this.start_date = event[0].start_date;
+                    this.end_date = event[0].end_date;
+                    this.time_value = '';
+                } else if (event[0].time_value) {
+                    this.time_value = event[0].time_value;
+                    this.get_date(this.time_value, 1);
+                }
+                break;
+            }
+            case 2: {
+                if (event[0].start_date && event[0].end_date) {
+                    this.start_date_compare = event[0].start_date;
+                    this.end_date_compare = event[0].end_date;
+                    this.time_value_compare = '';
+                } else if (event[0].time_value) {
+                    this.time_value_compare = event[0].time_value;
+                    this.get_date(this.time_value_compare, 2);
+                }
+                break;
+            }
+        }
+    }
+    get_emit_menu(event) {
+        if (event.organization_id) {
+            this.blockUI.start('Đang tải thông tin tổ chức...');
+            const data = {
+                organization_id: event.organization_id
+            };
+            const url = environment.API.sites + '_get_site_for_report';
+            this.appservice.post(data, url).subscribe(res => {
+                // console.log(res);
+                this.menu_tree = res.site_array.slice(0);
+                this.organization_id = event.organization_id;
+                this.site_id = this.menu_tree[0].id;
+                this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+                this.get_data();
+            }, (error) => {
+                this.blockUI.stop();
+                if (!environment.production) {
+                    console.log(error);
+                }
+            }, () => {
+                this.blockUI.stop();
+            });
+        } else if (event.site_id || event.site_id === 0) {
+            this.site_id = event.site_id;
+        }
+    }
+    // Huy thêm hàm lấy số dương
+    get_number_int(number_comared: number, number2: number) {
+        const chenhlech = Number(number2 - number_comared);
+        this.up_or_down = chenhlech > 0 ? 'caret-up' : chenhlech === 0 ? 'sort' : 'caret-down';
+        this.number_chenh_lech = Math.abs(chenhlech);
+        return Math.abs(chenhlech);
+    }
+    get_compar_per(number1: number, number2: number) {
+        let per = 0;
+        // if (Number(number1) >= Number(number2)) {
+        //     per = (Number(number2) / Number(number1) * 100);
+        // } else {
+        per = (Number(number1) / Number(number2) * 100);
+        // }
+        return per;
+    }
+    Go_number(number, total) {
+        let tong = 0;
+        if (total !== 0) {
+            tong = ((Number(number) / total) * 100);
+            return tong.toFixed(2);
+        }
+        return tong;
+    }
+    get_data() {
+        this.blockUI.start('Đang tải dữ liệu...');
+        const data = {
+            organization_id: this.organization_id
+            , site_id: this.site_id
+            , start_time: '\'' + this.start_time + '\''
+            , end_time: '\'' + this.end_time + '\''
+            , start_date: this.start_date
+            , end_date: this.end_date
+            , view_by: this.viewDataBy
+            , start_date_compare: this.start_date_compare
+            , end_date_compare: this.end_date_compare
+            , indexOptionSelected: this.indexOptionSelected
+            , operator: this.operator
+        };
+        if (!environment.production) {
+            console.log('data', data);
+        }
+
+        this.time_generate_report = new Date();
+        this.starttime = this.startTimeOption.find(item => item.value === this.start_time).label;
+        this.endtime = this.endTimeOption.find(item => item.value === this.end_time).label;
+        this.title_index = this.indexOptionSelected;
+        this.site_name = this.MenuInput.menu_tree.find(item => item.id === this.site_id).site_name;
+        // Lấy thời gian so sánh
+        const start_d = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+        const end_d = new Date(this.end_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+        this.title_start_date = this.appservice.convert_date_tostringdate_by_nghia(start_d, false);
+        this.title_end_date = this.appservice.convert_date_tostringdate_by_nghia(end_d, false);
+        if (this.start_date !== this.end_date) {
+            this.time_period = this.title_start_date + ' - ' + this.title_end_date;
+        } else { this.time_period = this.title_start_date; }
+        // Lấy thời gian so sánh được so sánh
+        const start_d_compare = new Date(this.start_date_compare.replace(/[']/g, '').replace(/[-]/g, '/'));
+        const end_d_compare = new Date(this.end_date_compare.replace(/[']/g, '').replace(/[-]/g, '/'));
+        this.title_start_date_compare = this.appservice.convert_date_tostringdate_by_nghia(start_d_compare, false);
+        this.title_end_date_compare = this.appservice.convert_date_tostringdate_by_nghia(end_d_compare, false);
+        if (this.title_start_date_compare !== this.title_end_date_compare) {
+            this.time_period_compare = this.title_start_date_compare + ' - ' + this.title_end_date_compare;
+        } else { this.time_period_compare = this.title_start_date_compare; }
+
+        this.title_time_period_compare = this.title_time_period = 'Ngày';
+        // tslint:disable-next-line:max-line-length
+        this.view = this.viewDataBy === 'Day' ? 'Ngày' : this.viewDataBy === 'Week' ? 'Tuần' : this.viewDataBy === 'Month' ? 'Tháng' : this.viewDataBy === 'Year' ? 'Năm' : 'Giờ';
+        this.appservice.post(data, environment.PERFORMANCE.API.sp_footfall_performance + '_time_comparison').subscribe(
+            res => {
+                if (!environment.production) {
+                    console.log('res', res);
+                }
+                const chart_xAxis = [];
+                this.chart_data = [];
+                // hiển thị giá trị vao biểu đồ bảng theo dữ liệu trả về của data
+                let i = 0;
+                if (res.data_compare.length >= res.data.length) {
+                    this.get_data_right_more(res.data_compare, res.data);
+                    res.data_compare.forEach(element => {
+                        chart_xAxis[i] = element.time_period;
+                        i++;
+                    });
+                } else {
+                    this.get_data_left_more(res.data, res.data_compare);
+                    i = 0;
+                    res.data.forEach(element => {
+                        chart_xAxis[i] = element.time_period;
+                        i++;
+                    });
+                }
+                const num_to_enter = [];
+                const num_to_enter_compare = [];
+                const traffic = [];
+                const traffic_compare = [];
+                const passer_by = [];
+                const passer_by_compare = [];
+                const shopper_visits = [];
+                const shopper_visits_compare = [];
+                const turn_rate = [];
+                const turn_rate_compare = [];
+                const kids_visits = [];
+                const kids_visits_compare = [];
+                const avg_time = [];
+                const avg_time_compare = [];
+
+                const conversion = [];
+                const atv = [];
+                const avg_item = [];
+                const sales_yield = [];
+                const sales_hour = [];
+                const shopper_on_sh = [];
+                const sales_on_s_h = [];
+                const transactions = [];
+                const sales = [];
+                const missed_sales = [];
+                const loyal_visits = [];
+                const loyal_transactions = [];
+                const loyal_conversion = [];
+                const cx_index = [];
+                const nps_index = [];
+                const miss_loyal_conversion = [];
+
+                const sales_hour_compare = [];
+                const shopper_on_sh_compare = [];
+                const sales_on_s_h_compare = [];
+                const conversion_compare = [];
+                const atv_compare = [];
+                const avg_item_compare = [];
+                const sales_yield_compare = [];
+                const transactions_compare = [];
+                const sales_compare = [];
+                const missed_sales_compare = [];
+                const loyal_visits_compare = [];
+                const loyal_transactions_compare = [];
+                const loyal_conversion_compare = [];
+                const cx_index_compare = [];
+                const nps_index_compare = [];
+                const miss_loyal_conversion_compare = [];
+
+                // biểu đồ theo  lịch 1
+                i = 0;
+                this.reset_to_zero('total_num_to_enter', 'total_num_to_enter_compare',
+                    'total_num_to_traffic', 'total_num_to_traffic_compare',
+                    'total_avgtime', 'total_avgtime_compare',
+                    'total_passer_by', 'total_passer_by_compare',
+                    'total_kids', 'total_kids_compare',
+                    'total_shopper_visits', 'total_shopper_visits_compare',
+                    'total_turn_rate', 'total_turn_rate_compare',
+                    'tt_conver', 'tt_conver_compare',
+                    'tt_atv', 'tt_atv_compare',
+                    'tt_avg_item', 'tt_avg_item_compare',
+                    'tt_sales_yeild', 'tt_sales_yeild_compare',
+                    'tt_transactions', 'tt_transactions_compare',
+                    'tt_sales', 'tt_sales_compare',
+                    'tt_missed_sales', 'tt_missed_sales_compare',
+                    'tt_loyal_visits', 'tt_loyal_visits_compare',
+                    'tt_loy_tran', 'tt_loy_tran_compare',
+                    'tt_loy_conver', 'tt_loy_conver_compare',
+                    'tt_missed_loyal', 'tt_missed_loyal_compare',
+                    'tt_cx_index', 'tt_cx_index_compare'
+                    , 'tt_sales_hour', 'tt_sales_hour_compare'
+                    , 'tt_shopper_on_sh', 'tt_shopper_on_sh_compare'
+                    , 'tt_sales_on_sh', 'tt_sales_on_sh_compare'
+                    , 'tt_nps_index', 'tt_nps_index_compare');
+
+                res.data.forEach(element => {
+                    num_to_enter[i] = Number(element.num_to_enter);
+                    this.total_num_to_enter += Number(num_to_enter[i]);
+
+                    traffic[i] = Number(element.traffic);
+                    this.total_num_to_traffic += Number(traffic[i]);
+
+                    passer_by[i] = Number(element.passer_by);
+                    this.total_passer_by += Number(passer_by[i]);
+
+                    shopper_visits[i] = Number(element.shopper_visits);
+                    this.total_shopper_visits += Number(shopper_visits[i]);
+
+                    turn_rate[i] = Number(element.turn_in_rate);
+                    this.total_turn_rate += Number(turn_rate[i]);
+
+                    kids_visits[i] = Number(element.kids_visits);
+                    this.total_kids += Number(kids_visits[i]);
+
+                    avg_time[i] = Number(element.avg_time);
+                    this.total_avgtime += Number(avg_time[i]);
+
+
+                    conversion[i] = (Number(element.conversion));
+                    atv[i] = (Number(element.atv));
+                    avg_item[i] = (Number(element.avg_item));
+                    sales_yield[i] = (Number(element.sales_yield));
+                    transactions[i] = (Number(element.transactions));
+                    sales[i] = (Number(element.sales));
+                    missed_sales[i] = (Number(element.missed_sales));
+                    loyal_visits[i] = (Number(element.loyal_visits));
+                    loyal_transactions[i] = (Number(element.loyal_transactions));
+                    loyal_conversion[i] = (Number(element.loyal_conversion));
+                    miss_loyal_conversion[i] = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
+                    cx_index[i] = (Number(element.cx_index));
+                    nps_index[i] = (Number(element.nps_index));
+                    sales_hour[i] = (Number(element.sales_hour));
+                    shopper_on_sh[i] = (Number(element.shopper_on_s_h));
+                    sales_on_s_h[i] = (Number(element.sales_on_s_h));
+
+                    this.tt_conver += Number(conversion[i]);
+                    this.tt_atv += Number(atv[i]);
+                    this.tt_avg_item += Number(avg_item[i]);
+                    this.tt_sales_yeild += Number(sales_yield[i]);
+                    this.tt_transactions += Number(transactions[i]);
+                    this.tt_sales += Number(sales[i]);
+                    this.tt_missed_sales += Number(missed_sales[i]);
+                    this.tt_loyal_visits += Number(loyal_visits[i]);
+                    this.tt_loy_tran += Number(loyal_transactions[i]);
+                    this.tt_loy_conver += Number(loyal_conversion[i]);
+                    this.tt_cx_index += Number(cx_index[i]);
+                    this.tt_nps_index += Number(nps_index[i]);
+                    this.tt_sales_hour += Number(sales_hour[i]);
+                    this.tt_shopper_on_sh += Number(shopper_on_sh[i]);
+                    this.tt_sales_on_sh += Number(sales_on_s_h[i]);
+                    i++;
+                });
+                const row1 = Number(res.data.length);
+                // this.total_kids = Number((this.total_kids / row1).toFixed(0));
+                this.total_turn_rate = Number((this.total_turn_rate / row1).toFixed(2));
+                this.total_avgtime = Number((this.total_avgtime * 60 / row1).toFixed(0));
+                this.tt_atv = Number((this.tt_atv / row1).toFixed(2));
+                this.tt_loy_conver = Number((this.tt_loy_conver / row1).toFixed(2));
+                this.tt_missed_loyal = Number(this.tt_loy_conver) > 0 ? (100 - Number(this.tt_loy_conver)) : 0;
+                this.tt_conver = Number((this.tt_conver / row1).toFixed(2));
+                this.tt_avg_item = Number((this.tt_avg_item / row1).toFixed(2));
+                this.tt_loyal_visits = Number((this.tt_loyal_visits / row1).toFixed(2));
+                this.tt_loy_tran = Number((this.tt_loy_tran / row1).toFixed(2));
+                this.tt_cx_index = Number((this.tt_cx_index / row1).toFixed(2));
+                this.tt_nps_index = Number((this.tt_nps_index / row1).toFixed(2));
+                this.tt_sales_hour = Number((this.tt_sales_hour / row1).toFixed(2));
+                this.tt_shopper_on_sh = Number((this.tt_shopper_on_sh / row1).toFixed(2));
+                this.tt_sales_on_sh = Number((this.tt_sales_on_sh / row1).toFixed(2));
+
+                // // biểu đồ theo  lịch 2
+                i = 0;
+                res.data_compare.forEach(element => {
+                    num_to_enter_compare[i] = Number(element.num_to_enter);
+                    this.total_num_to_enter_compare += Number(num_to_enter_compare[i]);
+
+                    traffic_compare[i] = Number(element.traffic);
+                    this.total_num_to_traffic_compare += Number(traffic_compare[i]);
+
+                    passer_by_compare[i] = Number(element.passer_by);
+                    this.total_passer_by_compare += Number(passer_by_compare[i]);
+
+                    shopper_visits_compare[i] = Number(element.shopper_visits);
+                    this.total_shopper_visits_compare += Number(shopper_visits_compare[i]);
+
+                    turn_rate_compare[i] = Number(element.turn_in_rate);
+                    this.total_turn_rate_compare += Number(turn_rate_compare[i]);
+
+                    kids_visits_compare[i] = Number(element.kids_visits);
+                    this.total_kids_compare += Number(kids_visits_compare[i]);
+
+                    avg_time_compare[i] = Number(element.avg_time);
+                    this.total_avgtime_compare += Number(avg_time_compare[i]);
+
+                    conversion_compare[i] = (Number(element.conversion));
+                    atv_compare[i] = (Number(element.atv));
+                    avg_item_compare[i] = (Number(element.avg_item));
+                    sales_yield_compare[i] = (Number(element.sales_yield));
+                    transactions_compare[i] = (Number(element.transactions));
+                    sales_compare[i] = (Number(element.sales));
+                    missed_sales_compare[i] = (Number(element.missed_sales));
+                    loyal_visits_compare[i] = (Number(element.loyal_visits));
+                    loyal_transactions_compare[i] = (Number(element.loyal_transactions));
+                    loyal_conversion_compare[i] = (Number(element.loyal_conversion));
+                    // tslint:disable-next-line:max-line-length
+                    miss_loyal_conversion_compare[i] = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
+                    cx_index_compare[i] = (Number(element.cx_index));
+                    nps_index_compare[i] = (Number(element.nps_index));
+                    sales_hour_compare[i] = (Number(element.sales_hour));
+                    shopper_on_sh_compare[i] = (Number(element.shopper_on_s_h));
+                    sales_on_s_h_compare[i] = (Number(element.sales_on_s_h));
+
+                    this.tt_conver_compare += Number(conversion[i]);
+                    this.tt_atv_compare += Number(atv_compare[i]);
+                    this.tt_avg_item_compare += Number(avg_item_compare[i]);
+                    this.tt_sales_yeild_compare += Number(sales_yield_compare[i]);
+                    this.tt_transactions_compare += Number(transactions_compare[i]);
+                    this.tt_sales_compare += Number(sales_compare[i]);
+                    this.tt_missed_sales_compare += Number(missed_sales_compare[i]);
+                    this.tt_loyal_visits_compare += Number(loyal_visits_compare[i]);
+                    this.tt_loy_tran_compare += Number(loyal_transactions_compare[i]);
+                    this.tt_loy_conver_compare += Number(loyal_conversion_compare[i]);
+                    this.tt_cx_index_compare += Number(cx_index_compare[i]);
+                    this.tt_nps_index_compare += Number(nps_index_compare[i]);
+                    this.tt_sales_hour_compare += Number(sales_hour_compare[i]);
+                    this.tt_shopper_on_sh_compare += Number(shopper_on_sh_compare[i]);
+                    this.tt_sales_on_sh_compare += Number(sales_on_s_h_compare[i]);
+
+                    i++;
+                });
+                const row2 = Number(res.data_compare.length);
+                // this.total_kids_compare = Number((this.total_kids_compare / row2).toFixed(0));
+                this.total_turn_rate_compare = Number((this.total_turn_rate_compare / row2).toFixed(2));
+                this.total_avgtime_compare = Number((this.total_avgtime_compare * 60 / row2).toFixed(0));
+                this.tt_atv_compare = Number((this.tt_atv_compare / row2).toFixed(2));
+                this.tt_loy_conver_compare = Number((this.tt_loy_conver_compare / row2).toFixed(2));
+                this.tt_missed_loyal_compare = Number(this.tt_loy_conver_compare) > 0 ? 100 - Number(this.tt_loy_conver_compare) : 0;
+                this.tt_conver_compare = Number((this.tt_conver_compare / row2).toFixed(2));
+                this.tt_avg_item_compare = Number((this.tt_avg_item_compare / row2).toFixed(2));
+                this.tt_loyal_visits_compare = Number((this.tt_loyal_visits_compare / row2).toFixed(2));
+                this.tt_loy_tran_compare = Number((this.tt_loy_tran_compare / row2).toFixed(2));
+                this.tt_cx_index_compare = Number((this.tt_cx_index_compare / row2).toFixed(2));
+                this.tt_nps_index_compare = Number((this.tt_nps_index_compare / row2).toFixed(2));
+                this.tt_sales_hour_compare = Number((this.tt_sales_hour_compare / row2).toFixed(2));
+                this.tt_shopper_on_sh_compare = Number((this.tt_shopper_on_sh_compare / row2).toFixed(2));
+                this.tt_sales_on_sh_compare = Number((this.tt_sales_on_sh_compare / row2).toFixed(2));
+                this.chart1(chart_xAxis, num_to_enter, num_to_enter_compare, avg_time, avg_time_compare, traffic, traffic_compare,
+                    passer_by, passer_by_compare, shopper_visits, shopper_visits_compare, kids_visits, kids_visits_compare, turn_rate,
+                    turn_rate_compare, conversion, conversion_compare, atv, atv_compare, avg_item, avg_item_compare, sales_yield,
+                    sales_yield_compare, transactions, transactions_compare, sales, sales_compare, missed_sales, missed_sales_compare,
+                    loyal_visits, loyal_visits_compare, loyal_transactions, loyal_transactions_compare, loyal_conversion,
+                    loyal_conversion_compare, miss_loyal_conversion, miss_loyal_conversion_compare,
+                    cx_index, cx_index_compare, nps_index, nps_index_compare, sales_hour, sales_hour_compare, shopper_on_sh,
+                    shopper_on_sh_compare, sales_on_s_h, sales_on_s_h_compare);
+                console.log(this.tt_missed_loyal);
+
+            }, (error) => {
+                this.blockUI.stop();
+                this.reset_session();
+            }, () => {
+                this.blockUI.stop();
+                let save_data;
+                if (this.time_value !== '') {
+                    const data_2 = {
+                        organization_id: this.organization_id
+                        , site_id: this.site_id
+                        , start_time: this.start_time
+                        , end_time: this.end_time
+                        , time_value: this.time_value
+                        , view_by: this.viewDataBy
+                        , time_value_compare: this.time_value_compare
+                        , indexOptionSelected: this.indexOptionSelected
+                    };
+                    save_data = data_2;
+                } else {
+                    save_data = data;
+                }
+                this.appservice.save_user_page_parametter(this.page_id, JSON.stringify(save_data));
+            }
+        );
+    }
+    reset_to_zero(...array) {
+        array.forEach(element => { this[element] = 0; });
+    }
+    get_data_right_more(data1, data2) {
+        let chart_data: { [k: string]: any } = {};
+        data1.forEach((element, index) => {
+            if (data2[index]) {
+                chart_data = data2[index];
+                // console.log('chart_data' + index, chart_data['time_period']);
+                if (this.viewDataBy !== 'Hour') {
+                    const time_old = chart_data['time_period'];
+                    delete chart_data['time_period'];
+                    chart_data['time_period'] = time_old + ' / ' + element.time_period;
+                }
+            } else {
+                chart_data = {
+                    time_period: element.time_period,
+                    avg_time: null,
+                    id: null,
+                    num_to_enter: null,
+                    num_to_exit: null,
+                    traffic: null,
+                    avg_item: null,
+                    sales: null,
+                    transactions: null,
+                    conversion: null,
+                    atv: null,
+                    kids_visits: null,
+                    loyal_conversion: null,
+                    loyal_transactions: null,
+                    loyal_visits: null,
+                    missed_sales: null,
+                    passer_by: null,
+                    sales_compare: null,
+                    sales_yield: null,
+                    shopper_visits: null,
+                    missed_loyal: null,
+                    turn_in_rate: null,
+                    cx_index: null,
+                    nps_index: null,
+                    sales_hour: null,
+                    shopper_on_sh: null,
+                    sales_on_s_h: null,
+                };
+            }
+            chart_data.num_to_enter_compare = element.num_to_enter;
+            chart_data.traffic_compare = element.traffic;
+            chart_data.avg_time_compare = element.avg_time;
+            chart_data.avg_item_compare = element.avg_item;
+            chart_data.sales_compare = element.sales;
+            chart_data.transactions_compare = element.transactions;
+            chart_data.conversion_compare = element.conversion;
+            chart_data.atv_compare = element.atv;
+            chart_data.kids_visits_compare = element.kids_visits;
+            chart_data.loyal_conversion_compare = element.loyal_conversion;
+            chart_data.loyal_transactions_compare = element.loyal_transactions;
+            chart_data.loyal_visits_compare = element.loyal_visits;
+            chart_data.missed_sales_compare = element.missed_sales;
+            chart_data.passer_by_compare = element.passer_by;
+            chart_data.sales_yield_compare = element.sales_yield;
+            chart_data.shopper_visits_compare = element.shopper_visits;
+            chart_data.turn_in_rate_compare = element.turn_in_rate;
+            chart_data.missed_loyal_compare = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
+            chart_data.cx_index_compare = element.cx_index;
+            chart_data.nps_index_compare = element.nps_index;
+            chart_data.sales_hour_compare = element.sales_hour;
+            chart_data.shopper_on_sh_compare = element.shopper_on_sh;
+            chart_data.sales_on_s_h_compare = element.sales_on_s_h;
+            this.chart_data.push(chart_data);
+        });
+    }
+    get_data_left_more(data1, data2) {
+        let chart_data: { [k: string]: any } = {};
+        data1.forEach((element, index) => {
+            chart_data = data1[index];
+            if (data2[index]) {
+                if (this.viewDataBy !== 'Hour') {
+                    const time_data_compa = data2[index]['time_period'];
+                    const time_data = element.time_period;
+                    delete chart_data['time_period'];
+                    chart_data['time_period'] = time_data + ' / ' + time_data_compa;
+                    chart_data['num_to_enter_compare'] = data2[index].num_to_enter;
+                    chart_data['traffic_compare'] = data2[index].traffic;
+                    chart_data['avg_time_compare'] = data2[index].avg_time;
+                    chart_data['avg_item_compare'] = data2[index].avg_item;
+                    chart_data['sales_compare'] = data2[index].sales;
+                    chart_data['transactions_compare'] = data2[index].transactions;
+                    chart_data['conversion_compare'] = data2[index].conversion;
+                    chart_data['atv_compare'] = data2[index].atv;
+                    chart_data['kids_visits_compare'] = data2[index].kids_visits;
+                    chart_data['loyal_conversion_compare'] = data2[index].loyal_conversion;
+                    chart_data['loyal_transactions_compare'] = data2[index].loyal_transactions;
+                    chart_data['loyal_visits_compare'] = data2[index].loyal_visits;
+                    chart_data['missed_sales_compare'] = data2[index].missed_sales;
+                    chart_data['passer_by_compare'] = data2[index].passer_by;
+                    chart_data['sales_yield_compare'] = data2[index].sales_yield;
+                    chart_data['sales_hour_compare'] = data2[index].sales_hour;
+                    chart_data['shopper_on_s_h_compare'] = data2[index].shopper_on_s_h;
+                    chart_data['sales_on_s_h_compare'] = data2[index].sales_on_s_h;
+                    chart_data['shopper_visits_compare'] = data2[index].shopper_visits;
+                    chart_data['turn_in_rate_compare'] = data2[index].turn_in_rate;
+                    // tslint:disable-next-line:max-line-length
+                    chart_data['missed_loyal_compare'] = Number(data2[index].loyal_conversion) > 0 ? Number(100 - (Number(data2[index].loyal_conversion))) : 0;
+                    chart_data['cx_index_compare'] = data2[index].cx_index;
+                    chart_data['nps_index_compare'] = data2[index].nps_index;
+                }
+            } else {
+                chart_data['num_to_enter_compare'] = null;
+                chart_data['traffic_compare'] = null;
+                chart_data['avg_time_compare'] = null;
+                chart_data['avg_item_compare'] = null;
+                chart_data['sales_compare'] = null;
+                chart_data['transactions_compare'] = null;
+                chart_data['conversion_compare'] = null;
+                chart_data['atv_compare'] = null;
+                chart_data['kids_visits_compare'] = null;
+                chart_data['loyal_conversion_compare'] = null;
+                chart_data['loyal_transactions_compare'] = null;
+                chart_data['loyal_visits_compare'] = null;
+                chart_data['missed_sales_compare'] = null;
+                chart_data['passer_by_compare'] = null;
+                chart_data['sales_yield_compare'] = null;
+                chart_data['sales_hour_compare'] = null;
+                chart_data['shopper_on_s_h_compare'] = null;
+                chart_data['sales_on_s_h_compare'] = null;
+                chart_data['shopper_visits_compare'] = null;
+                chart_data['turn_in_rate_compare'] = null;
+                chart_data['missed_loyal_compare'] = null;
+                chart_data['cx_index_compare'] = null;
+                chart_data['nps_index_compare'] = null;
+            }
+            this.chart_data.push(chart_data);
+        });
+    }
+
+    toHHMMSS(totalSeconds) {
+        const hh = Math.floor(totalSeconds / 3600).toFixed(0);
+        totalSeconds %= 3600;
+        const mm = Math.floor(totalSeconds / 60).toFixed(0);
+        const sc = (totalSeconds % 60).toFixed(0);
+        const m = String(mm).padStart(2, '00');
+        const h = String(hh).padStart(2, '00');
+        const s = String(sc).padStart(2, '00');
+        return h + ':' + m + ':' + s;
+    }
+
+    toMM = (secs) => {
+        const minutes = Math.floor(secs / 60);
+        return minutes;
+    }
+
+    exportExcel(): void {
+        const data = {
+            organization_id: this.organization_id
+            , site_id: this.site_id
+            , start_time: '\'' + this.start_time + '\''
+            , end_time: '\'' + this.end_time + '\''
+            , start_date: this.start_date
+            , end_date: this.end_date
+            , view_by: this.viewDataBy
+            , start_date_compare: this.start_date_compare
+            , end_date_compare: this.end_date_compare
+            , indexOptionSelected: this.indexOptionSelected
+        };
+        this.blockUI.start('Đang xuất báo cáo...');
+        // tslint:disable-next-line:max-line-length
+        this.appservice.post(data, environment.PERFORMANCE.API.sp_footfall_performance + '_time_comparison_export_excel').subscribe(fileData => {
+            window.open(this.url_api + fileData);
+            this.name_of_excel = fileData;
+            if (!environment.production) { console.log('Successed'); }
+        }, (error) => {
+            this.blockUI.stop();
+        }, () => {
+            this.blockUI.stop();
+            const data2 = { name_of_excel: this.name_of_excel };
+            const url = environment.FBA.API.export_metrics_analytic + '_delete_excel';
+            this.appservice.post(data2, url).subscribe(res => {
+                if (!environment.production) { console.log('Deleted'); }
+            });
+        }
+        );
+    }
+    type_chart() {
+        if (this.indexOptionSelected === 'Turn in rate' || this.indexOptionSelected === 'Conversion rate'
+            || this.indexOptionSelected === 'Avg Time' || this.indexOptionSelected === 'Loyal Visits' || this.indexOptionSelected === 'ATV'
+            || this.indexOptionSelected === 'Avg Items' || this.indexOptionSelected === 'Loyal Transactions'
+            || this.indexOptionSelected === 'Loyal Conversion rate' || this.indexOptionSelected === 'Missed Loyal rate'
+            || this.indexOptionSelected === 'CX index' || this.indexOptionSelected === 'NPS index'
+            || this.indexOptionSelected === 'Sales hours' || this.indexOptionSelected === 'Shoppers on sales hour') {
+            this.type = 'spline';
+        } else {
+            this.type = 'column';
+        }
+        return this.type;
+    }
+    chart1(chart_xAxis, num_to_enter, num_to_enter_compare, avg_time, avg_time_compare, traffic, traffic_compare,
+        passer_by, passer_by_compare, shopper_visits, shopper_visits_compare, kids_visits, kids_visits_compare, turn_in_rate,
+        turn_in_rate_compare,
+        conversion, conversion_compare, atv, atv_compare, avg_item, avg_item_compare, sales_yield, sales_yield_compare,
+        transactions, transactions_compare, sales, sales_compare, missed_sales, missed_sales_compare, loyal_visits, loyal_visits_compare,
+        loyal_transactions, loyal_transactions_compare, loyal_conversion, loyal_conversion_compare, miss_loyal_conversion,
+        miss_loyal_conversion_compare, cx_index, cx_index_compare, nps_index, nps_index_compare, sales_hour,
+        sales_hour_compare, shopper_on_sh, shopper_on_sh_compare, sales_on_s_h, sales_on_s_h_compare
+    ) {
+        const selft = this;
+        const select = this.indexOptionSelected;
+        const color = environment.POC.colors;
+        Hightcharts.chart(this.container1.nativeElement, {
+            chart: { height: 500, style: { fontFamily: 'Roboto,sans-serif !important;', } },
+            title: { text: '' },
+            subtitle: {
+                useHTML: true, align: 'left', y: 0,
+                // tslint:disable-next-line:max-line-length
+                text: '<div style="font-family:Roboto, sans-serif !important; color: #7b7b7b; width:100%">' + this.site_name + '  ' + this.title_index + ' ' + ' ' + this.starttime + ' - ' + this.endtime + '' + ' ' + this.title_time_period + ':  ' + ' ' + this.time_period + ' so với  ' + this.time_period_compare + ', ' + ' ' + ' xem theo: ' + this.view + '</div> '
+            },
+            tooltip: { shared: true, distance: 80, padding: 10, },
+            navigation: { buttonOptions: { align: 'right', verticalAlign: 'bottom', y: -8 } },
+            // tslint:disable-next-line:max-line-length
+            plotOptions: { series: { events: { legendItemClick: function ($events) { } } }, column: { borderRadius: 2.5, minPointLength: 0 } },
+            xAxis: [{
+                labels: { rotation: -45, style: { fontSize: '90%', fontFamily: 'Roboto, sans-serif' } },
+                categories: chart_xAxis,
+            }],
+            yAxis: [
+                {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.visits } },
+                    allowDecimals: false, title: { text: 'Visits', style: { color: color.visits } },
+                    visible: select === 'Visits', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.traffic_flow } },
+                    allowDecimals: false, title: { text: 'Traffic Flow', style: { color: color.traffic_flow } },
+                    visible: select === 'Traffic Flow', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.passer_by } },
+                    allowDecimals: false, title: { text: 'PasserBy', style: { color: color.passer_by } },
+                    visible: select === 'PasserBy', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.shopper_visits } },
+                    allowDecimals: false, title: { text: 'Shopper Visits', style: { color: color.shopper_visits } },
+                    visible: select === 'Shopper Visits', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.kids_visits } },
+                    allowDecimals: false, title: { text: 'Kids Visits (%)', style: { color: color.kids_visits } },
+                    visible: select === 'Kids Visits', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.turn_in_rate } },
+                    allowDecimals: false, title: { text: 'Turn in rate (%)', style: { color: color.turn_in_rate } },
+                    visible: select === 'Turn in rate', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.avg_time } },
+                    allowDecimals: false, title: { text: 'Avg Time (min)', style: { color: color.avg_time } },
+                    visible: select === 'Avg Time', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Conversion rate (%)', style: { color: color.conversion, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.conversion, } },
+                    visible: select === 'Conversion rate', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'ATV', style: { color: color.atv, } }, allowDecimals: false,
+                    // tslint:disable-next-line:max-line-length
+                    labels: { formatter: function () { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.atv, } },
+                    visible: select === 'ATV', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Avg Items', style: { color: color.items, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.items, } },
+                    visible: select === 'Avg Items', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Sales Yield', style: { color: color.sales_yield, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.sales_yield, } },
+                    maxPadding: 0, minPadding: 0, min: 0, visible: select === 'Sales Yield',
+                }, {
+                    title: { text: 'Transactions', style: { color: color.customers, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.customers, } },
+                    visible: select === 'Transactions', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Sales', style: { color: color.sales, } }, allowDecimals: false,
+                    // tslint:disable-next-line:max-line-length
+                    labels: { formatter: function () { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.sales, } },
+                    visible: select === 'Sales', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Missed Sales Opportunity', style: { color: color.missed_sales, } },
+                    // tslint:disable-next-line:max-line-length
+                    allowDecimals: false, labels: { formatter: function () { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.missed_sales, } },
+                    visible: select === 'Missed Sales Opportunity', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Sales hours', style: { color: color.sales_hour, } }, allowDecimals: false,
+                    labels: { format: '{value} ', style: { color: color.sales_hour, } }, visible: select === 'Sales hours',
+                    maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Shoppers on sales hour', style: { color: color.shopper_on_sh, } }, allowDecimals: false,
+                    labels: { format: '{value} ', style: { color: color.shopper_on_sh, } }, visible: select === 'Shoppers on sales hour',
+                    maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Sales on sales hour', style: { color: color.sales_on_s_h, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.sales_on_s_h, } },
+                    visible: select === 'Sales on sales hour', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Loyal Visits (%)', style: { color: color.loyal_visits, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.loyal_visits, } },
+                    visible: select === 'Loyal Visits', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Loyal Transactions (%)', style: { color: color.loyal_transactions, } },
+                    // tslint:disable-next-line:max-line-length
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.loyal_transactions, } },
+                    allowDecimals: false, visible: select === 'Loyal Transactions', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'Loyal Conversion rate (%)', style: { color: color.loyal_conversion, } },
+                    // tslint:disable-next-line:max-line-length
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.loyal_conversion, } },
+                    allowDecimals: false, visible: select === 'Loyal Conversion rate',
+                }, {
+                    title: { text: 'Missed Loyal rate (%)', style: { color: color.missed_loyal, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.missed_loyal, } },
+                    visible: select === 'Missed Loyal rate', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'CX index (%)', style: { color: color.cxindex, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.cxindex, } },
+                    visible: select === 'CX index', maxPadding: 0, minPadding: 0, min: 0,
+                }, {
+                    title: { text: 'NPS index (%)', style: { color: color.npsindex, } }, allowDecimals: false,
+                    labels: { formatter() { return this.axis.defaultLabelFormatter.call(this); }, style: { color: color.npsindex, } },
+                    visible: select === 'NPS index', maxPadding: 0, minPadding: 0,
+                },
+            ],
+            series: [
+                {
+                    // tslint:disable-next-line:max-line-length
+                    name: 'Visits', color: color.visits, type: selft.type_chart(), yAxis: 0, data: num_to_enter, // tooltip: { valueSuffix: ' lượt' }
+                    showInLegend: select === 'Visits', visible: select === 'Visits',
+                }, {
+                    name: 'Visits Compared', color: color.compare, type: selft.type_chart(), yAxis: 0, data: num_to_enter_compare,
+                    showInLegend: select === 'Visits', visible: select === 'Visits',
+                }, {
+                    name: 'PasserBy', color: color.passer_by, type: selft.type_chart(), yAxis: 2, data: passer_by,
+                    showInLegend: select === 'PasserBy', visible: select === 'PasserBy',
+                }, {
+                    name: 'PasserBy Compared', color: color.compare, type: selft.type_chart(), yAxis: 2, data: passer_by_compare,
+                    showInLegend: select === 'PasserBy', visible: select === 'PasserBy',
+                }, {
+                    name: 'Shopper Visits', color: color.shopper_visits, type: selft.type_chart(), yAxis: 3, data: shopper_visits,
+                    showInLegend: select === 'Shopper Visits', visible: select === 'Shopper Visits',
+                }, {
+                    name: 'Shopper Visits Compared', color: color.compare, type: selft.type_chart(), yAxis: 3, data: shopper_visits_compare,
+                    showInLegend: select === 'Shopper Visits', visible: select === 'Shopper Visits',
+                }, {
+                    name: 'Traffic flow', color: color.traffic_flow, type: selft.type_chart(), yAxis: 1, data: traffic,
+                    showInLegend: select === 'Traffic Flow', visible: select === 'Traffic Flow',
+                }, {
+                    name: 'Traffic flow Compared', color: color.compare, type: selft.type_chart(), yAxis: 1, data: traffic_compare,
+                    showInLegend: select === 'Traffic Flow', visible: select === 'Traffic Flow',
+                }, {
+                    name: 'Kids Visits', color: color.kids_visits, type: selft.type_chart(), yAxis: 4, data: kids_visits,
+                    showInLegend: select === 'Kids Visits', visible: select === 'Kids Visits',
+                }, {
+                    name: 'Kids Visits Compared', color: color.compare, type: selft.type_chart(), yAxis: 4, data: kids_visits_compare,
+                    showInLegend: select === 'Kids Visits', visible: select === 'Kids Visits',
+                }, {
+                    name: 'Turn in rate (%)', color: color.turn_in_rate, type: selft.type_chart(), yAxis: 5, data: turn_in_rate,
+                    showInLegend: select === 'Turn in rate', visible: select === 'Turn in rate',
+                }, {
+                    name: 'Turn in rate Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 5, data: turn_in_rate_compare,
+                    showInLegend: select === 'Turn in rate', visible: select === 'Turn in rate',
+                }, {
+                    name: 'Avg Time (min)', color: color.avg_time, type: 'spline',
+                    yAxis: 6, data: avg_time,
+                    // tslint:disable-next-line:max-line-length
+                    tooltip: { pointFormatter: function () { const point1 = this; return '<span style="color:' + point1.color + '">\u25CF</span> ' + point1.series.name + ': <b>' + selft.toHHMMSS(point1.y * 60) + '</b><br/>'; } },
+                    showInLegend: select === 'Avg Time', visible: select === 'Avg Time',
+                }, {
+                    name: 'Avg Time Compared (min)', color: color.compare,
+                    type: 'spline', yAxis: 6, data: avg_time_compare,
+                    // tslint:disable-next-line:max-line-length
+                    tooltip: { pointFormatter: function () { const point2 = this; return '<span style="color:' + point2.color + '">\u25CF</span> ' + point2.series.name + ': <b>' + selft.toHHMMSS(point2.y * 60) + '</b><br/>'; } },
+                    showInLegend: select === 'Avg Time', visible: select === 'Avg Time',
+                }, {
+                    name: 'Conversion rate (%)', color: color.conversion, type: selft.type_chart(), yAxis: 7, data: conversion,
+                    showInLegend: select === 'Conversion rate', visible: select === 'Conversion rate'
+                }, {
+                    name: 'Conversion rate Compared  (%)', color: color.compare, type: selft.type_chart(), yAxis: 7,
+                    data: conversion_compare, showInLegend: select === 'Conversion rate', visible: select === 'Conversion rate'
+                }, {
+                    name: 'ATV', color: color.atv, type: selft.type_chart(), yAxis: 8, data: atv,
+                    showInLegend: select === 'ATV', visible: select === 'ATV'
+                }, {
+                    name: 'ATV Compared', color: color.compare, type: selft.type_chart(), yAxis: 8, data: atv_compare,
+                    showInLegend: select === 'ATV', visible: select === 'ATV'
+                }, {
+                    name: 'Avg Items', color: color.items, type: selft.type_chart(), yAxis: 9, data: avg_item,
+                    showInLegend: select === 'Avg Items', visible: select === 'Avg Items'
+                }, {
+                    name: 'Avg Items Compared', color: color.compare, type: selft.type_chart(), yAxis: 9, data: avg_item_compare,
+                    showInLegend: select === 'Avg Items', visible: select === 'Avg Items'
+                }, {
+                    name: 'Sales Yield', color: color.sales_yield, type: selft.type_chart(), yAxis: 10, data: sales_yield,
+                    showInLegend: select === 'Sales Yield', visible: select === 'Sales Yield'
+                }, {
+                    name: 'Sales Yield Compared', color: color.compare, type: selft.type_chart(), yAxis: 10, data: sales_yield_compare,
+                    showInLegend: select === 'Sales Yield', visible: select === 'Sales Yield'
+                }, {
+                    name: 'Transactions', color: color.customers, type: selft.type_chart(), yAxis: 11, data: transactions,
+                    showInLegend: select === 'Transactions', visible: select === 'Transactions'
+                }, {
+                    name: 'Transactions Compared', color: color.compare, type: selft.type_chart(), yAxis: 11, data: transactions_compare,
+                    showInLegend: select === 'Transactions', visible: select === 'Transactions'
+                }, {
+                    name: 'Sales', color: color.sales, type: selft.type_chart(), yAxis: 12, data: sales,
+                    showInLegend: select === 'Sales', visible: select === 'Sales'
+                }, {
+                    name: 'Sales Compared', color: color.compare, type: selft.type_chart(), yAxis: 12, data: sales_compare,
+                    showInLegend: select === 'Sales', visible: select === 'Sales'
+                }, {
+                    name: 'Missed Sales Opportunity', color: color.missed_sales, type: selft.type_chart(), yAxis: 13, data: missed_sales,
+                    showInLegend: select === 'Missed Sales Opportunity',
+                    visible: select === 'Missed Sales Opportunity'
+                }, {
+                    name: 'Missed Sales Opportunity Compared', color: color.compare, type: selft.type_chart(), yAxis: 13,
+                    data: missed_sales_compare, showInLegend: select === 'Missed Sales Opportunity',
+                    visible: select === 'Missed Sales Opportunity'
+                }, {
+                    name: 'Sales hours', color: color.sales_hour, showInLegend: select === 'Sales hours',
+                    type: selft.type_chart(), yAxis: 14, data: sales_hour, visible: select === 'Sales hours',
+                }, {
+                    name: 'Sales hours Compared', color: color.compare, showInLegend: select === 'Sales hours',
+                    type: selft.type_chart(), yAxis: 14, data: sales_hour_compare, visible: select === 'Sales hours',
+                }, {
+                    name: 'Shoppers on sales hour', color: color.shopper_on_sh, showInLegend: select === 'Shoppers on sales hour',
+                    type: selft.type_chart(), yAxis: 15, data: shopper_on_sh, visible: select === 'Shoppers on sales hour',
+                }, {
+                    name: 'Shoppers on sales hour Compared', color: color.compare, showInLegend: select === 'Shoppers on sales hour',
+                    type: selft.type_chart(), yAxis: 15, data: shopper_on_sh_compare, visible: select === 'Shoppers on sales hour',
+                }, {
+                    name: 'Sales on sales hour', color: color.sales_on_s_h, showInLegend: select === 'Sales on sales hour',
+                    type: selft.type_chart(), yAxis: 16, data: sales_on_s_h, visible: select === 'Sales on sales hour',
+                }, {
+                    name: 'Sales on sales hour Compared', color: color.compare, showInLegend: select === 'Sales on sales hour',
+                    type: selft.type_chart(), yAxis: 16, data: sales_on_s_h_compare, visible: select === 'Sales on sales hour',
+                }, {
+                    name: 'Loyal Visits (%)', color: color.loyal_visits, type: selft.type_chart(), yAxis: 17, data: loyal_visits,
+                    showInLegend: select === 'Loyal Visits', visible: select === 'Loyal Visits'
+                }, {
+                    name: 'Loyal Visits Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 17,
+                    data: loyal_visits_compare, showInLegend: select === 'Loyal Visits', visible: select === 'Loyal Visits'
+                }, {
+                    name: 'Loyal Transactions (%)', color: color.loyal_transactions, type: selft.type_chart(), yAxis: 18,
+                    data: loyal_transactions, showInLegend: select === 'Loyal Transactions',
+                    visible: select === 'Loyal Transactions'
+                }, {
+                    name: 'Loyal Transactions Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 18,
+                    data: loyal_transactions_compare, showInLegend: select === 'Loyal Transactions',
+                    visible: select === 'Loyal Transactions'
+                }, {
+                    name: 'Loyal Conversion rate (%)', color: color.loyal_conversion, type: selft.type_chart(), yAxis: 19,
+                    data: loyal_conversion, showInLegend: select === 'Loyal Conversion rate',
+                    visible: select === 'Loyal Conversion rate'
+                }, {
+                    name: 'Loyal Conversion rate Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 19,
+                    data: loyal_conversion_compare, showInLegend: select === 'Loyal Conversion rate',
+                    visible: select === 'Loyal Conversion rate'
+                }, {
+                    name: 'Missed Loyal rate (%)', color: color.missed_loyal, type: selft.type_chart(), yAxis: 20,
+                    data: miss_loyal_conversion, showInLegend: select === 'Missed Loyal rate',
+                    visible: select === 'Missed Loyal rate'
+                }, {
+                    name: 'Missed Loyal rate Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 20,
+                    data: miss_loyal_conversion_compare, showInLegend: select === 'Missed Loyal rate',
+                    visible: select === 'Missed Loyal rate'
+                }, {
+                    name: 'CX index (%)', color: color.cxindex, type: selft.type_chart(), yAxis: 21, data: cx_index,
+                    showInLegend: select === 'CX index', visible: select === 'CX index'
+                }, {
+                    name: 'CX index Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 21, data: cx_index_compare,
+                    showInLegend: select === 'CX index', visible: select === 'CX index'
+                }, {
+                    name: 'NPS index (%)', color: color.npsindex, type: selft.type_chart(), yAxis: 22, data: nps_index,
+                    showInLegend: select === 'NPS index', visible: select === 'NPS index'
+                }, {
+                    name: 'NPS index Compared (%)', color: color.compare, type: selft.type_chart(), yAxis: 22, data: nps_index_compare,
+                    showInLegend: select === 'NPS index', visible: select === 'NPS index'
+                }
+            ]
+        });
+    }
+    change_view() {
+        this.get_data();
+    }
+}

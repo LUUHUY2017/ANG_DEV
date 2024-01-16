@@ -1,0 +1,148 @@
+<div style="min-height:75vh" class="card card-parent">
+  <div class="card-header">
+    <div class="row lineh-overview">
+      <ul id="age-ana-head-overview">
+        <li>
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+              <i class="fa fa-map-marker location"></i>
+              <span>&nbsp;{{location}}</span>
+              <i class="fa fa-caret-down"></i>
+              &nbsp;
+            </div>
+            <i (click)="locationSelectionDisplay=!locationSelectionDisplay" [hidden]="hidden_menu_location"
+              class="fa fa-chevron-circle-down ngoai-tru icon-menu-header pdt5"></i>
+          </div>
+          <!-- Chọn option tổ chức -->
+          <div style="height: auto;overflow: unset;border-radius: 10px;" [hidden]="!locationSelectionDisplay"
+            class=" khung-location block">
+            <!-- (clickOutside)="locationSelectionDisplay=false" [exclude]="'.ngoai-tru'" -->
+            <div style="margin-bottom: 0" class="card">
+              <div class="card-header">
+                <span>{{language.chon_dia_diem}}</span>
+              </div>
+              <div class="card-body">
+                <!-- <ng-select class="bootstrap selectimeview" [(ngModel)]="organization_id"
+                  [options]="organization_arr_option" [allowClear]="false" (selected)="changeorganization($event)">
+                </ng-select> -->
+                <ng-select class="bootstrap selectimeview" (change)="changeorganization($event)"
+                  [items]="organization_arr_option" bindLabel="label" bindValue="value" [clearable]=false
+                  [(ngModel)]="organization_id"></ng-select>
+              </div>
+              <div class="card-footer">
+                <div style="float: right;  padding: 0 8px;">
+                  <button type="button" class="btn btn-secondary"
+                    (click)="locationSelectionDisplay=!locationSelectionDisplay">{{language.dong_cua_so}}</button>
+                </div>
+              </div>
+            </div> <!-- card -->
+          </div>
+          <!--  Chọn địa điểm/ khu vực  -->
+          <div [hidden]="!siteSelectionDisplay" class=" khung-location block"
+            (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+              <div style="position: relative;width: 100%;" class="inputgroup">
+                <input (keyup)="search_menu($event.target.value)" style="border:none !important;padding-left: 7px;"
+                  type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}">
+                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                  class="fa fa-search"></i>
+              </div>
+              <ul style="padding-left: 0;">
+                <li *ngFor="let item of menu_tree"
+                  (click)=" item.enables == 1 ? changeitem(item.site_name,item.organization_id, item.id) : ''"
+                  class="menu-{{item.alevel}} {{item.site_name === location ? 'li_active' : ''}}  {{item.enables == '0' ? 'li_unlist' : ''}}">
+                  {{item.site_name}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li>
+          <span class="giomocua" style="margin-right:5px;">{{language.gio_mo_cua}}</span>
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin-right:10px;">
+            <!-- <ng-select class="bootstrap selecttimeview below giomocua" [options]="startTimeOption" [allowClear]="false"
+              [(ngModel)]="startTime"></ng-select> -->
+            <ng-select class="bootstrap selecttimeview below giomocua" [items]="startTimeOption" bindLabel="label"
+              bindValue="value" [clearable]=false [(ngModel)]="startTime"></ng-select>
+          </div>
+          <button type="button" class="btn btn-primary btn-ap-view"
+            (click)="new_get_data()">{{language.ap_dung}}</button>
+        </li>
+        <li class="li-lh-32">
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay2=!siteSelectionDisplay2" class="text-select vung-kich2">
+              <i class="fa fa-calendar-minus-o location"></i>
+              <span>&nbsp;{{time_period }}</span>
+              <i class="fa fa-caret-down"></i>
+            </div>
+          </div>
+          <!-- popup -->
+          <div [hidden]="!siteSelectionDisplay2" (clickOutside)="siteSelectionDisplay2=false" [exclude]="'.vung-kich2'"
+            class=" khung-time block">
+            <div id="khung-time-scroll">
+              <ul id="ul-time">
+                <!-- <li class="active">
+                  <span>Chọn thời kỳ</span>
+                  <div id="reportrangefba" style="  margin-top: 2px; cursor: pointer; width: 100%">
+                    <i class="fa fa-calendar"></i>&nbsp;
+                    <span style="font-size: 12px;"></span> <i class="fa fa-caret-down"></i>
+                    <input type="hidden" id="startDateReportTemp" [(ngModel)]="Indexstart">
+                    <input type="hidden" id="endDateReportTemp" [(ngModel)]="IndexEnd">
+                  </div>
+                </li> -->
+                <li *ngFor=" let item of fba_time_period_overview" (click)="chonthoigian(item)"
+                  class="{{item.label === time_period ? 'li_active' : ''}}">
+                  {{item.label}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <!-- kết thúc li thứ  3 -->
+      </ul>
+    </div>
+  </div>
+  <!-- Kết thúc-card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+        <div class="col-md-6">
+          <h6 style="font-weight:bold;text-align:left; margin-left:1.5rem">{{language.gioi_tinh_gender}}</h6>
+          <div class="fba-body-body">
+            <div style=" margin: 0 auto" #container2> </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h6 style="font-weight:bold;text-align:left; margin-left:1.5rem">{{language.do_tuoi_age}}</h6>
+          <div class="fba-body-body">
+            <div #container> </div>
+          </div>
+        </div>
+    </div>
+    <ng-container *ngIf="show_error">
+      <div class="show_info_error">
+        <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}. {{language.vui_long}}<a
+          (click)="get_data();" style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}} </div>
+    </ng-container>
+    <div id="divbaocao" style="text-align: right;width: 100%;font-size: 11px;padding-right: 5px;">
+      {{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+  <block-ui></block-ui>
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{language.Thong_bao}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+          {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>
+    </div>
+  </ng-template>

@@ -1,0 +1,346 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row" style="border-radius: 5px; border: 1px">
+      <ul id="fba-ana-head">
+        <li>
+          <label for="">Địa điểm/ khu vực </label>
+          <!-- Nút chọn tổ chức -->
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+              <i class="fa fa-map-marker location" aria-hidden="true"></i>
+              <span>&nbsp;{{location}}</span>&nbsp;
+              <i class="fa fa-caret-down"></i> &nbsp;
+            </div>
+            <i style="padding-top:5px;cursor: pointer;font-size: 14px;color: rgb(185, 58, 58);"
+              (click)="locationSelectionDisplay=!locationSelectionDisplay" [hidden]="hidden_menu_location"
+              class="fa fa-dot-circle-o ngoai-tru" aria-hidden="true"></i>
+          </div>
+          <!-- Chọn option tổ chức -->
+          <div style="height: auto;overflow: unset;" [hidden]="!locationSelectionDisplay" class=" khung-location block">
+            <!-- (clickOutside)="locationSelectionDisplay=false" [exclude]="'.ngoai-tru'" -->
+            <div style="margin-bottom: 0" class="card">
+              <div class="card-header">
+                <span>Chọn địa điểm</span>
+              </div>
+              <div class="card-body">
+                <ng-select class="bootstrap selectimeview" [options]="organization_arr_option"
+                  [(ngModel)]="organization_id" [allowClear]="false" (selected)="changeorganization($event)">
+                </ng-select>
+              </div>
+              <div class="card-footer">
+                <div style="float: right;  padding: 0 8px;">
+                  <button type="button" class="btn btn-secondary"
+                    (click)="locationSelectionDisplay=!locationSelectionDisplay">Đóng
+                    cửa sổ</button>
+                </div>
+              </div>
+            </div> <!-- card -->
+          </div>
+          <!--  Chọn địa điểm/ khu vực  -->
+          <div [hidden]="!siteSelectionDisplay" class=" khung-location block"
+            (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+              <div style="position: relative;width: 100%;" class="inputgroup">
+                <input (keyup)="search_menu($event.target.value)" style="border:none !important; padding-left: 7px;"
+                  type="text" class="form-control" placeholder="Tìm kiếm địa điểm/khu vực">
+                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                  class="fa fa-search" aria-hidden="true"></i>
+              </div>
+              <ul style="padding-left: 0;">
+                <li (click)="changeitem(item.organization_id, item.id, item.site_name)" *ngFor="let item of menu_tree"
+                  class="menu-{{item.alevel}} {{item.site_name === location ? 'li_active' : ''}}">
+                  {{item.site_name}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+        <!-- kết thúc li thứ nhất -->
+        <li>
+          <label for="">Câu hỏi khảo sát</label>
+          <div dropdown>
+            <div class="text-select">
+              <div dropdownToggle class="overview-survey">
+                <svg class="jss965 jss966" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"
+                  style="width: 20px;margin-bottom: 5px;">
+                  <g>
+                    <path d="M0 0h24v24H0z" style="fill: rgba(1, 1, 1, 0);"></path>
+                    <path
+                      d="M20.43 20.6H3.57a2.26 2.26 0 0 1-2.26-2.27V6.2a2.26 2.26 0 0 1 2.27-2.25h16.86A2.26 2.26 0 0 1 22.7 6.2v12.13a2.26 2.26 0 0 1-2.27 2.26zM3.57 5.9a.33.33 0 0 0-.32.3v12.13a.33.33 0 0 0 .32.32h16.86a.33.33 0 0 0 .32-.32V6.2a.33.33 0 0 0-.32-.3z">
+                    </path>
+                    <path
+                      d="M16.62 13.76h-2.1v-.2a2.58 2.58 0 0 1 .12-.88 1.92 1.92 0 0 1 .36-.6 11.08 11.08 0 0 1 1.08-1q.45-.37.45-.68a.62.62 0 0 0-.18-.47.77.77 0 0 0-.54-.17.88.88 0 0 0-.64.26 1.52 1.52 0 0 0-.33.9l-2.14-.26a2.92 2.92 0 0 1 .85-1.9 3.2 3.2 0 0 1 2.3-.72 3.4 3.4 0 0 1 1.93.5 2.1 2.1 0 0 1 1 1.8 1.74 1.74 0 0 1-.26.92 4.46 4.46 0 0 1-1.06 1.06 2.83 2.83 0 0 0-.7.7 1.45 1.45 0 0 0-.14.74zm-2.17.56h2.25v2h-2.25zM6.13 9.76h5.2v2h-5.2zM6.13 13.28h6.42v2H6.13z">
+                    </path>
+                  </g>
+                </svg>
+                <span>&nbsp;{{question_name}}</span><i class="fa fa-caret-down"></i>
+              </div>
+            </div>
+            <!-- popup -->
+            <div *dropdownMenu class="dropdown-menu khung-question block">
+              <div id="khung-question-scroll">
+                <div class="ongoing">
+                  <div class="small-metric">Đang diễn ra</div>
+        <li *ngFor=" let item of questions_ongoing"
+          (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+          <div class="questionText">
+            <span style=" display: block;">{{item.question_name}}?</span>
+          </div>
+          <div class="timePeriod">
+            <span>{{item.campaign_name}} </span>
+            <!-- tháng {{ item.start_time| date:'MM'}} -->
+            <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+              date:'dd-MM-yyyy'}}</span>
+          </div>
+        </li>
+    </div>
+    <!-- kết thúc ongoing -->
+    <div class="starting">
+      <div class="small-metric">Sắp diễn ra</div>
+      <li *ngFor=" let item of questions_upcoming"
+        (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} </span>
+          <!-- tháng {{ item.start_time| date:'MM'}} -->
+          <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc sắp diễn ra -->
+    <div class="ending">
+      <div class="small-metric">Kết thúc</div>
+      <li *ngFor=" let item of questions_ended"
+        (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} </span>
+          <!-- tháng {{ item.start_time| date:'MM'}} -->
+          <span style="font-style: italic;">Từ {{ item.start_time| date:'dd-MM-yyyy'}} đến {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc phần kết thúc -->
+  </div>
+</div>
+</div>
+</li>
+<!-- kết thúc li thứ 2 -->
+<li>
+  <label for="">Thời kỳ</label>
+  <div class="overview-period">
+    <div (click)="siteSelectionDisplay2=!siteSelectionDisplay2" class="text-select vung-kich2">
+      <i class="fa fa-calendar-minus-o location" aria-hidden="true"></i>
+      <span>&nbsp;{{time_period}}</span>
+      <i class="fa fa-caret-down"></i>
+    </div>
+  </div>
+  <!-- popup -->
+  <div [hidden]="!siteSelectionDisplay2" (clickOutside)="siteSelectionDisplay2=false" [exclude]="'.vung-kich2'"
+    class=" khung-time block">
+    <div id="khung-time-scroll">
+      <ul id="ul-time">
+        <li class="active">
+          <span>Chọn thời kỳ</span>
+          <div id="reportrangefba" style="  margin-top: 2px; cursor: pointer; width: 100%">
+            <i class="fa fa-calendar"></i>&nbsp;
+            <span style="font-size: 12px;"></span> <i class="fa fa-caret-down"></i>
+            <input type="hidden" id="startDateReportTemp">
+            <input type="hidden" id="endDateReportTemp">
+          </div>
+        </li>
+        <li *ngFor=" let item of fba_time_period_overview" (click)="chonthoigian(item)">
+          <!-- class="{{item.label === time_period ? 'active' : ''}}" -->
+          {{item.label}}
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>
+<!-- kết thúc li thứ  3 -->
+</ul>
+</div>
+</div>
+<!-- Kết thúc card-header -->
+<div class="card-body card-body-bottom">
+  <div class="row">
+    <div class="container-fluid">
+      <div class="animated fadeIn">
+        <block-ui></block-ui>
+        <div class="card card-child">
+          <div id="card-header" class="card-header">
+            <div class="row">
+              <ul id="fbametrics_headmapmenu_2">
+                <li>
+                  <!--   <ng-select class="bootstrap selectimeview" [options]="indexOption" [allowClear]="false"
+                       [(ngModel)]="indexOptionSelected"  (selected)="thaydoichart($event)"></ng-select> -->
+                </li> <!-- li-visit -->
+                <li>
+                  <button type="button" class="btn btn-primary float-right btnapdung" (click)="time_change()">
+                    Áp dụng
+                  </button>
+                  <div class="btn-group btn-group-toggle float-right ml" data-toggle="buttons">
+                    <ng-select class="bootstrap selecttimeview nonml" [options]="startTimeOption" [allowClear]="false"
+                      [(ngModel)]="startTime"></ng-select>
+
+                    <span style="padding: 4px 0px;">-</span>
+                    <ng-select class="bootstrap selecttimeview " [options]="endTimeOption" [allowClear]="false"
+                      [(ngModel)]="endTime"></ng-select>
+                  </div>
+                </li><!-- Kết thúc li thứ 2 -->
+                <li>
+                  <div>
+                    <div class="btn-group float-right" dropdown>
+                      <button style="display:none" dropdownToggle type="button"
+                        class="btn btn-primary dropdown-toggle float-right btnchiase">
+                        Chia Sẻ
+                      </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right " role="menu">
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-facebook"
+                            href="https:www.facebook.com"><i class="fa fa-facebook"></i>Facebook</a></li>
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-google-plus"
+                            href="https:www.plus.google.com"><i class="fa fa-google-plus"></i>G+</a></li>
+                        <!-- <li role="menuitem"><a class="dropdown-item  " href="#">Email</a></li> -->
+                      </ul>
+                    </div>
+                    <div class="btn-group float-right" dropdown>
+                      <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle float-right btnxuat">
+                        Xuất
+                      </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                        <li role="menuitem"><a (click)="exportExcel()"
+                            class="dropdown-item float-right cursor-pointer">Xuất
+                            ra Excel</a>
+                        </li>
+                        <li style="display:none" role="menuitem"><a
+                            class="dropdown-item  float-right cursor-pointer">Xuất
+                            ra PDF</a>
+                          <!-- (click)="export_excel()" -->
+                        </li>
+                        <li style="display:none" role="menuitem"><a
+                            class="dropdown-item  float-right cursor-pointer">Other</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </li> <!-- Kết thúc li thứ 3-->
+              </ul>
+            </div> <!-- Kết thúc row-header -->
+          </div> <!-- Kết thúc-card-header con -->
+          <div class="card-body card-body-bottom">
+            <div class="row">
+              <div class="fba-body-header">
+              </div>
+              <!-- end fba-body-header -->
+              <div class="fba-customer-body-body">
+                <div class="row customer_filter_table">
+                  <ul>
+                    <li id="showrow">
+                      <span class="font-span-table">Số dòng: &nbsp;</span>
+                      <select class="input-sm select_cus_table" [(ngModel)]="rowsOnPage">
+                        <option [ngValue]="5"> &nbsp; 5</option>
+                        <option [ngValue]="15">15</option>
+                        <option [ngValue]="30">30</option>
+                        <option [ngValue]="50">50</option>
+                      </select>
+                    </li>
+                    <li><span class="font-span-table">Tìm kiếm: &nbsp;</span><input type="text"
+                        class="input_filter_table" (keyup)="search_table($event.target.value)"></li>
+                  </ul>
+                </div>
+                <div class="table-responsive">
+                  <table [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="rowsOnPage"
+                    style="width: 100%;min-width: 900px" class="table  table-striped">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px">STT</th>
+                        <th style="width: 140px;text-align:left">Họ và tên</th>
+                        <th style="width: 140px;text-align:left">Email</th>
+                        <th style="width: 110px;text-align: left">Điện thoại</th>
+                        <th style="width: 110px;text-align:left">Đánh giá</th>
+                        <th style="width: 150px;text-align:left">Lý do không hài lòng</th>
+                        <th style="width: 200px;text-align:left">Ý kiến bổ sung</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- <tr>
+                        <td></td>
+                        <td>
+                          <div> 50 <span id="percent">(5%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá cung cấp họ tên</span>
+                        </td>
+                        <td>
+                          <div> 40 <span id="percent">(4%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá cung cấp số điện thoại </span>
+                        </td>
+                        <td>
+                          <div> 20 <span id="percent">(2%)</span></div>
+                          <span id="text"> trong tổng số 1000 đánh giá cung cấp email </span>
+                        </td>
+                        <td>
+                          <div> 20 <span id="percent">(45%)</span> </div>
+                          <span id="text">đánh giá kém trong 50 khách hàng cung cấp thông tin</span>
+                        </td>
+                        <td>
+                          <div> 200 <span id="percent">(20%)</span> </div>
+                          <span id="text"> trong tổng số 1000 đánh giá trả lời câu hỏi lý do</span>
+                        </td>
+                        <td>
+                          <div> 50 <span id="percent">(5%) </span> </div>
+                          <span id="text"> trong tổng số 1000 đnáh giá có ý kiển bổ sung </span>
+                        </td>
+                      </tr> -->
+
+
+                      <tr *ngFor="let item of mf.data;let i = index">
+                        <td>{{i+1}}</td>
+                        <td style="text-align:left; padding-left: 0.75rem;">
+                          {{item.customer_name ? item.customer_name : '&nbsp;'}}</td>
+                        <td style="text-align:left; padding-left: 0.35rem;">
+                          {{item.customer_email ? item.customer_email : ' &nbsp; '}}</td>
+                        <td style="text-align:left; padding-left: 0.65rem;">
+                          {{item.customer_phone ? item.customer_phone : '&nbsp;'}}</td>
+                        <td style="text-align:left;padding-left: 0.15rem;">{{item.answer}}</td>
+                        <td style="text-align:left;padding-left: 0.65rem;">
+                          {{item.reason_name ? item.reason_name : '&nbsp;'}}
+                        </td>
+                        <td style="text-align:left;padding-left: 0.65rem;">
+                          {{item.other_reason_name ? item.other_reason_name : '&nbsp; -'}}
+                        </td>
+                      </tr>
+                      <tr></tr>
+                      <tr>
+                        <td colspan="7" *ngIf="data?.length === 0"
+                          style="color:gray;font-style:italic; text-align: center;font-size: 13px; white-space: pre;">
+                          <span>Không có dữ liệu</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tfoot class="customer-info-tfoot">
+                      <tr>
+                        <td colspan="7">
+                          <mfBootstrapPaginator></mfBootstrapPaginator>
+                          <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- Kết thúc card -->
+      </div>
+    </div>
+  </div>
+  <div style="text-align: right;width: 100%;font-size: 11px;">Báo cáo này đã được tạo
+    vào {{time_generate_report | date: 'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} -
+    <span (click)="reset_session()" style=" color: blue; cursor: pointer;">làm mới báo cáo</span>
+  </div>
+</div>
+</div>

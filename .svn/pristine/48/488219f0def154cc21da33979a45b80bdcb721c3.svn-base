@@ -1,0 +1,5 @@
+:host ::ng-deep {
+  .ng-select.ng-select-single .ng-select-container {
+    height: 30px !important;
+  }
+}

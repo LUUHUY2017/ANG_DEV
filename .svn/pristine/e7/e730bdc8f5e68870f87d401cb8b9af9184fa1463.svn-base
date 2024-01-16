@@ -1,0 +1,115 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row m-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 visit-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div> <!-- card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child ">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <ng-select class="bootstrap selecttimeview select1" [items]="indexOption" bindLabel="label"
+                      bindValue="value" groupBy="group" [clearable]=false (selected)="destinationOnSelect($event)"
+                      [(ngModel)]="indexOptionSelected1"></ng-select>
+                    <span style="padding: 4px 0;">-</span>
+                    <ng-select class="bootstrap selecttimeview select2" [items]="indexOption" bindLabel="label"
+                      bindValue="value" groupBy="group" [clearable]=false (selected)="destinationOnSelect($event)"
+                      [(ngModel)]="indexOptionSelected2"></ng-select>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <!-- li-ap dung -->
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()"> {{language.xuat_ra_excel}}</a> </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                  <!-- li- xuất -->
+                </ul>
+              </div>
+
+            </div>
+
+            <div class="card-body card-body-bottom">
+              <div class="row foot-title-show"> {{site_name}} &nbsp;{{ starttime }}
+                &nbsp;&minus;&nbsp; {{ endtime }} &nbsp; {{ title_time_period }}: {{ time_period }} </div>
+              <!--/.row-->
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <div class="table-responsive ">
+                  <table style="width: 100%;min-width: 900px" class="table table-striped table-comparation">
+                    <thead>
+                      <tr>
+                        <th style="width:220px;padding-left: 2.5rem;"> {{site_name}}</th>
+                        <th style="width:220px"> {{ indexOptionSelected1 }}{{valueSuffix1}} </th>
+                        <th style="width:220px"> {{ indexOptionSelected2 }}{{valueSuffix2}} </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td> </td>
+                        <td> <b>{{avg_oy |  number:'1.0-2'}}{{valueSuffix_html1}}</b>
+                          <div class="spancell"> {{language.gia_tri_trung_binh_cua_hang}} </div>
+                        </td>
+                        <td> <b>{{avg_ox |  number:'1.0-2'}}{{valueSuffix_html2}}</b>
+                          <div class="spancell"> {{language.gia_tri_trung_binh_cua_hang}} </div>
+                        </td>
+                      </tr>
+                      <tr *ngFor="let item of all_data">
+                        <td style="padding-left: 2.5rem;">{{item.name}}</td>
+                        <td>{{item.y  |  number:'1.0-2'}}
+                          <span class="spancell">{{valueSuffix_html1}}</span>
+                        </td>
+                        <td>{{item.x  |  number:'1.0-2'}}
+                          <span class="spancell"> {{valueSuffix_html2}}</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div> <!-- card-body-parent -->
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>

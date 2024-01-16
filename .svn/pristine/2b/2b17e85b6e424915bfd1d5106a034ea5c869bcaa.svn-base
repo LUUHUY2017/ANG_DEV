@@ -1,0 +1,360 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <app-generalmenu></app-generalmenu>
+      </div>
+   </div>
+   <block-ui></block-ui>
+   <notifier-container></notifier-container>
+   <div class="row">
+      <div class="col-lg-12">
+         <div style=" border:unset;border-radius: 3px;" class="card">
+            <div style="height: 55px;" class="card-header card-font">
+               <span style="line-height:33px; font-family: Open-semi;
+               font-size: 20px;"> <i class="fa fa-vcard" style="color:#f3b920;" aria-hidden="true"></i> Danh sách nhân
+                  viên</span>
+               <button *ngIf="can_add" style="float:right; font-family: Open-semi;" type="button"
+                  class="btn btn-them buton-search" (click)="show_insert(insertTemplate)"><i
+                     class="fa fa-plus">&nbsp;&nbsp;</i>Thêm
+                  nhân viên</button>
+            </div>
+            <div class="card-body card-table table-companies">
+               <div class="row" *ngIf="organization_arr_filter?.length > 0">
+                  <div class="col-md-3">
+                     <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr_filter"
+                        [(ngModel)]="organization_id_filter" name="organization_id" [allowClear]="false"
+                        (selected)="getSiteTree()" placeholder="Chọn tổ chức">
+                     </ng-select>
+                  </div>
+                  <div class="col-md-3">
+                     <!-- Textbox chọn -->
+                     <div class="config-text-administrator">
+                        <div (click)="siteFilterDisplay=!siteFilterDisplay"
+                           class="text-select vung-kich custom-select-ad" style="border: 1px solid #ececec;
+                                       padding: 5px; cursor:pointer">
+                           <span>&nbsp;{{siteFilterModel ? siteFilterModel.site_name : 'Chưa có dữ liệu' }} <i
+                                 style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                              </i></span>
+                        </div>
+                     </div>
+                     <!-- Chọn địa điểm/ khu vực -->
+                     <div class="khung-location-administrator block" (clickOutside)="siteFilterDisplay=false"
+                        [exclude]="'.vung-kich'" [@openCloseDropdown]="siteFilterDisplay ? 'open': 'closed'">
+                        <div id="khung-location-scroll">
+                           <div style="position: relative;width: 100%;" class="inputgroup">
+                              <!-- <input (keyup)="search_menu($event.target.value)"
+                                             style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                                             placeholder="Tìm kiếm địa điểm/ khu vực"> -->
+                              <!-- <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                                             class="fa fa-search" aria-hidden="true"></i> -->
+                           </div>
+                           <ul style="padding-left: 0; padding-top: 10px;">
+                              <li *ngFor="let item of siteFilter" (click)="search_staff_in_site(item)"
+                                 class="menu-{{item.alevel}} {{item.enables == 0 ? 'disabled' : ''}}"
+                                 style="cursor:pointer;">
+                                 {{item.site_name}}
+                              </li>
+                           </ul>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-4 ml-auto" style="display: flex;
+                  align-items: center;
+                  justify-content: flex-end;" *ngIf="can_search">
+                     <label for="searchinput" style="margin-bottom: 0px;">Tìm kiếm&nbsp;&nbsp;</label>
+                     <input type="text"
+                        style="padding: 3px 10px;border-radius: 25px; outline: none; font-family: Open-semi;"
+                        [(ngModel)]="search_key" (ngModelChange)="search_staff()">
+                  </div>
+               </div>
+               <div class="table-responsive">
+                  <table [mfData]="staff" #mf="mfDataTable" [mfRowsOnPage]="15"
+                     class="table companies-table table-hover" style="width: 100%;min-width: 900px">
+                     <thead>
+                        <tr style="font-family: Open-semi;">
+                           <th style="width: 10%">STT</th>
+                           <th style="width: 20%" *ngIf="user_info.lever == 0">Tổ chức</th>
+                           <th style="width: 20%">Tên site</th>
+                           <th style="width: 23%">Tên nhân viên</th>
+                           <th style="width: 10%">Hình ảnh</th>
+                           <th style="width: 15%; text-align: center;">Xử lý</th>
+                        </tr>
+                     </thead>
+                     <tbody [@openClose]="isOpen ? 'open' : 'closed'">
+                        <tr *ngIf="onLoad">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span><i class="fa fa-spinner infinity">&nbsp;</i>Đang tải dữ liệu...</span>
+                           </td>
+                        </tr>
+                        <tr *ngIf="error_message">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span>Đã có lỗi xảy ra. Bấm vào </span><a (click)="ngOnInit()"
+                                 style="color: #63c2de; cursor:pointer;">đây để tải lại</a>
+                           </td>
+                        </tr>
+                        <tr *ngIf="staff?.length === 0 && !error_message">
+                           <td colspan="6"
+                              style="color:gray;font-style:italic; text-align: center;font-size: 12px; white-space: pre;">
+                              <span>Không có dữ liệu</span>
+                           </td>
+                        </tr>
+                        <tr class="trhover" *ngFor="let item of mf.data; let i = index">
+                           <td>{{i +1}}</td>
+                           <td *ngIf="user_info.lever == 0">
+                              {{item.organization_name ? item.organization_name : 'Không thuộc tổ chức'}}</td>
+                           <td>{{item.site_name}}</td>
+                           <td>{{item.staff_name}}</td>
+                           <td><img src="{{urlImage + item.staff_avatar}}"
+                                 title="ảnh đại diện của nhân viên {{item.staff_name}}" style="max-width:70%"></td>
+                           <td style="text-align: center;">
+                              <a style="color: #63c2de;cursor: pointer;" (click)="dulieuthaydoi(item,uploadform)"
+                                 title="Thư viện ảnh nhân viên">
+                                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a style="color: #085220;cursor: pointer;" (click)="show_update(item,updateTemplate)"
+                                 title="Sửa thông tin nhân viên">
+                                 <i class="fa fa-edit" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <a style="color: crimson;cursor: pointer;" (click)="delete_staff(item)"
+                                 title="Xóa nhân viên">
+                                 <i class="fa fa-times" aria-hidden="true"></i>
+                              </a>&nbsp;
+                              <!-- <a *ngIf="user_info.lever == 0" style="color: crimson;cursor: pointer;"
+                                 title="Xóa feedback" (click)="delete_item(item.id)"> <i class="fa fa-times"></i>
+                              </a>&nbsp; -->
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tfoot class="companies_table-tfoot">
+                        <tr>
+                           <td colspan="6">
+                              <mfBootstrapPaginator></mfBootstrapPaginator>
+                              <!-- [rowsOnPageSet]="[5,10,25]" show bao nhieu thi chon -->
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <ng-template #insertTemplate>
+      <form (ngSubmit)="insertform(insert_org)" #insert_org="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Thêm nhân viên</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_arr_insert"
+                     [ngModel]="organization_id_filter" name="organization_id" [allowClear]="false"
+                     placeholder="Chọn tổ chức">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="white-space: pre;" class="col-md-3 col-3 col-form-label lh-label">Thuộc địa
+                  điểm</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <!-- Textbox chọn -->
+                  <div class="config-text-administrator">
+                     <div (click)="siteSelectionDisplay=!siteSelectionDisplay"
+                        class="text-select vung-kich custom-select-ad" style="border: 1px solid #ececec;
+                           padding: 5px; cursor:pointer">
+                        <span>&nbsp;{{location_insert?.site_name}} <i
+                              style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                           </i></span>
+                     </div>
+                  </div>
+                  <!-- Chọn địa điểm/ khu vực -->
+                  <div [hidden]="!siteSelectionDisplay" class="khung-location-administrator block"
+                     (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+                     <div id="khung-location-scroll">
+                        <div style="position: relative;width: 100%;" class="inputgroup">
+                           <!-- <input (keyup)="search_menu($event.target.value)"
+                                 style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                                 placeholder="Tìm kiếm địa điểm/ khu vực"> -->
+                           <!-- <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                                 class="fa fa-search" aria-hidden="true"></i> -->
+                        </div>
+                        <ul style="padding-left: 0; padding-top: 10px;">
+                           <li *ngFor="let item of dropdownList_site" (click)="get_item_to_insert(item)"
+                              class="menu-{{item.alevel}} {{item.enables == 0 || item.store == 0 ? 'disabled' : ''}}"
+                              style="cursor:pointer;">
+                              {{item.site_name}}
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên nhân viên</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" #txtcode="ngModel" required type="text" ngModel
+                     name="staff_name">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     Bạn chưa nhập tên nhân viên
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Ảnh đại diện</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input style="margin-top:2px;" type="file" class="form-control" (change)="InsertUpload($event)">
+                  <img *ngIf="ImageUrll1" class="img-fluid img2" [src]="ImageUrll1" style="width:49%;"
+                     alt="ảnh đại diện nhân viên" title="ảnh đại diện nhân viên">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <p style="margin: 0px;flex-grow: 1; color: crimson; font-style: italic;" *ngIf="error_popup_message">Đã có
+               lỗi xảy ra</p>
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               Đóng</a>
+            <button class="btn  btn-primary" [disabled]="insert_org.invalid">
+               Thêm</button>
+         </div>
+      </form>
+   </ng-template>
+   <ng-template #updateTemplate>
+      <form (ngSubmit)="updateform(update_form)" #update_form="ngForm">
+         <div class="modal-header">
+            <h4 class="modal-title pull-left">Chỉnh sửa thông tin nhân viên</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <div class="form-group row form-no-marbottom" *ngIf="user_info.lever == 0">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tổ chức</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <ng-select class="bootstrap selectimeview backselect" required [options]="organization_update"
+                     [ngModel]="organization_id_filter" name="organization_id" [allowClear]="false"
+                     placeholder="Chọn tổ chức">
+                  </ng-select>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label style="white-space: pre;" class="col-md-3 col-3 col-form-label lh-label">Thuộc địa
+                  điểm</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <!-- Textbox chọn -->
+                  <div class="config-text-administrator">
+                     <div (click)="siteSelectionDisplay=!siteSelectionDisplay"
+                        class="text-select vung-kich custom-select-ad" style="border: 1px solid #ececec;
+                              padding: 5px; cursor:pointer">
+                        <span>&nbsp;{{location_insert?.site_name}} <i
+                              style="float: right;font-size: 14px; margin-right: 0.2rem; color: #aaaaaa;"> ▼
+                           </i></span>
+                     </div>
+                  </div>
+                  <!-- Chọn địa điểm/ khu vực -->
+                  <div class="khung-location-administrator block" (clickOutside)="siteSelectionDisplay=false"
+                     [exclude]="'.vung-kich'" [@openCloseDropdown]="siteSelectionDisplay ? 'open': 'closed'">
+                     <div id="khung-location-scroll">
+                        <div style="position: relative;width: 100%;" class="inputgroup">
+                           <!-- <input (keyup)="search_menu($event.target.value)"
+                                    style="border:none !important;padding-left: 7px" type="text" class="form-control"
+                                    placeholder="Tìm kiếm địa điểm/ khu vực"> -->
+                           <!-- <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                                    class="fa fa-search" aria-hidden="true"></i> -->
+                        </div>
+                        <ul style="padding-left: 0; padding-top: 10px;">
+                           <li *ngFor="let item of dropdownList_site" (click)="get_item_to_insert(item)"
+                              class="menu-{{item.alevel}} {{item.enables == 0 || item.store == 0 ? 'disabled' : ''}} {{item.id === location_insert.id ? 'active' : ''}}"
+                              style="cursor:pointer;">
+                              {{item.site_name}}
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Tên nhân viên</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input class="form-control color-font" id="nf-email" #txtcode="ngModel" required type="text"
+                     [ngModel]="data_update.staff_name" name="staff_name">
+                  <small *ngIf="txtcode.touched && txtcode.errors?.required" class="error-message">
+                     Bạn chưa nhập tên nhân viên
+                  </small>
+               </div>
+            </div>
+            <div class="form-group row form-no-marbottom">
+               <label class="col-md-3 col-3 col-form-label lh-label">Ảnh đại diện</label>
+               <div class="col-md-9 col-9 col-form-label">
+                  <input style="margin-top:2px;" type="file" class="form-control"
+                     (change)="UpdateUpload($event, update_staff_avatar)">
+                  <img class="img-fluid img2" #update_staff_avatar [src]="urlImage + data_update.staff_avatar"
+                     style="width:49%;" alt="ảnh đại diện nhân viên" title="{{data_update.staff_name}}">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <p style="margin: 0px;flex-grow: 1; color: crimson; font-style: italic;" *ngIf="error_popup_message">Đã có
+               lỗi xảy ra</p>
+            <a (click)="modalRef.hide()" class="btn  btn-huy active">
+               Đóng</a>
+            <button class="btn btn-success" [disabled]="update_form.invalid">
+               Chỉnh sửa</button>
+         </div>
+      </form>
+   </ng-template>
+   <!-- Kết thúc  Modal cập nhật-->
+   <ng-template #uploadform>
+      <div class="modal-header" style="background: gray; color:#f3b21c; border-radius: 0px;">
+         <h4 class="modal-title pull-left"><i class="fa fa-picture-o"></i>&nbsp;Ảnh nhận dạng {{staff_name}}&nbsp;<i
+               class="fa fa-spinner infinity" *ngIf="onloadPopup" style="color: #fff;">&nbsp;</i></h4>
+         <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+      <div class="modal-body">
+         <div class="row" style="background: #fafafa;">
+            <div class="col-md-12" style="height: 300px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;">
+               <h5 *ngIf="library.length == 0">{{error_popup_message ? 'Đã có lỗi xảy ra' : 'Chưa có ảnh nhận dạng'}}
+               </h5>
+               <img *ngIf="active_record" style="max-width: 200px;
+               max-height: 200px;" title="{{active_record.id}}"
+                  src="data:image/jpeg;base64,{{active_record.img_base64}}">
+            </div>
+            <div class="col-md-12 text-center" style="position: relative;">
+               <input #upload type="file" (change)="getUploadData($event)" class="form-control"
+                  style="visibility: hidden; position: absolute;">
+               <i title="Tải ảnh lên" *ngIf="!onloadPopup && !error_popup_message" class="fa fa-plus mr-2 iconAddPlus"
+                  (click)="trigger_click(upload)"></i>
+               <i title="Xóa ảnh" *ngIf="active_record" (click)="delete_item(active_record)"
+                  class="fa fa-times fa-2x iconRemovePlus"></i></div>
+         </div>
+      </div>
+      <div class="modal-footer" *ngIf="library.length > 0" style="background: #808080;">
+         <div class="col-md-12" style="
+         overflow-y: auto;
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+         justify-content: center;
+         border: 1px solid #ffffff52;
+            border-radius: 2px;
+            padding: 10px 0px;    background: #999;">
+            <img *ngFor="let item of library" title="{{item.id}}" src="data:image/jpeg;base64,{{item.img_base64}}"
+               style="padding: 5px;
+         min-height: 80px;
+         width: 80px; cursor: pointer;" (click)="active_record = item;"
+               class="{{active_record?.id == item.id ? 'actived_record' : ''}}">
+         </div>
+      </div>
+   </ng-template>
+</main>

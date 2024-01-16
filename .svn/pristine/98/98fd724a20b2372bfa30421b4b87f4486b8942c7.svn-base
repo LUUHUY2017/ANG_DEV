@@ -1,0 +1,280 @@
+import { IOption } from 'ng-select';   // select option <option>
+
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+
+// chỉnh css angular
+import { ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import 'rxjs/add/operator/map';
+// tree node
+import { TreeNode } from 'primeng/components/common/treenode';
+// import Modal
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+// import viewchild
+import { AdminstratorMenuComponent } from '../../../viewchild/adminstratormenu/adminstratormenu.component';
+@ViewChild(AdminstratorMenuComponent)
+
+@Component({
+  templateUrl: './sites.component.html',
+  styleUrls: ['./sites.component.css'],
+  // chỉnh css angular
+  encapsulation: ViewEncapsulation.None
+})
+
+export class SitesComponent implements OnInit {
+  page_id = '\'' + environment.Pages.administration.sites + '\'';
+  @ViewChild('dataTable') table: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private modalService: BsModalService,
+    private appservice: AppService) {
+  }
+  // Khai báo kiểu dữ kiệu
+  datatree: any;
+  siteTreeList: any; // khai báo site tree list
+  site_name: any;
+  site_id = 0;
+  siteNodeSelected: TreeNode;
+  user_organization: any;
+  organization_arr_option: Array<IOption>;
+  // thay đổi theo sự kiện click
+  organization_arr: Array<IOption>;
+  category: Array<IOption>;
+  org_selected: string;
+  org_selectedform: string;
+  category_id: string;
+  tu_khoa: string;
+  data_insert: any;
+  data_update: any;
+  public modalRef: BsModalRef;
+  delete_tablet_id: number;
+  site_cols = [
+    // { field: 'id', header: 'ID' },
+    // { field: 'site_code', header: 'Site Code' },
+    { field: 'site_name', header: 'Tên' },
+    { field: 'site_shortname', header: 'Viết Tắt' },
+    { field: 'site_code', header: 'Mã Code' },
+  ];
+  st_name: string;
+  site_code: string;
+  site_shortname: string;
+  show_icon = false;
+  url_img = 'http://i.imgur.com/Z4eQKYZ.gif';
+
+  ngOnInit(): void {
+    this.get_location_time();
+  }
+
+  // Lấy thông tin tổ chức lên ng-select
+  get_location_time() {
+    this.blockUI.start('Đang tải cấu hình...');
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          console.log('get_user_page_parametter', param);
+        }
+        this.organization_arr = param.organization_arr;
+        this.org_selected = String(param.organization_arr[0].value);
+        this.loadSite(this.org_selected);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.start('Lỗi, không kết nối được máy chủ');
+        this.blockUI.stop();
+      },
+    );
+  }
+
+  //  thay đổi tổ chức
+  thaydoitochuc(event) {
+    if (!environment.production) {
+      console.log('id', event.value);
+    }
+    this.loadSite(event.value);
+  }
+  // search menu
+  search_menu(value: string) {
+    // chuyển giá trị truyền vào về chữ thường để so sánh
+    console.log('value', value);
+    const string = value.toLowerCase();
+  }
+  get_data() {
+    const id_or = this.org_selected;
+    this.loadSite(id_or);
+  }
+  findSiteSelected(siteList) {
+    siteList.forEach(element => {
+      if (Number(element.site_id) === this.site_id) {
+        this.site_name = element.site_name;
+      }
+    });
+  }
+  siteTreeNodeSelect(event) {
+    if (!environment.production) {
+      console.log('nodeSelect', event);
+    }
+  }
+
+  siteTreeNodeUnselect(event) {
+    if (!environment.production) {
+      console.log('nodeUnselect', event);
+    }
+  }
+
+  loadSite(organization_id) {
+    this.blockUI.start('Đang tải dữ liệu...');
+    this.appservice.get_sites_tree(organization_id).then(res => {
+      if (!environment.production) {
+        if (!environment.production) {
+          console.log('tất cả site', res);
+        }
+      }
+      this.findSiteSelected(res);
+      this.siteTreeList = this.appservice.convert_sites_tree_ng_dropdown(res);
+      if (!environment.production) {
+        console.log('all site tree', this.siteTreeList);
+      }
+      this.blockUI.stop();
+    }).catch(err => {
+      this.blockUI.stop();
+    });
+  }
+
+  // cập nhật dữ liệu pupup
+  open_popup_update(item, templates: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('a', item);
+    }
+    this.data_update = item;
+    this.changeitem(item.organization_id);
+    this.modalRef = this.modalService.show(templates, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+    // hỏi xóa modal
+    modal_question(item, dialog: TemplateRef<any>) {
+      if (!environment.production) {
+        console.log('data_item', item);
+      }
+      this.delete_tablet_id = item;
+      this.modalRef = this.modalService.show(dialog, {
+        backdrop: true,
+        ignoreBackdropClick: true
+      });
+    }
+  updateform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.update_site).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // this.router.navigate(['/admin/admin']);
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.get_data();
+
+      });
+  }
+
+  // thêm dữ liệu popup
+  open_popup_insert(item, template: TemplateRef<any>) {
+    if (!environment.production) {
+      console.log('a', item);
+    }
+    this.data_insert = item;
+    this.changeitem(item.organization_id);
+    this.modalRef = this.modalService.show(template, {
+      backdrop: true,
+      ignoreBackdropClick: true
+    });
+  }
+
+  //  get_category
+  changeitem(organization_id) {
+    const data = {
+      organization_id: organization_id,
+    };
+    if (!environment.production) {
+      console.log('id', data);
+    }
+    this.show_icon = true;
+    this.appservice.post(data, environment.FBA.Administration.categories).subscribe(
+      respo => {
+        this.show_icon = false;
+        if (!environment.production) {
+          console.log('data_category', respo);
+        }
+        this.category = respo.category;
+        if (this.category.length > 0) {
+          this.category_id = respo.category[0].value;
+        } else {
+          this.category_id = '0';
+        }
+      });
+  }
+  // thêm địa điểm
+  insertform(item) {
+    this.blockUI.start('Đang thêm dữ liệu...');
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    const data: FormData = new FormData();
+    data.append('data', JSON.stringify(item.value));
+    this.appservice.post(data, environment.FBA.Administration.insert_site).subscribe(
+      para => {
+        if (!environment.production) {
+          console.log('dữ liệu gửi về', para);
+        }
+        // this.router.navigate(['/admin/admin']);
+        this.st_name = '';
+        this.site_code = '';
+        this.site_shortname = '';
+      },
+      (error) => {
+        if (!environment.production) {
+          console.log(error);
+        }
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+        this.get_data();
+      });
+  }
+
+  delete_site() {
+    const data = {
+      id: this.delete_tablet_id
+      // , deleted: 1
+    };
+      this.appservice.post(data, environment.FBA.Administration.delete_site).subscribe(
+        param => {
+          this.modalRef.hide();
+          this.get_data();
+        });
+  }
+}

@@ -1,0 +1,13 @@
+:host ::ng-deep {
+  .ng-select.ng-select-single .ng-select-container {
+    height: 30px !important;
+  }
+  .fba-customer-body-body table tfoot.customer-info-tfoot ul.pagination {
+    float: right;
+    margin-bottom: -1rem;
+  }
+  .daterangepicker {
+    top: 50px !important;
+  }
+
+}

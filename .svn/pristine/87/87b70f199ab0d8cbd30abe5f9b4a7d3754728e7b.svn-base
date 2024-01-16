@@ -1,0 +1,768 @@
+<main>
+   <div class="row">
+      <div class="col-md-12">
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a style="color:cornflowerblue" [routerLink]="['/fba/question/list-question']"><i
+                     class="fa fa-home" aria-hidden="true"></i>
+                 {{language.danh_sach_cau_hoi}}</a></li>
+            <li class="breadcrumb-item">
+               <!-- <a [routerLink]="['/fba/question/add-question']">Thêm câu hỏi</a> -->
+               <a>{{language.them_cau_hoi}}</a>
+            </li>
+            <!-- <li class="breadcrumb-item active">Dashboard</li> -->
+         </ol>
+      </div>
+   </div>
+   <!-- Kết thúc header -->
+   <form (ngSubmit)="submitform(question_submit)" #question_submit="ngForm">
+      <div class="row">
+         <div class="col-md-12 ">
+            <div class="card card-parent">
+               <!--    <div class="card-header card-font">
+               <span>Câu hỏi</span>
+               </div> -->
+               <div class="card-body">
+                  <div class="row">
+                     <div class="col-md-4 col-4">
+                        <div (click)="changetab(1)" class=" title-step {{status === 1 || status === 2 || status === 3  ? 'active' : ''}}">
+                           <span class="text-step">{{language.cau_hoi}}</span> &nbsp;
+                        </div>
+                     </div>
+                     <div class="col-md-4 col-4">
+                        <div (click)="changetab(2)" class=" title-step {{status === 2 || status === 3 ? 'active' : ''}}">
+                           <span class="text-step">{{language.danh_gia}}</span> &nbsp;
+                        </div>
+                     </div>
+                     <div class="col-md-4 col-4 ">
+                        <div (click)="changetab(3)" class=" title-step {{status === 3 ? 'active' : ''}}">
+                           <span class="text-step">{{language.ly_do}}</span> &nbsp;
+                        </div>
+                     </div>
+                  </div>
+                  <!-- Kết thúc row title -->
+                  <br>
+                  <div class="row">
+                     <div class="col-md-12">
+                        <block-ui></block-ui>
+                        <div class="card card-form card-child {{ status === 1 ? 'showform' : '' }}">
+                           <div class="card-header card-font">
+                              <span> <i class="fa fa-question-circle-o" aria-hidden="true"></i> {{language.cau_hoi}}</span>
+                           </div>
+                           <div class="card-body noborder-radius">
+                              <div style="display:none" class="form-group">
+                                 <label for="nf-email">ID Question</label>
+                                 <input class="form-control" id="nf" type="text" [ngModel]="id_question" name="id_question">
+                              </div>
+                              <div class="form-group">
+                                 <label>{{language.ten_to_chuc}}</label>
+                                 <ng-select class="bootstrap selectimeview" required #txtorganization="ngModel"
+                                    [options]="organization_arr" [(ngModel)]="org_selected" name="organization_id"
+                                    [allowClear]="true">
+                                 </ng-select>
+                                 <small *ngIf="txtorganization.touched && txtorganization.errors?.required" class="error_form">{{language.ban_chua_chon_to_chuc}}</small>
+                              </div>
+                              <div class="form-group" [hidden]="hienkhung">
+                                 <label style="font-style:italic" for="nf-email">{{language.chon_cau_hoi}} </label>&nbsp;
+                                 <select class="form-control" (change)="changequestion($event.target.value)">
+                                    <option value="1">{{language.vui_long_chon_cau_hoi}}</option>
+                                    <option *ngFor="let item of data_list_question" value="{{item.id}}">{{item.question_name}}</option>
+                                 </select>
+                              </div>
+                              <div class="form-group">
+                                 <label style="display:inline-block" for="nf-email">{{language.cau_hoi}}</label>&nbsp;
+
+                                 <i style="cursor:pointer;float: right;padding-right: 8px;color: #2196f3" class="fa fa-plus-square"
+                                    aria-hidden="true" (click)="hienkhung=!hienkhung"></i>
+                                 <input class="form-control" id="nf-email" required type="text" #txtquestion="ngModel"
+                                    [ngModel]="dataexe.question_name" name="question_name">
+                                 <small *ngIf="txtquestion.touched && txtquestion.errors?.required" class="error_form">{{language.ban_chua_nhap_cau_hoi}}</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>{{language.chien_dich}}</label>
+                                 <input class="form-control" type="text" [ngModel]="dataexe.campaign_name" required
+                                    #txtcampaign="ngModel" name="campaign_name" >
+                                 <small *ngIf="txtcampaign.touched && txtcampaign.errors?.required" class="error_form">{{language.ban_chua_nhap_chien_dich}}</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>{{language.thoi_gian_bat_dau}}</label>
+                                 <input class="form-control" type="date" [ngModel]="start_time | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="start_time = $event" #txtstart_time="ngModel" required name="start_time">
+                                 <small *ngIf="txtstart_time.touched && txtstart_time.errors?.required" class="error_form">{{language.ban_chua_nhap_thoi_gian}}</small>
+                              </div>
+                              <div class="form-group">
+                                 <label>{{language.thoi_gian_ket_thuc}}</label>
+                                 <input class="form-control" type="date" [ngModel]="end_time | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="end_time = $event" #txtend_time="ngModel" required name="end_time">
+                                 <small *ngIf="txtend_time.touched && txtend_time.errors?.required" class="error_form">{{language.ban_chua_nhap_thoi_gian}</small>
+                              </div>
+
+                              <div class="form-group">
+                                 <label>{{language.kich_hoat}}</label> &nbsp; &nbsp; &nbsp; &nbsp;
+                                 <div class="form-check-inline">
+                                    <label class="form-check-label" for="inline-t-ac">
+                                       <input style="vertical-align: middle;" class="form-check-input" id="inline-t-ac"
+                                          type="radio" [value]="true" [(ngModel)]="dataexe.actived" name="actived"> {{language.co}}
+                                    </label>
+                                 </div>
+                                 <div class="form-check-inline">
+                                    <label class="form-check-label" for="inline-f-ac">
+                                       <input style="vertical-align: middle;" class="form-check-input" id="inline-f-ac"
+                                          type="radio" [value]="false" [(ngModel)]="dataexe.actived" name="actived">
+                                      {{language.khong}}
+                                    </label>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="card-footer">
+                              <a class="button-step button-next" (click)="status = 2">
+                                 {{language.tiep_theo}} <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> </a>
+                           </div>
+                        </div>
+                        <!-- card time out -->
+
+                        <div class="card card-child card-form {{ status === 2 ? 'showform' : '' }}">
+                           <div class="card-header card-font">
+                              <span><i class="fa fa-check-square-o" aria-hidden="true"></i> {{language.chat_luong_cau_hoi}} </span>
+                           </div>
+                           <div class="card-body">
+                              <div class="row row-question1 ">
+                                 <div class="col-md-3 title-first  pl-cot2">
+                                 </div>
+                                 <div style="text-align:center" class="col-md-2 title-first col-12 pl-cot2">
+                                    <label> {{language.nhan}} </label>
+                                 </div>
+                                 <div class="col-md-7 title-first  col-12 ">
+                                    <div class="row">
+                                       <div class="col-2 rea-reaoth-cus custom-label">
+                                          <label class="col-sm-12">{{language.man_hinh_chinh}}</label>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus custom-label">
+                                          <label class="col-sm-12">{{language.ly_do}}</label>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus custom-label">
+                                          <label class="col-sm-12">{{language.ly_do_khac}}</label>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus custom-label">
+                                          <label class="col-sm-12">{{language.thong_tin_khach_hang}}</label>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus custom-label">
+                                          <label class="col-sm-12">{{language.xin_cam_on_}}</label>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="row">
+                                 <div class="col-md-3 title-first col-6 pl-cot2">
+                                 </div>
+                                 <div style="text-align:center" class="col-md-2 title-first col-6 pl-cot2">
+                                    <div class="col-sm-12 col-form-label cfm-question">
+                                       <label class="container">
+                                          <input style="z-index: 10;" class="form-check-input width-check" type="checkbox"
+                                             value="true" [(ngModel)]="dataexe.answer_label_visit" name="answer_label_visit">
+                                          <span style="margin-top: -5px;" class="checkmark"></span>
+                                       </label>
+                                    </div>
+                                 </div>
+                                 <div class="col-md-7 title-first  col-12 ">
+                                    <div class="row">
+                                       <div class="col-2 rea-reaoth-cus">
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <div class="form-check form-check-inline mr-1">
+                                                <input (keypress)="checknumber($event)" class="input-child input-custom"
+                                                   type="text" [ngModel]="dataexe.reason_time_out" name="reason_time_out">
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <div class="form-check form-check-inline mr-1">
+                                                <input (keypress)="checknumber($event)" class="input-child input-custom"
+                                                   type="text" [ngModel]="dataexe.reason_other_time_out" name="reason_other_time_out">
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus">
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <div class="form-check form-check-inline mr-1">
+                                                <input (keypress)="checknumber($event)" class="input-child input-custom"
+                                                   type="text" [ngModel]="dataexe.customer_info_time_out" name="customer_info_time_out">
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <div class="form-check form-check-inline mr-1">
+                                                <input (keypress)="checknumber($event)" class="input-child input-custom"
+                                                   type="text" [ngModel]="dataexe.finish_time_out" name="finish_time_out">
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row form-parent">
+                                 <div class="col-md-3 quality-question col-12">
+                                    <img *ngIf="dataexe.very_positive_img " class="img-fluid img1" [src]="('data:image/png;base64,'+dataexe.very_positive_img)"
+                                       alt="">
+                                    <img *ngIf="ImageUrll1" class="img-fluid img2" [src]="ImageUrll1" alt="">
+                                    <label id="label-upload-quality" (click)="fileInputVP.click()">
+                                       <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                    </label>
+                                    <input id="upload-photo" ngModel name="very_positive_img" type="file" (change)="uploadimagequality($event.target.files,1)"
+                                       #fileInputVP />
+                                 </div>
+                                 <div class="col-md-2 margin-top-quality col-6 pl-cot2">
+                                    <label> </label>
+                                    <input class="form-control" [ngModel]="dataexe.very_positive" name="very_positive"
+                                       type="text">
+                                 </div>
+                                 <div class="col-md-7 margin-top-quality  col-6 ">
+                                    <div class=" row">
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input [ngModel]="checked" [disabled]="checked" class="form-check-input width-check"
+                                                   type="checkbox" value="true" name="e">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile1" name="actived_vp_reason">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile2" name="actived_vp_other">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile3" name="actived_vp_info">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input [ngModel]="checked" [disabled]="checked" class="form-check-input width-check"
+                                                   type="checkbox" value="true" name="a">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row form-parent">
+                                 <div class="col-md-3 quality-question col-12">
+                                    <img *ngIf="dataexe.positive_img" class="img-fluid img1" [src]="('data:image/png;base64,'+dataexe.positive_img)"
+                                       alt="">
+                                    <img *ngIf="ImageUrll2" class="img-fluid img2" [src]="ImageUrll2" alt="">
+                                    <label id="label-upload-quality" (click)="fileInputP.click()">
+                                       <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                    </label>
+                                    <input type="file" id="upload-photo" ngModel name="positive_img" (change)="uploadimagequality($event.target.files,2)"
+                                       #fileInputP />
+                                 </div>
+                                 <div class="col-md-2 margin-top-quality col-6 pl-cot2">
+                                    <label> </label>
+                                    <input class="form-control" [ngModel]="dataexe.positive" name="positive" type="text">
+                                 </div>
+                                 <div class="col-md-7 margin-top-quality col-6 ">
+                                    <div class="form-group row">
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="bc">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile4" name="actived_p_reason">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile5" name="actived_p_other">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [ngModel]="actived_smile6" name="actived_p_info">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="b">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row form-parent">
+                                 <div class="col-md-3 quality-question col-12">
+                                    <img *ngIf="dataexe.negative_img" class="img-fluid img1" [src]="('data:image/png;base64,'+dataexe.negative_img)"
+                                       alt="">
+                                    <img *ngIf="ImageUrll3 " class="img-fluid img2" [src]="ImageUrll3" alt="">
+                                    <label id="label-upload-quality" (click)="fileInputN.click()">
+                                       <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                    </label>
+                                    <input type="file" id="upload-photo" ngModel name="negative_img" (change)="uploadimagequality($event.target.files,3)"
+                                       #fileInputN />
+                                 </div>
+                                 <div class="col-md-2 margin-top-quality col-6 pl-cot2">
+                                    <label> </label>
+                                    <input class="form-control" [ngModel]="dataexe.negative" name="negative" type="text">
+                                 </div>
+                                 <div class="col-md-7 margin-top-quality col-6 ">
+                                    <div class="form-group row">
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="cc">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile7"
+                                                   value="true" name="actived_n_reason">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile8"
+                                                   value="true" name="actived_n_other">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile9"
+                                                   value="true" name="actived_n_info">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="c">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row form-parent">
+                                 <div class="col-md-3 quality-question col-12">
+                                    <img *ngIf="dataexe.very_negative_img" class="img-fluid img1" [src]="('data:image/png;base64,'+dataexe.very_negative_img)"
+                                       alt="">
+                                    <img *ngIf="ImageUrll4" class="img-fluid img2" [src]="ImageUrll4" alt="">
+                                    <label id="label-upload-quality" (click)="fileInputVN.click()">
+                                       <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                    </label>
+                                    <input type="file" ngModel name="very_negative_img" id="upload-photo" (change)="uploadimagequality($event.target.files,4)"
+                                       #fileInputVN />
+                                 </div>
+
+                                 <div class="col-md-2 margin-top-quality col-6 pl-cot2">
+                                    <label></label>
+                                    <input class="form-control" [ngModel]="dataexe.very_negative" name="very_negative"
+                                       type="text">
+                                 </div>
+                                 <div class="col-md-7 margin-top-quality col-6 ">
+                                    <div class="form-group row">
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="dc">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile10"
+                                                   value="true" name="actived_vn_reason">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile11"
+                                                   value="true" name="actived_vn_other">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-3 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" [ngModel]="actived_smile12"
+                                                   value="true" name="actived_vn_info">
+                                                <span class="checkmark"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+                                       <div class="col-2 rea-reaoth-cus">
+                                          <label class="col-sm-12">&nbsp;&nbsp;&nbsp;</label>
+                                          <div class="col-sm-12 col-form-label cfm-question">
+                                             <label class="container">
+                                                <input class="form-check-input width-check" type="checkbox" value="true"
+                                                   [disabled]="checked" [ngModel]="checked" name="d">
+                                                <span class="checkmark  opacity-check"></span>
+                                             </label>
+                                          </div>
+                                       </div>
+
+                                    </div>
+                                 </div>
+                              </div>
+                              <small class="require-field">Ảnh kích thước không vượt quá {{appservice.uploadImageHeight + 'x' + this.appservice.uploadImageWidth}}</small>
+                           </div>
+                           <div class="card-footer">
+                              <a (click)="status = 1" style="margin-right: 8px;" class="button-step button-pre">
+                                 <i class="fa fa-arrow-circle-o-left" aria-hidden="true"></i> {{language.quay_lai}}</a>
+                              <a (click)="status = 3" class="button-step button-next">
+                                    {{language.tiep_theo}} <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> </a>
+                           </div>
+                        </div>
+
+                        <!-- Card hình ảnh -->
+                        <div class="card card-form card-child {{ status === 3 ? 'showform' : '' }}">
+                           <div class="card-header card-font">
+                              <span> <i class="fa fa-list-ul" aria-hidden="true"></i> {{language.ly_do}} </span>
+                           </div>
+                           <div class="card-body">
+                              <div class="table-responsive">
+                                 <table id="table-reason" class="table table-bordered datatable  table-sm" style="width:100%;min-width: 600px;">
+                                    <thead>
+                                       <tr>
+                                          <th style="width:40px;"> {{language.STT}}</th>
+                                          <th style="width:80px;"> {{language.anh_ly_do}}</th>
+                                          <th style="width: 350px">{{language.ten_ly_do}} </th>
+                                          <th style="width: 50px;"> {{language.kich_hoat}}</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr style="text-align: center;">
+                                          <td>1</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img1 || ImageUrl_reasonl1 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl1 ? ImageUrl_reasonl1 : ('data:image/png;base64,'+reason_img1)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS1.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img1" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,1)" #fileInputRS1 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name1"
+                                                name="reason_name1" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason1"
+                                                   name="actived_reason1" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>2</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img2 || ImageUrl_reasonl2" class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl2  ? ImageUrl_reasonl2 : ('data:image/png;base64,'+reason_img2)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS2.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img2" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,2)" #fileInputRS2 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name2"
+                                                name="reason_name2" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason2"
+                                                   name="actived_reason2" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>3</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img3 || ImageUrl_reasonl3" class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl3  ? ImageUrl_reasonl3 : ('data:image/png;base64,'+reason_img3)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS3.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img3" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,3)" #fileInputRS3 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name3"
+                                                name="reason_name3" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason3"
+                                                   name="actived_reason3" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>4</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img4 || ImageUrl_reasonl4" class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl4  ? ImageUrl_reasonl4 : ('data:image/png;base64,'+reason_img4)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS4.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img4" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,4)" #fileInputRS4 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name4"
+                                                name="reason_name4" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason4"
+                                                   name="actived_reason4" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>5</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img5 || ImageUrl_reasonl5 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl5  ? ImageUrl_reasonl5 : ('data:image/png;base64,'+reason_img5)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS5.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img5" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,5)" #fileInputRS5 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name5"
+                                                name="reason_name5" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason5"
+                                                   name="actived_reason5" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>6</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img6 || ImageUrl_reasonl6 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl6  ? ImageUrl_reasonl6 : ('data:image/png;base64,'+reason_img6)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS6.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img6" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,6)" #fileInputRS6 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name6"
+                                                name="reason_name6" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason6"
+                                                   name="actived_reason6" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>7</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img7 ||ImageUrl_reasonl7 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl7  ? ImageUrl_reasonl7 : ('data:image/png;base64,'+reason_img7)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS7.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img7" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,7)" #fileInputRS7 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name7"
+                                                name="reason_name7" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason7"
+                                                   name="actived_reason7" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>8</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img8 || ImageUrl_reasonl8 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl8  ? ImageUrl_reasonl8 : ('data:image/png;base64,'+reason_img8)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS8.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img8" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,8)" #fileInputRS8 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name8"
+                                                name="reason_name8" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason8"
+                                                   name="actived_reason8" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+
+                                          </td>
+                                       </tr>
+                                       <tr style="text-align: center;">
+                                          <td>9</td>
+                                          <td style="position: relative;">
+                                             <img *ngIf="reason_img9 || ImageUrl_reasonl9 " class="img-fluid mx-auto d-block"
+                                                style="width:40px;" [src]="ImageUrl_reasonl9  ? ImageUrl_reasonl9 : ('data:image/png;base64,'+reason_img9)"
+                                                alt="">
+                                             <label id="label-upload" (click)="fileInputRS9.click()">
+                                                <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                                             </label>
+                                             <input type="file" name="reason_img9" ngModel id="upload-image-reason"
+                                                (change)="uploadimage_reason($event.target.files,9)" #fileInputRS9 />
+                                          </td>
+                                          <td>
+                                             <input class="form-control input-reason input-reason-table" [ngModel]="reason_name9"
+                                                name="reason_name9" type="text" placeholder={{language.nhap_ly_do_}}>
+                                          </td>
+                                          <td>
+                                             <label class="container-rea">
+                                                <input class="form-check-input" type="checkbox" [ngModel]="actived_reason9"
+                                                   name="actived_reason9" value="true">
+                                                <span class="checkmark check-reason"></span>
+                                             </label>
+                                          </td>
+                                       </tr>
+                                    </tbody>
+                                 </table>
+                                 <small class="require-field">Ảnh kích thước không vượt quá {{appservice.uploadImageHeight + 'x' + this.appservice.uploadImageWidth}}</small>
+                              </div>
+                           </div>
+                           <div class="card-footer">
+                              <div style="visibility: hidden;opacity: 0" class="card-foote {{ status === 3 ? 'hien' : '' }}">
+                                 <a (click)="status=2" style="margin-right: 8px;" class="button-step button-pre">
+                                    <i class="fa fa-arrow-circle-o-left" aria-hidden="true"></i> {{language.quay_lai}}</a>
+                                 <button class="btn  btn-danger" [disabled]="question_submit.invalid">
+                                    <i class="fa fa-check" aria-hidden="true"></i> {{language.them_moi}}</button>
+                              </div>
+                           </div>
+                        </div>
+
+                     </div>
+                  </div>
+
+               </div>
+            </div>
+         </div>
+      </div>
+   </form>
+   <notifier-container></notifier-container>
+   <!-- Kết thúc row thứ nhất -->
+</main>

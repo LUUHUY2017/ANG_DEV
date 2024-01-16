@@ -1,0 +1,348 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row" style="border-radius: 5px; border: 1px">
+      <ul id="fba-ana-head">
+        <li>
+          <label for="">{{language.dia_diem_khu_vuc}} </label>
+          <!-- Nút chọn tổ chức -->
+          <div class="overview-period">
+            <div (click)="siteSelectionDisplay=!siteSelectionDisplay" class="text-select vung-kich">
+              <i class="fa fa-map-marker location"></i>
+              <span>&nbsp;{{location}}</span>&nbsp;
+              <i class="fa fa-caret-down"></i> &nbsp;
+            </div>
+            <i (click)="locationSelectionDisplay=!locationSelectionDisplay" [hidden]="hidden_menu_location"
+              class="fa fa-chevron-circle-down ngoai-tru icon-menu-header pdt5"></i>
+          </div>
+          <!-- Chọn option tổ chức -->
+          <div style="height: auto;overflow: unset;border-radius: 10px;" [hidden]="!locationSelectionDisplay"
+            class=" khung-location block">
+            <!-- (clickOutside)="locationSelectionDisplay=false" [exclude]="'.ngoai-tru'" -->
+            <div style="margin-bottom: 0" class="card">
+              <div class="card-header">
+                <span>{{language.chon_dia_diem}}</span>
+              </div>
+              <div class="card-body">
+                <!-- <ng-select class="bootstrap selectimeview" [(ngModel)]="organization_id" [options]="organization_arr_option" [allowClear]="false" (selected)="changeorganization($event)">
+                </ng-select> -->
+                <ng-select class="bootstrap selectimeview" (change)="changeorganization($event)"
+                  [items]="organization_arr_option" bindLabel="label" bindValue="value" [clearable]=false
+                  [(ngModel)]="organization_id"></ng-select>
+              </div>
+              <div class="card-footer">
+                <div style="float: right;  padding: 0 8px;">
+                  <button type="button" class="btn btn-secondary"
+                    (click)="locationSelectionDisplay=!locationSelectionDisplay">{{language.dong_cua_so}}</button>
+                </div>
+              </div>
+            </div> <!-- card -->
+          </div>
+          <!--  Chọn địa điểm/ khu vực  -->
+          <div [hidden]="!siteSelectionDisplay" class=" khung-location block"
+            (clickOutside)="siteSelectionDisplay=false" [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+              <div style="position: relative;width: 100%;" class="inputgroup">
+                <input (keyup)="search_menu($event.target.value)" style="border:none !important;padding-left: 7px;"
+                  type="text" class="form-control" placeholder="{{language.tim_kiem_dia_diem}}">
+                <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;"
+                  class="fa fa-search"></i>
+              </div>
+              <ul style="padding-left: 0;">
+                <li (click)=" item.enables == 1 ? changeitem(item.organization_id, item.id, item.site_name): ''"
+                  *ngFor="let item of menu_tree"
+                  class="menu-{{item.alevel}} {{item.site_name === location ? 'li_active' : ''}} {{item.enables == '0' ? 'li_unlist' : ''}}">
+                  {{item.site_name}}
+                </li>
+
+              </ul>
+            </div>
+          </div>
+        </li>
+        <!-- kết thúc li thứ nhất -->
+        <li>
+          <label for="">{{language.cau_hoi_khao_sat}}</label>
+          <div dropdown>
+            <div class="text-select">
+              <div dropdownToggle class="overview-survey">
+                <svg class="jss965 jss966" focusable="false" viewBox="0 0 24 24" role="presentation"
+                  style="width: 20px;margin-bottom: 5px;">
+                  <g>
+                    <path d="M0 0h24v24H0z" style="fill: rgba(1, 1, 1, 0);"></path>
+                    <path
+                      d="M20.43 20.6H3.57a2.26 2.26 0 0 1-2.26-2.27V6.2a2.26 2.26 0 0 1 2.27-2.25h16.86A2.26 2.26 0 0 1 22.7 6.2v12.13a2.26 2.26 0 0 1-2.27 2.26zM3.57 5.9a.33.33 0 0 0-.32.3v12.13a.33.33 0 0 0 .32.32h16.86a.33.33 0 0 0 .32-.32V6.2a.33.33 0 0 0-.32-.3z">
+                    </path>
+                    <path
+                      d="M16.62 13.76h-2.1v-.2a2.58 2.58 0 0 1 .12-.88 1.92 1.92 0 0 1 .36-.6 11.08 11.08 0 0 1 1.08-1q.45-.37.45-.68a.62.62 0 0 0-.18-.47.77.77 0 0 0-.54-.17.88.88 0 0 0-.64.26 1.52 1.52 0 0 0-.33.9l-2.14-.26a2.92 2.92 0 0 1 .85-1.9 3.2 3.2 0 0 1 2.3-.72 3.4 3.4 0 0 1 1.93.5 2.1 2.1 0 0 1 1 1.8 1.74 1.74 0 0 1-.26.92 4.46 4.46 0 0 1-1.06 1.06 2.83 2.83 0 0 0-.7.7 1.45 1.45 0 0 0-.14.74zm-2.17.56h2.25v2h-2.25zM6.13 9.76h5.2v2h-5.2zM6.13 13.28h6.42v2H6.13z">
+                    </path>
+                  </g>
+                </svg>
+                <span>&nbsp;{{question_name}}</span><i class="fa fa-caret-down"></i>
+              </div>
+            </div>
+            <!-- popup -->
+            <div *dropdownMenu class="dropdown-menu khung-question block">
+              <div id="khung-question-scroll">
+                <div class="ongoing">
+                  <div class="small-metric">{{language.dang_dien_ra}}</div>
+        <li *ngFor=" let item of questions_ongoing"
+          (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+          <div class="questionText">
+            <span style=" display: block;">{{item.question_name}}?</span>
+          </div>
+          <div class="timePeriod">
+            <span>{{item.campaign_name}} </span>
+            <!-- tháng {{ item.start_time| date:'MM'}} -->
+            <span style="font-style: italic;">{{language.fba_tu}} {{ item.start_time| date:'dd-MM-yyyy'}}
+              {{language.fba_den}} {{ item.end_time|
+              date:'dd-MM-yyyy'}}</span>
+          </div>
+        </li>
+    </div>
+    <!-- kết thúc ongoing -->
+    <div class="starting">
+      <div class="small-metric">{{language.sap_dien_ra}}</div>
+      <li *ngFor=" let item of questions_upcoming"
+        (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} </span>
+          <!-- tháng {{ item.start_time| date:'MM'}} -->
+          <span style="font-style: italic;">{{language.fba_tu}} {{ item.start_time| date:'dd-MM-yyyy'}}
+            {{language.fba_den}} {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc sắp diễn ra -->
+    <div class="ending">
+      <div class="small-metric">{{language.ket_thuc}}</div>
+      <li *ngFor=" let item of questions_ended"
+        (click)="question_change(item.question_id, item.question_name,item.very_positive_img,item.positive_img,item.negative_img,item.very_negative_img)">
+        <div class="questionText">
+          <span style=" display: block;">{{item.question_name}}? </span>
+        </div>
+        <div class="timePeriod">
+          <span>{{item.campaign_name}} </span>
+          <!-- tháng {{ item.start_time| date:'MM'}} -->
+          <span style="font-style: italic;">{{language.fba_tu}} {{ item.start_time| date:'dd-MM-yyyy'}}
+            {{language.fba_den}} {{ item.end_time|
+            date:'dd-MM-yyyy'}}</span>
+        </div>
+      </li>
+    </div>
+    <!-- Kết thúc phần kết thúc -->
+  </div>
+</div>
+</div>
+</li>
+<!-- kết thúc li thứ 2 -->
+<li>
+  <label for="">{{language.thoi_ky}}</label>
+  <div class="overview-period">
+    <div (click)="siteSelectionDisplay2=!siteSelectionDisplay2" class="text-select vung-kich2">
+      <i class="fa fa-calendar-minus-o location"></i>
+      <span>&nbsp;{{time_period}}</span>
+      <i class="fa fa-caret-down"></i>
+    </div>
+  </div>
+  <!-- popup -->
+  <div [hidden]="!siteSelectionDisplay2" (clickOutside)="siteSelectionDisplay2=false" [exclude]="'.vung-kich2'"
+    class=" khung-time block">
+    <div id="khung-time-scroll">
+      <ul id="ul-time">
+        <li class="{{ltp.innerHTML === time_period ? 'active': ''}}">
+          <span>{{language.chon_thoi_ky}}</span>
+          <div id="reportrangefba" style="  margin-top: 2px; cursor: pointer; width: 100%">
+            <i class="fa fa-calendar"></i>&nbsp;
+            <span #ltp id="time_period" style="font-size: 12px;"></span> <i class="fa fa-caret-down"></i>
+            <input type="hidden" id="startDateReportTemp">
+            <input type="hidden" id="endDateReportTemp">
+          </div>
+        </li>
+        <li class="{{item.label === time_period ? 'active' : ''}}" *ngFor=" let item of fba_time_period_metrics"
+          (click)="chonthoigian(item)">
+          {{  item.label}}
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>
+<!-- kết thúc li thứ  3 -->
+</ul>
+</div>
+</div><!-- Kết thúc card-header -->
+
+<div class="card-body card-body-bottom">
+  <div class="row">
+    <div class="container-fluid">
+      <div class="animated fadeIn">
+        <block-ui></block-ui>
+        <div class="card card-child">
+          <div id="card-header" class="card-header">
+            <div class="row">
+              <ul id="fbametrics_headmapmenu_2">
+                <li>
+                </li> <!-- li-visit -->
+                <li>
+                  <button type="button" class="btn btn-primary float-right btnapdung" (click)="time_change()">
+                    {{language.ap_dung}}
+                  </button>
+                  <div class="btn-group btn-group-toggle float-right ml" data-toggle="buttons">
+                    <ng-select class="bootstrap selecttimeview nonml" [items]="startTimeOption" bindLabel="label"
+                      bindValue="value" [clearable]=false [(ngModel)]="startTime"></ng-select>
+                    <span style="padding: 4px 0px;">-</span>
+                    <ng-select class="bootstrap selecttimeview" [items]="endTimeOption" bindLabel="label"
+                      bindValue="value" [clearable]=false [(ngModel)]="endTime"></ng-select>
+                  </div>
+                </li><!-- Kết thúc li thứ 2 -->
+                <li>
+                  <div>
+                    <div class="btn-group float-right" dropdown>
+                      <button style="display:none" dropdownToggle type="button"
+                        class="btn btn-primary dropdown-toggle float-right btnchiase">
+                        Chia Sẻ
+                      </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right " role="menu">
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-facebook"
+                            href="https:www.facebook.com"><i class="fa fa-facebook"></i>Facebook</a></li>
+                        <li role="menuitem"><a class="dropdown-item btn-brand btn-google-plus"
+                            href="https:www.plus.google.com"><i class="fa fa-google-plus"></i>G+</a></li>
+                      </ul>
+                    </div>
+                    <div class="btn-group float-right" dropdown>
+                      <button dropdownToggle type="button"
+                        class="btn btn-primary dropdown-toggle float-right btnxuat">{{language.xuat}} </button>
+                      <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                        <li (click)="exportExcel()" role="menuitem "><a
+                            class="dropdown-item float-right cursor-pointer">{{language.xuat_ra_excel}}</a>
+                        </li>
+                        <li style="display:none" role="menuitem"><a
+                            class="dropdown-item  float-right cursor-pointer">Xuất ra PDF</a>
+                        </li>
+                        <li style="display:none" role="menuitem"><a
+                            class="dropdown-item  float-right cursor-pointer">Other</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </li> <!-- Kết thúc li thứ 3-->
+              </ul>
+            </div> <!-- Kết thúc row-header -->
+          </div> <!-- Kết thúc-card-header con -->
+          <div class="card-body card-body-bottom">
+            <div class="row  title-show">
+              <span class="title-show1 "><i style="color: #1a1a1a;" class="fa fa-map-marker"></i>
+                {{title_location}}</span>
+              <span class="title-show2"> <svg class="jss965 jss966" focusable="false" viewBox="0 0 24 24"
+                  role="presentation" style="width: 14px;margin-bottom: 2px;">
+                  <g>
+                    <path d="M0 0h24v24H0z" style="fill: rgba(1, 1, 1, 0);"></path>
+                    <path
+                      d="M20.43 20.6H3.57a2.26 2.26 0 0 1-2.26-2.27V6.2a2.26 2.26 0 0 1 2.27-2.25h16.86A2.26 2.26 0 0 1 22.7 6.2v12.13a2.26 2.26 0 0 1-2.27 2.26zM3.57 5.9a.33.33 0 0 0-.32.3v12.13a.33.33 0 0 0 .32.32h16.86a.33.33 0 0 0 .32-.32V6.2a.33.33 0 0 0-.32-.3z">
+                    </path>
+                    <path
+                      d="M16.62 13.76h-2.1v-.2a2.58 2.58 0 0 1 .12-.88 1.92 1.92 0 0 1 .36-.6 11.08 11.08 0 0 1 1.08-1q.45-.37.45-.68a.62.62 0 0 0-.18-.47.77.77 0 0 0-.54-.17.88.88 0 0 0-.64.26 1.52 1.52 0 0 0-.33.9l-2.14-.26a2.92 2.92 0 0 1 .85-1.9 3.2 3.2 0 0 1 2.3-.72 3.4 3.4 0 0 1 1.93.5 2.1 2.1 0 0 1 1 1.8 1.74 1.74 0 0 1-.26.92 4.46 4.46 0 0 1-1.06 1.06 2.83 2.83 0 0 0-.7.7 1.45 1.45 0 0 0-.14.74zm-2.17.56h2.25v2h-2.25zM6.13 9.76h5.2v2h-5.2zM6.13 13.28h6.42v2H6.13z">
+                    </path>
+                  </g>
+                </svg> {{title_question_name}}</span>
+
+              <span class="title-show3"> <i class="fa fa-clock-o i-black"></i>
+                {{ starttime }}
+              </span>
+              <span>&nbsp;&minus;&nbsp;</span>
+              <span class="title-show3"> <i class="fa fa-clock-o i-black"></i>
+                {{ endtime }}
+              </span>
+              &nbsp;&nbsp;
+              <span class="title-show3"> <i style="color: #1a1a1a;" class="fa fa-calendar-minus-o "></i>
+                {{title_time_period }}: {{ time_period2}} </span>
+            </div>
+            <br>
+            <div class="row">
+              <div style="border-bottom:1px  dotted #a7a4a4" class="fba-body-body">
+                <div style="width:97%;display:block;margin: auto" #container> </div>
+                <!-- margin: auto; -->
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-reason">
+                <div class="table-responsive">
+                  <table id="table-cold-left" style="width: 100%;min-width: 600px" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th style="width: 250px;padding-bottom: 15px;">
+                          <div class="tong-danh-gia">{{tong_mat_hong + tong_mat_do ? tong_mat_hong + tong_mat_do :
+                            '0'}} </div>
+                          <div class="phan-tram-danh-gia">({{avg_lydo_tong_danh_gia > 0 ? avg_lydo_tong_danh_gia : '0'
+                            }}%) </div>
+                          <span id="percent">{{language.danh_gia_tieu_cuc_trong_tong_so}} {{tong_danh_gia > 0 ? tong_danh_gia :
+                            '0'}} {{language.danh_gia_bang}}</span>
+                        </th>
+                        <th *ngIf="image_negative_img" style="width: 200px;">
+                          <img [src]="'data:image/png;base64,'+image_negative_img" title="{{table_negative_name}}">
+                          <div style="padding-top:7px;" class="tong-danh-gia"> {{tong_mat_hong ? tong_mat_hong : '0'}}
+                            <span id="percent">({{((tong_mat_hong/(tong_hai_mat))*100).toFixed(2) >0 ?
+                              ((tong_mat_hong/(tong_hai_mat))*100).toFixed(2) : '0'}}%) </span></div>
+                        </th>
+                        <th *ngIf="image_very_negative_img" style="width: 200px;">
+                          <img [src]="'data:image/png;base64,'+image_very_negative_img"
+                            title="{{table_very_negative_name}}">
+                          <div style="padding-top:7px;" class="tong-danh-gia"> {{tong_mat_do ? tong_mat_do : '0'}}
+                            <span id="percent">({{((tong_mat_do/(tong_hai_mat))*100).toFixed(2) > 0 ?
+                              ((tong_mat_do/(tong_hai_mat))*100).toFixed(2) : '0'}}%) </span></div>
+                        </th>
+                        <th style="width: 250px;background-color:#eb6266;padding-bottom: 15px;color: white">
+                          <div style="color:white !important" class="tong-danh-gia">{{tong_so_total_negative ?
+                            tong_so_total_negative : '0'}}</div>
+                          <div style="color:white !important" class="phan-tram-danh-gia">100%</div>
+                          <span style="color:white !important" id="percent">{{language.phan_hoi_ly_do}}</span>
+                        </th>
+                      </tr>
+
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of data">
+                        <td>{{item.reason_name}}</td>
+                        <td>{{item.negative}} <span> ({{((item.negative/(tong_so_total_negative))*100).toFixed(2) > 0 ?
+                            ((item.negative/(tong_so_total_negative))*100).toFixed(2) : '0' }}%) </span></td>
+                        <td>{{item.very_negative}} <span>
+                            ({{((item.very_negative/(tong_so_total_negative))*100).toFixed(2) > 0 ?
+                            ((item.very_negative/(tong_so_total_negative))*100).toFixed(2) : '0' }}%) </span></td>
+                        <td>{{item.total_negative}} <span> (
+                            {{ (((item.total_negative)/(tong_so_total_negative))*100).toFixed(2) > 0 ? (((item.total_negative)/(tong_so_total_negative) )*100).toFixed(2) : '0' }}%)
+                          </span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align: right;width: 100%;font-size: 11px;">
+    {{language.bao_cao_duoc_tao}}
+    {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+    <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+  </div>
+</div>
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông báo!</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Có lỗi xảy ra! Vui lòng nhấn<a style="color: blue; cursor: pointer;" (click)="reset_session()"> vào đây </a> để
+      tải lại</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="reset_session()">Tải lại</button>
+  </div>
+</ng-template>

@@ -1,0 +1,30 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+// import { UserPermissionGuard } from '../../shared/user_permission.guard';
+
+const routes: Routes = [
+    {
+        path: '',
+        data: {
+            title: ''
+            , module_title: 'terminal',
+        },
+        // canActivateChild: [UserPermissionGuard], // nếu mà có genderage
+        children: [
+            {
+                path: '',
+                redirectTo: 'monitor'
+            },
+            {
+                path: 'monitor',
+                loadChildren: './monitor/terminalmonitor.module#TerminalMonitorModule'
+            }
+        ]
+    }
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
+})
+export class TerminalRoutingModule { }

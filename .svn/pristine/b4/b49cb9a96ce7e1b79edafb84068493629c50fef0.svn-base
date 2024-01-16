@@ -1,0 +1,56 @@
+<main>
+  <div class="row">
+    <div class="col-md-12">
+      <app-footfallsettingmenu></app-footfallsettingmenu>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div style=" border:unset;border-radius: 3px;" class="card">
+        <!-- <div style="height: 55px;" class="card-header card-font">
+          <span style="line-height:33px;"> <i class="fa fa-list-alt" aria-hidden="true"></i> Danh sách tài
+            khoản</span>
+        </div> -->
+        <div class="card-body table-users">
+          <div class="row mb-3" *ngIf="isSuperAdmin">
+            <div class="col-md-2">
+              <ng-select class="bootstrap selectimeview" required [options]="organization_arr" [(ngModel)]="organization_id"
+                [allowClear]="false" (selected)="changeOrg($event)" placeholder="Chọn tổ chức">
+              </ng-select>
+            </div>
+          </div>
+          <!-- Nav tabs -->
+          <ng-container *ngIf="canLoadChildComponent">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link {{componentStats === 1 ? 'active font-weight-bold': null}} rounded-0"
+                  (click)="changeComponent(1)">Xem theo từng trang</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {{componentStats === 2 ? 'active font-weight-bold': null}} rounded-0"
+                  (click)="changeComponent(2)">Xem theo từng người dùng</a>
+              </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content p-4">
+              <div class="row {{componentStats === 1 ? 'active': null}} mr-0 ml-0" *ngIf="componentStats === 1">
+                <app-pagemail [organization_id]="organization_id" [defaultModule]="defaultModule"></app-pagemail>
+              </div>
+              <div class="row {{componentStats === 2 ? 'active': null}} mr-0 ml-0" *ngIf="componentStats === 2">
+                <app-ffuserchildren [organization_id]="organization_id" [defaultModule]="defaultModule">
+                </app-ffuserchildren>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!isOnload && errorMess != null">
+            <div class="error-div"><i class="fa fa-exclamation-triangle">&nbsp;</i>{{errorMess}}. Vui lòng<a
+                style="color: #f3b21c; cursor: pointer;" (click)="ngOnInit()">&nbsp;bấm vào đây&nbsp;</a>để tại lại
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <block-ui></block-ui>
+  <!-- Kết thúc  Modal cập nhật-->
+</main>

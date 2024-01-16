@@ -1,0 +1,118 @@
+<block-ui></block-ui>
+<div class="row">
+  <div class="container-fluid">
+    <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+    <div class="animated fadeIn">
+      <div class="card card-parent">
+        <!-- <div class="card-header"> -->
+        <!-- <button class="btn btn-primary btn-apdung">Thêm mới</button> -->
+        <!-- </div> -->
+        <!-- <div class="card-body updatingcard">
+          Đang cập nhật...
+        </div> -->
+        <div class="card-body" style="padding-top: 10px;">
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <small>
+                <i class="fa fa-home">&nbsp;</i>
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                &nbsp;<a [routerLink]="[ '/dashboard']">{{language.trang_chu}}</a>&nbsp;
+                <i class="fa fa-angle-double-right" aria-hidden="true">&nbsp;</i>
+                <a [routerLink]="[ '/help']">{{language.tro_giup}}</a>&nbsp;
+                <i class="fa fa-angle-double-right" aria-hidden="true">&nbsp;</i></small>
+              <h1><i class="fa fa-info-circle"
+                  style="color: #f19925">&nbsp;</i>{{language.chi_tiet_cau_hoi_va_tro_giup}}</h1>
+            </div>
+          </div>
+          <div class="row">
+            <h3 style="text-align: center;
+            justify-content: center;
+            display: flex;
+            flex-grow: 1;
+            align-items: center;
+            flex-direction: row;" *ngIf="data?.length === 0">{{language.khong_tim_thay_bai_viet}}</h3>
+            <ng-container *ngIf="data?.length > 0">
+              <div class="col-md-9" *ngFor="let item of data">
+                <div class="row">
+                  <div class="col-md-12">
+                    <h3 style="    text-align: left;
+                      font-family: Open-bold;
+                      text-transform: uppercase;">{{item.title_content}}</h3>
+                    <span>
+                      <small><i class="fa fa-user-circle">&nbsp;</i>{{language.tac_gia_bai_viet_}}&nbsp;<span
+                          style="font-style: italic; color: #999;">{{item.user_name}}</span></small>
+                    </span>
+                    <span class="ml-2">
+                      <small><i class="fa fa-clock-o">&nbsp;</i>{{language.ngay_cap_nhat_}}&nbsp;<span
+                          style="font-style: italic; color: #999;">{{item.updated_at | date: 'hh:mm dd:mm:yyyy'}}</span></small>
+                    </span>
+                    <span class="ml-2">
+                      <small><i class="fa fa-check">&nbsp;</i>{{language.trang_thai_}}&nbsp;<span
+                          style="font-style: italic; color: #999;">{{item.deleted == 0 ? 'Đang cập nhật' : 'Ngừng hoạt động'}}</span></small>
+                    </span>
+                    <span class="ml-2">
+                      <small><i class="fa fa-eye">&nbsp;</i>{{language.luot_xem_}}&nbsp;<span
+                          style="font-style: italic; color: #999;">10 lượt</span></small>
+                    </span>
+                    <button class="btn btn-primary" style="background: #4267b2;
+                      border-color: #4267b2;
+                      border-radius: 0px;
+                      float: right;"><i class="fa fa-facebook">&nbsp;</i>{{language.chia_se}}</button>
+                    <img class="mt-3" [src]="url_img + item.title_img" style="max-width: 100%;
+                    display: block;
+                    margin: auto;" alt="Smiley face">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 mt-3" style="    font-style: italic;
+                  text-align: center;
+                  font-size: 12px;
+                  padding-bottom: 10px;
+                  border-bottom: 0.6px solid rgba(0, 0, 0, 0.12);">
+                    {{item.help_description}}
+                  </div>
+                  <div class="col-md-12 mt-4" style="padding-bottom: 10px;
+                  border-bottom: 0.6px solid rgba(0, 0, 0, 0.12);" [innerHTML]="item.help_content">
+                  </div>
+                  <!-- <div class="col-md-12 mt-2" [innerHTML]="item.tag_name">
+                  </div> -->
+                </div>
+              </div>
+            </ng-container>
+            <div class="col-md-3 thetag">
+              <div class="row mb-2" style="margin:0px; border: 1px solid #eee; padding: 15px 0px;">
+                <div class="col-md-12" style="padding-top: 5px; padding-bottom: 5px;">
+                  <h4 style="text-align: center"><i class="fa fa-tags"
+                      style="color: #f19925;">&nbsp;</i>{{language.the_tag}}</h4>
+                </div>
+                <div class="col-md-12">
+                  <span style="padding: 5px 5px 5px 20px;
+                  background: #f19925;
+                  color: #fff;
+                  font-size: 12px; display: block; position: relative;" class="mr-2 ml-2">{{language.the_tag_so}} 2
+                    <span class="tagnumber">3</span></span>
+                  <span style="padding: 5px 10px;
+                  background: #f19925;
+                  color: #fff;
+                  font-size: 12px; display: block" class="mr-2 ml-2 mt-2">{{language.the_tag_so}} 1</span>
+                  <span style="padding: 5px 10px;
+                  background: #f19925;
+                  color: #fff;
+                  font-size: 12px; display: block" class="mr-2 ml-2 mt-2">{{language.the_tag_so}} 1</span>
+                  <span style="padding: 5px 10px;
+                  background: #f19925;
+                  color: #fff;
+                  font-size: 12px; display: block" class="mr-2 ml-2 mt-2">{{language.the_tag_so}} 1</span>
+                  <span style="padding: 5px 10px;
+                  background: #f19925;
+                  color: #fff;
+                  font-size: 12px; display: block" class="mr-2 ml-2 mt-2">{{language.the_tag_so}} 1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,241 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row m-0">
+      <div class="col-12 col-sm-4 col-md-4 p-0">
+        <app-menutree (submit_menu)="get_emit_menu($event)"></app-menutree>
+      </div>
+      <div class="col-12 col-sm-8 col-md-8 p-0 visit-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div> <!-- card-header -->
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child ">
+            <div id="card-header" class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li>
+                    <!-- <ng-select class="bootstrap selecttimeview select-visits" [options]="indexOption" [allowClear]="false" [(ngModel)]="indexOptionSelected"></ng-select> -->
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                      bindValue="value" groupBy="group" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <!-- <ng-select class="bootstrap selecttimeview starttime" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <!-- <ng-select class="bootstrap selecttimeview endtime" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select> -->
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card-body card-body-bottom">
+              <div class="row">
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-7 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right ml btnngaygio" data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                      (click)="get_data()">{{language.gio}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day"
+                      (click)="get_data()">{{language.ngay}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week"
+                      (click)="get_data()">{{language.tuan}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Month"
+                      (click)="get_data()">{{language.thang}}</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Year"
+                      (click)="get_data()">{{language.nam}}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row foot-title-show">
+                <div class="title-show1 ">
+                  {{site_name}} &nbsp;{{title_index}} &nbsp;{{ starttime }}&minus; {{ endtime }} &nbsp;
+                  {{ title_time_period }}: {{ time_period }}, {{language.xem_theo}} {{ view }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <table class="table table-striped table-visit">
+                  <thead>
+                    <tr>
+                      <!-- <th style="width: 50%" [hidden]="this.indexOptionSelected !== this.indexOptionSelected"> {{this.indexOptionSelected}} </th> -->
+                      <th style="width: 400px;padding-left: 2.5rem;">{{language.time}}</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'PasserBy'">PasserBy</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Shopper Visits'">Shopper Visits
+                      </th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Visits'">Visits</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Turn in rate'">Turn in rate (%)
+                      </th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Kids Visits'">Kids Visits</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Traffic Flow'">Traffic flow</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Avg Time'">Avg Time (min)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Conversion rate'">Conversion rate
+                        (%)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'ATV'">ATV</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Avg Items'">Avg Items</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Sales Yield'">Sales Yield</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Transactions'">Transactions</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Sales'">Sales</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Missed Sales Opportunity'">Missed
+                        Sales Opportunity</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Sales hours'">Sales hours</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Shoppers on sales hour'">Shoppers
+                        on sales hour</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Sales on sales hour'">Sales on
+                        sales hour</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Loyal Visits'">Loyal Visits</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Loyal Transactions'">Loyal
+                        Transactions (%)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Loyal Conversion rate'">Loyal
+                        Conversion rate (%)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'Missed Loyal rate'">Missed Loyal
+                        rate (%)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'CX index'">CX index (%)</th>
+                      <th style="width: 400px" [hidden]="this.indexOptionSelected !== 'NPS index'">NPS index (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td></td>
+                      <td [hidden]="this.indexOptionSelected !== 'PasserBy'">
+                        <b>{{this.tt_passer |  number:'1.0-2'}}</b> </td>
+                      <!-- <br><span class="spancell"></span> -->
+                      <td [hidden]="this.indexOptionSelected !== 'Shopper Visits'">
+                        <b>{{this.tt_shop_visits |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Visits'"><b>{{this.tt_enter |  number:'1.0-2'}}</b>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Kids Visits'">
+                        <b>{{this.tt_kids_visits |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Turn in rate'">
+                        <b>{{this.tt_turn_rate |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Traffic Flow'">
+                        <b>{{this.tt_traffic |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Avg Time'"><b>{{toHHMMSS(tt_time) }}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Conversion rate'">
+                        <b>{{this.tt_conver |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'ATV'"><b>{{this.tt_atv |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Avg Items'">
+                        <b>{{this.tt_avg_item |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales Yield'">
+                        <b>{{this.tt_sales_yeild |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Transactions'">
+                        <b>{{this.tt_transactions |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales'"><b>{{this.tt_sales |  number:'1.0-2'}}</b>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Missed Sales Opportunity'">
+                        <b>{{this.tt_missed_sales |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales hours'">
+                        <b>{{this.tt_sales_hour |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Shoppers on sales hour'">
+                        <b>{{this.tt_shopper_on_sh |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales on sales hour'">
+                        <b>{{this.tt_sales_on_sh |  number:'1.0-2'}}</b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Visits'">
+                        <b>{{this.tt_loyal_visits |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Transactions'">
+                        <b>{{this.tt_loy_tran |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Conversion rate'">
+                        <b>{{this.tt_loy_conver |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Missed Loyal rate'">
+                        <b>{{this.tt_missed_loyal |  number:'1.0-2'}} <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'CX index'"><b>{{this.tt_cx_index |  number:'1.0-2'}}
+                          <span class="spancell">(%)</span></b></td>
+                      <td [hidden]="this.indexOptionSelected !== 'NPS index'"><b>{{this.tt_nps_index |  number:'1.0-2'}}
+                          <span class="spancell">(%)</span></b></td>
+                    </tr>
+                    <tr *ngFor="let item of chart_data">
+                      <td style="padding-left: 2.5rem;">{{item.time_period}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'PasserBy'">{{item.passer_by |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.passer_by, tt_passer)}}%)</span>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Shopper Visits'">
+                        {{item.shopper_visits |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.shopper_visits, tt_shop_visits)}}%)</span>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Kids Visits'"> {{item.kids_visits |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.kids_visits, tt_kids_visits)}}%)</span>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Turn in rate'">
+                        {{item.turn_in_rate |  number:'1.0-2'}} <span class="spancell">(%)</span> </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Visits'">{{item.num_to_enter |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.num_to_enter, tt_enter)}}%)</span>
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Traffic Flow'">{{item.traffic |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.traffic, tt_traffic)}}%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Avg Time'">{{toHHMMSS(item.avg_time * 60)}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'Conversion rate'">
+                        {{item.conversion |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'ATV'">{{item.atv |  number:'1.0-2'}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'Avg Items'">{{item.avg_item |  number:'1.0-2'}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales Yield'">{{item.sales_yield |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.sales_yield, tt_sales_yeild)}}%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Transactions'">{{item.transactions |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.transactions, tt_transactions)}}%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales'">{{item.sales |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.sales, tt_sales)}}%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Missed Sales Opportunity'">
+                        {{item.missed_sales |  number:'1.0-2'}}
+                        <span class="spancell">({{Go_number(item.missed_sales, tt_missed_sales)}}%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales hours'">{{item.sales_hour |  number:'1.0-2'}}
+                      </td>
+                      <td [hidden]="this.indexOptionSelected !== 'Shoppers on sales hour'">
+                        {{item.shopper_on_s_h |  number:'1.0-2'}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'Sales on sales hour'">
+                        {{item.sales_on_s_h |  number:'1.0-2'}}</td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Visits'">{{item.loyal_visits |  number:'1.0-2'}}
+                        <span class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Transactions'">
+                        {{item.loyal_transactions |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Loyal Conversion rate'">
+                        {{item.loyal_conversion |  number:'1.0-2'}} <span class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'Missed Loyal rate'">
+                        {{  item.loyal_conversion > 0 ? ((100 - item.loyal_conversion) |  number:'1.0-2') : 0 }} <span
+                          class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'CX index'">{{item.cx_index |  number:'1.0-2'}} <span
+                          class="spancell">(%)</span></td>
+                      <td [hidden]="this.indexOptionSelected !== 'NPS index'">{{item.nps_index |  number:'1.0-2'}} <span
+                          class="spancell">(%)</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}} {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}} {{time_generate_report | date: 'hh:mm:ss'}} -
+        <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+  </div>
+  </div> <!-- card-body-parent -->
+</div>

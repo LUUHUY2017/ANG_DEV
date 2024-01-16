@@ -1,0 +1,285 @@
+<block-ui></block-ui>
+<div class="row">
+    <div class="container-fluid">
+        <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+        <div class="animated fadeIn">
+            <div class="card card-parent">
+                <div class="card-header" style="background: #f3b21c;
+        border: none;
+        border-radius: 0px;
+        color: #fff;
+        font-family: Open-Bold;
+        text-transform: uppercase;">
+                    <h4 class="mb-0">How It Work</h4>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Đang cập nhật... -->
+                    <div class="row cardbody-items ml-mr-0">
+                        <div class="col-md-12">
+                            <h4 class="float-left" style="font-family: Open-Bold;
+              font-size: 32px;">ACS® Analytics Platform</h4>
+                        </div>
+                    </div>
+                    <div class="row mt-4 cardbody-items ml-mr-0">
+                        <div class="col-md-12 alignitem">
+                            <img src="assets/img/iconmenu/generalchart.jpg" style="max-width:100%">
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <p style="max-width: 770px;
+              color: #777;
+              font-size: 1.2em;
+              line-height: 1.6875;">ACS Analytics là một tập hợp các hệ thống làm việc cùng nhau để tổ chức, phân tích
+                                và trực quan hóa một lượng lớn dữ liệu bán lẻ đa dạng (Big data)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mt-3 ml-mr-0 grayblock pb-5">
+                        <div class="col-md-12 alignitem pt-4 pb-4 mb-2">
+                            <h2 class="mb-0">
+                                ACS® Analytics platform works through a series of steps
+                            </h2>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 1 ? 'active' : ''}}" (click)="status = 1"
+                                src="assets/img/iconmenu/colection.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 1 ? 'active' : ''}}">COLLECTION</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 2 ? 'active' : ''}}" (click)="status = 2"
+                                src="assets/img/iconmenu/analisis.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 2 ? 'active' : ''}}">ANALYSIS</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 3 ? 'active' : ''}}" (click)="status = 3"
+                                src="assets/img/iconmenu/visualization.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 3 ? 'active' : ''}}">VISUALIZATION</span>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <img class="col-anh {{status === 4 ? 'active' : ''}}" (click)="status = 4"
+                                src="assets/img/iconmenu/insight.jpg">
+                            <div class="text-center">
+                                <span class="collection {{status === 4 ? 'active' : ''}}">INSIGHTS</span>
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="align-items: center; margin-top: 4rem !important;">
+                            <div class="row">
+                                <div *ngIf="status === 1" class="col-md-9 khoinoidung" id="noidung1">
+                                    <p>ACS Analytics hoạt động qua nhiều bước gồm Thu thập dữ liệu – Phân tích – Báo cáo
+                                        – Cải tiến ACS® Analytics là hệ thống mở, cho phép thu thập, tích hợp trực tiếp
+                                        từ nhiều nguồn dữ liệu khác nhau như thiết bị đếm người,
+                                        đánh giá dịch vụ khách hàng, Camera nhận diện khuôn mặt, hệ thống nhân sự, thời
+                                        tiết, POS, Wifi, …, giúp bạn dễ dàng lựa chọn bất cứ thiết bị của bất cứ hãng
+                                        nào trên thị trường dựa trên yêu cầu và ngân sách đầu
+                                        tư.
+                                    </p>
+                                </div>
+                                <div *ngIf="status === 2" class="col-md-9 khoinoidung" id="noidung2">
+                                    <p>
+                                        ACS Analytics được thiết kế để tổ chức, phân tích, và trực quan hóa khối lượng
+                                        lớn dữ liệu bán lẻ bằng các biểu đồ, bảng biểu. Phần mềm tích lũy dữ liệu từ tất
+                                        các điểm bán (stores) vào một điểm duy nhất trên hệ thống Cloud hoặc máy chủ của
+                                        bạn, cung
+                                        cấp bức trang tổng thể, tức thời về các cửa hàng và khách hàng, trên toàn bộ hệ
+                                        thống theo thời gian thực.
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>Tích hợp dữ liệu từ tất cả các điểm trên toàn cầu</span></li>
+                                                <li><span>Phù hợp với nhiều qui mô từ vài điểm cho tới hàng trăm, nghìn
+                                                        điểm</span></li>
+                                                <li><span>Không phụ thuộc vào băng thông, đường truyền</span></li>
+                                                <li><span>Cung cấp khả năng truy cập vào hệ thống theo thời gian
+                                                        thực</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>Giám sát chủ động các nguồn dữ liệu đầu vào với việc tích hợp
+                                                        dữ liệu</span></li>
+                                                <li><span>An toàn, ổn định, tính sẵn sàng cào và tương thích với nhiều
+                                                        tiêu chuẩn ứng
+                                                        dụng</span></li>
+                                                <li><span>Cung cấp cả dịch vụ Cloud hoặc trên máy chủ khách hàng
+                                                        (private server)</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="status === 3" class="col-md-9 khoinoidung" id="noidung3">
+                                    <p>
+                                        ACS® Analytics trình bày thông tin theo nhiều định dạng hữu ích, cho phép bạn
+                                        khám phá và thực hiện các thay đổi để cải thiện trải nghiệm khách hàng và hiệu
+                                        suất thương mại. Bộ công cụ phân tích và báo cáo mạnh mẽ cho phép bạn dễ dàng
+                                        trực quan hóa dữ
+                                        liệu, xác định xu hướng và so sánh chúng trong bất kỳ khoảng thời gian nào. Và
+                                        bạn có thể dễ dàng truy cập tất cả các thông tin này bằng nhiều giao diện trực
+                                        quan:
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>Web dashboard</span></li>
+                                                <li><span>Báo cáo trên thiêt bị di động</span></li>
+                                                <li><span>Lập lịch gửi báo cáo tự động qua email</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-info">
+                                                <li><span>Cảnh báo theo thời gian thực</span></li>
+                                                <li><span>Công cụ phân tích và khai thác dữ liệu</span></li>
+                                                <li><span>Xuất dữ liệu thô và bộ API</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="status === 4" class="col-md-9 khoinoidung" id="noidung4">
+                                    <p>
+                                        Lượng dữ liệu thu thập được càng lớn càng giúp bạn hiểu biết càng nhiều về hành
+                                        vị của khách hàng và hiệu quả hoạt động của bạn. Là một nhà bán lẻ, bạn có thể
+                                        hưởng lợi từ sự hiểu biết chính xác, dựa trên thực tế về cách kháchhàng di
+                                        chuyển bên trong
+                                        các cửa hàng của bạn. Hơn nữa, bạn có thể tối ưu hóa bố cục cửa hàng, gian hàng,
+                                        nhân sự và thậm chí cả các sản phẩm của mình dựa trên những gì bạn đã học được.
+                                        Với nền tảng ACS Analytics, bạn đã có trong tay công
+                                        cụ mạnh mẽ nhất mà bạn chưa từng có để đạt được sự hiểu biết sâu sắc nhất về
+                                        hoạt động của từng điểm bán, toàn hệ thống và hành vị khách hàng.
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Số lượng khách hàng tới mua sắm tại từng
+                                                stores và toàn hệ thống ?</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Số lượng người đi qua store (Passerby Traffic) ?</span></li>
+                                                <li><span>Số lượng khách hàng tới mua sắm?</span></li>
+                                                <li><span>Trong tổng số lượt khách, bao nhiêu là khách hàng tới mua và
+                                                        bao nhiêu là từ nhân viên
+                                                        (shoppers vs. staff) ?</span></li>
+                                                <li><span>Mức độ nhân sự được so sánh với lượng khách hàng trong
+                                                        ngày?</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Ai là khách hàng của bạn?</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Khách hàng là nam hay nữ, độ tuổi bao nhiêu (male/female, age,
+                                                        etc.)?</span></li>
+                                                <li><span>Họ là khách mới lần đầu tới mua sắm hay là khách cũ, khách đã
+                                                        từng tới mua sắm
+                                                        (New/returning visitors)?</span></li>
+                                                <li><span>Họ là khách VIP, Loyalty?</span></li>
+                                                <li><span>Tỷ lệ khách VIP/Loyalty tới cửa hàng và mua hàng/Không mua
+                                                        hàng (VIP Purchased/VIP Non
+                                                        Purchases)?</span></li>
+                                                <li><span>Ảnh hưởng của trẻ con đối với quyết định mua sắm của bố mẹ
+                                                        chúng ?</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Hàng vi của khách hàng trong suốt quá
+                                                trình mua sắm (customer behavior)?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Thời gian khách hàng trải nghiệm (Avg time)</span></li>
+                                                <li><span>Họ dừng ở gian hàng nào, khu vực nào (Dwelling time &
+                                                        Heatmap)</span></li>
+                                                <li><span>Giá trị đơn hàng trung bình cho mỗi đơn hàng (Avg Transaction
+                                                        Value - ATV)</span></li>
+                                                <li><span>Số lượng sản phẩm, hàng hóa cho mỗi đơn hàng (Avg Transaction
+                                                        Itimes - ATI)</span>
+                                                </li>
+                                                <li><span>Họ có hài lòng với dịch vụ, sản phẩm bạn cung cấp không (CX
+                                                        Index, NPS Index)?</span>
+                                                </li>
+                                                <li><span>Khách hàng tương tác với các sản phẩm mới, mẫu mới, … </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Vai trò của nhân viên bán hàng với kết
+                                                quả tại từng store - KPI?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>Việc phân bổ nhân sự tại từng của hàng đã phù hợp với nhu cầu,
+                                                        tối ưu chưa (Visits per
+                                                        sales hour)?</span></li>
+                                                <li><span>Hiệu suất của nhân viên bán hàng (sale per sale hour)?</span>
+                                                </li>
+                                                <li><span>Đánh giá KPI của nhân viên bán hàng trên từng store và toàn hệ
+                                                        thống</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p style="font-family: Open-Bold;">Hiểu quả của từng store theo các chỉ số
+                                                hiệu quả chính KPI?
+                                            </p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <ul class="list-info" style="list-style-type: lower-alpha;">
+                                                <li><span>So sánh và đánh giá mối tương quan về hiểu quả giữa các chỉ
+                                                        số: Visits, tỷ lệ chuyển
+                                                        đổi - CR, doanh thu - sales, giá trị đơn hàng trung bình – ATV,
+                                                        … </span></li>
+                                                <li><span>Hiệu quả hoạt động theo từng chỉ số chính của từng Store với
+                                                        nhóm Store, tất cả Store
+                                                        theo mô hình Boston</span></li>
+                                                <li><span>Yếu tố bên người nào ảnh hưởng tới kết quả chung như thời
+                                                        tiết, yếu tố văn hóa địa
+                                                        phương, các dự kiện, giao thông?</span></li>
+                                                <li><span>Hiệu qủa của các chương trình Marketing: thu hút thêm nhiều
+                                                        khách hàng, có đúng đối
+                                                        tượng khách hàng không, có làm gia tăng doanh số không, …</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <img src="assets/Analytics.ico" style="width: 70px;">
+                        </div>
+                        <div class="col-md-12 alignitem mt-3">
+                            <div class="row" style="justify-content:center;">
+                                <div class="col-md-6 contactinfo">
+                                    <h3 style="position:relative;">
+                                        <i class="fa fa-phone-square" style="position: absolute;
+                    top: -5px;
+                    font-size: 35px;
+                    left: -50px;
+                    color: #f3b21c;"></i> 0904 839 338</h3>
+                                    <p>We're here to answer any questions you have. Friendly staff are standing
+                                        by.&nbsp;<a href="https://www.acs.vn"
+                                            style="text-decoration: underline;">Contact us.</a></p>
+                                </div>
+                                <div class="col-md-6 contactinfo">
+                                    <h3 style="position:relative;">
+                                        <i class="fa fa-envelope-o" style="position: absolute;
+                      top: -5px;
+                      font-size: 35px;
+                      left: -50px;
+                      color: #f3b21c;"></i>sales@acs.vn</h3>
+                                    <p>Subscribe to our news feed for retail industry news and trends.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

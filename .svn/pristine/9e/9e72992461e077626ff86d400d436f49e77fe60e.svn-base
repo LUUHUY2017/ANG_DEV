@@ -1,0 +1,28 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminAddSettingComponent } from './addsetting.component';
+import { AdminAddSettingRoutingModule } from './addsetting-routing.module';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SettingService } from '../setting.service';
+import { BlockUIModule } from 'ng-block-ui';
+import { SelectModule } from 'ng-select';
+
+@NgModule({
+    declarations: [
+        AdminAddSettingComponent
+    ],
+    imports: [
+        CommonModule,
+        AdminAddSettingRoutingModule,
+        FormsModule,
+        RouterModule,
+        BlockUIModule,
+        SelectModule
+    ],
+    exports: [],
+    providers: [SettingService],
+})
+export class AdminAddSettingModule {
+    constructor() {}
+ }

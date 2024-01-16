@@ -1,0 +1,245 @@
+<block-ui></block-ui>
+<div class="row">
+    <div class="container-fluid">
+        <!-- <script src="ace-builds/src-min/ace.js"></script> -->
+        <div class="animated fadeIn">
+            <div class="card card-parent">
+                <div class="card-body card-body-bottom">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white bg-primary shadow">
+                                <ng-container *ngFor="let item of chart_1_session">
+                                    <div style="font-size:10px;padding: 3px 7px;">
+                                        <span> {{item.site_label}}</span> &nbsp;
+                                        <span>{{item.time_label}}</span>
+                                        <a style="cursor:pointer;float: right;" (click)="show_config(config, 1)"> <i class="icon-settings" aria-hidden="true"></i></a>
+                                    </div>
+                                </ng-container>
+                                <div class="card-body pb-0">
+                                    <div [hidden]="selected_show1 !== 'PasserBy'" class="text-value">{{ total_passer_by1 ? (total_passer_by1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Shopper Visits'" class="text-value">{{ total_shopper_visits1 ? (total_shopper_visits1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Turn in rate'" class="text-value">{{ total_turn_rate1 ? (total_turn_rate1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Kids Visits'" class="text-value">{{ total_kids1 ? (total_kids1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Visits'" class="text-value">{{ total_num_to_enter1 ? (total_num_to_enter1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Traffic Flow'" class="text-value">{{ total_traffic1 ? (total_traffic1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Avg Time'" class="text-value">{{ total_avg_time1 ? toHHMMSS(total_avg_time1) : "00:00:00" }}</div>
+                                    <div [hidden]="selected_show1 !== 'Accupancy'" class="text-value">{{ live_occupancy_data1 ? (live_occupancy_data1 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show1 !== 'PasserBy'">PasserBy</div>
+                                    <div [hidden]="selected_show1 !== 'Shopper Visits'">Shopper Visits</div>
+                                    <div [hidden]="selected_show1 !== 'Turn in rate'">Turn in rate (%)</div>
+                                    <div [hidden]="selected_show1 !== 'Kids Visits'">Kids Visits</div>
+                                    <div [hidden]="selected_show1 !== 'Visits'">Visits</div>
+                                    <div [hidden]="selected_show1 !== 'Traffic Flow'">Traffic Flow</div>
+                                    <div [hidden]="selected_show1 !== 'Avg Time'">Avg Time (min)</div>
+                                    <div [hidden]="selected_show1 !== 'Accupancy'">Accupancy</div>
+                                </div>
+                                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                                    <ng-container *ngIf=" selected_show1 === 'Visits' ||  selected_show1 === 'Traffic Flow' || selected_show1 === 'Kids Visits' || selected_show1 === 'Shopper Visits'  || selected_show1 === 'PasserBy' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1" [options]="barChartOptions12" [colors]="barChartColours1" [legend]="barChartLegend1" [chartType]="barChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf=" selected_show1 === 'Avg Time' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData1" [labels]="barChartLabels1" [options]="barChartOptions11" [colors]="lineChartColours1" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf="selected_show1 === 'Accupancy'  || selected_show1 === 'Turn in rate'">
+                                        <canvas baseChart class="chart" [datasets]="lineChartData1" [labels]="lineChartLabels1" [options]="lineChartOptions1" [colors]="lineChartColours1" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/.col-->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white bg-info shadow">
+                                <ng-container *ngFor="let item of chart_2_session">
+                                    <div style="font-size:10px;padding: 3px 7px;">
+                                        <span> {{item.site_label}}</span> &nbsp;
+                                        <span>{{item.time_label}}</span>
+                                        <a style="cursor:pointer;float: right;" (click)="show_config(config, 2)"> <i class="icon-settings" aria-hidden="true"></i></a>
+                                    </div>
+                                </ng-container>
+                                <div class="card-body pb-0">
+                                    <div [hidden]="selected_show2 !== 'PasserBy'" class="text-value">{{ total_passer_by2 ? (total_passer_by2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Shopper Visits'" class="text-value">{{ total_shopper_visits2 ? (total_shopper_visits2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Turn in rate'" class="text-value">{{ total_turn_rate2 ? (total_turn_rate2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Kids Visits'" class="text-value">{{ total_kids2 ? (total_kids2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Visits'" class="text-value">{{ total_num_to_enter2 ? (total_num_to_enter2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Traffic Flow'" class="text-value">{{ total_traffic2 ? (total_traffic2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Avg Time'" class="text-value">{{ total_avg_time2 ? toHHMMSS(total_avg_time2) : "00:00:00" }}</div>
+                                    <div [hidden]="selected_show2 !== 'Accupancy'" class="text-value">{{ live_occupancy_data2 ? (live_occupancy_data2 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show2 !== 'PasserBy'">PasserBy</div>
+                                    <div [hidden]="selected_show2 !== 'Shopper Visits'">Shopper Visits</div>
+                                    <div [hidden]="selected_show2 !== 'Turn in rate'">Turn in rate (%)</div>
+                                    <div [hidden]="selected_show2 !== 'Kids Visits'">Kids Visits</div>
+                                    <div [hidden]="selected_show2 !== 'Visits'">Visits</div>
+                                    <div [hidden]="selected_show2 !== 'Traffic Flow'">Traffic Flow</div>
+                                    <div [hidden]="selected_show2 !== 'Avg Time'">Avg Time (min)</div>
+                                    <div [hidden]="selected_show2 !== 'Accupancy'">Accupancy</div>
+                                </div>
+                                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                                    <ng-container *ngIf=" selected_show2 === 'Visits' ||  selected_show2 === 'Traffic Flow' || selected_show2 === 'Kids Visits' || selected_show2 === 'Shopper Visits'  || selected_show2 === 'PasserBy'">
+                                        <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2" [options]="barChartOptions12" [colors]="barChartColours2" [legend]="barChartLegend1" [chartType]="barChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf=" selected_show2 === 'Avg Time' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData2" [labels]="barChartLabels2" [options]="barChartOptions11" [colors]="lineChartColours2" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf="selected_show2 === 'Accupancy' || selected_show2 === 'Turn in rate' ">
+                                        <canvas baseChart class="chart" [datasets]="lineChartData2" [labels]="lineChartLabels2" [options]="lineChartOptions1" [colors]="lineChartColours2" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white bg-warning shadow">
+                                <ng-container *ngFor="let item of chart_3_session">
+                                    <div style="font-size:10px;padding: 3px 7px;">
+                                        <span> {{item.site_label}}</span> &nbsp;
+                                        <span>{{item.time_label}}</span>
+                                        <a style="cursor:pointer;float: right;" (click)="show_config(config, 3)"> <i class="icon-settings" aria-hidden="true"></i></a>
+                                    </div>
+                                </ng-container>
+                                <div class="card-body pb-0">
+                                    <div [hidden]="selected_show3 !== 'PasserBy'" class="text-value">{{ total_passer_by3 ? (total_passer_by3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Shopper Visits'" class="text-value">{{ total_shopper_visits3 ? (total_shopper_visits3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Turn in rate'" class="text-value">{{ total_turn_rate3 ? (total_turn_rate3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Kids Visits'" class="text-value">{{ total_kids3 ? (total_kids3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Visits'" class="text-value">{{ total_num_to_enter3 ? (total_num_to_enter3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Traffic Flow'" class="text-value">{{ total_traffic3 ? (total_traffic3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Avg Time'" class="text-value">{{ total_avg_time3 ? toHHMMSS(total_avg_time3) : "00:00:00" }}</div>
+                                    <div [hidden]="selected_show3 !== 'Accupancy'" class="text-value">{{ live_occupancy_data3 ? (live_occupancy_data3 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show3 !== 'PasserBy'">PasserBy</div>
+                                    <div [hidden]="selected_show3 !== 'Shopper Visits'">Shopper Visits</div>
+                                    <div [hidden]="selected_show3 !== 'Turn in rate'">Turn in rate (%)</div>
+                                    <div [hidden]="selected_show3 !== 'Kids Visits'">Kids Visits</div>
+                                    <div [hidden]="selected_show3 !== 'Visits'">Visits</div>
+                                    <div [hidden]="selected_show3 !== 'Traffic Flow'">Traffic Flow</div>
+                                    <div [hidden]="selected_show3 !== 'Avg Time'">Avg Time (min)</div>
+                                    <div [hidden]="selected_show3 !== 'Accupancy'">Accupancy</div>
+                                </div>
+                                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                                    <ng-container *ngIf=" selected_show3 === 'Visits' ||  selected_show3 === 'Traffic Flow' || selected_show3 === 'Kids Visits' || selected_show3 === 'Shopper Visits'  || selected_show3 === 'PasserBy' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3" [options]="barChartOptions12" [colors]="barChartColours3" [legend]="barChartLegend1" [chartType]="barChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf="selected_show3 === 'Avg Time' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData3" [labels]="barChartLabels3" [options]="barChartOptions11" [colors]="lineChartColours3" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf="selected_show3 === 'Accupancy' || selected_show3 === 'Turn in rate'  ">
+                                        <canvas baseChart class="chart" [datasets]="lineChartData3" [labels]="lineChartLabels3" [options]="lineChartOptions1" [colors]="lineChartColours3" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/.col-->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white bg-danger shadow">
+                                <ng-container *ngFor="let item of chart_4_session">
+                                    <div style="font-size:10px;padding: 3px 7px;">
+                                        <span> {{item.site_label}}</span> &nbsp;
+                                        <span>{{item.time_label}}</span>
+                                        <a style="cursor:pointer;float: right;" (click)="show_config(config, 4)"> <i class="icon-settings" aria-hidden="true"></i></a>
+                                    </div>
+                                </ng-container>
+                                <div class="card-body pb-0">
+                                    <div [hidden]="selected_show4 !== 'PasserBy'" class="text-value">{{ total_passer_by4 ? (total_passer_by4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Shopper Visits'" class="text-value">{{ total_shopper_visits4 ? (total_shopper_visits4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Turn in rate'" class="text-value">{{ total_turn_rate4 ? (total_turn_rate4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Kids Visits'" class="text-value">{{ total_kids4 ? (total_kids4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Visits'" class="text-value">{{ total_num_to_enter4 ? (total_num_to_enter4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Traffic Flow'" class="text-value">{{ total_traffic4 ? (total_traffic4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Avg Time'" class="text-value">{{ total_avg_time4? toHHMMSS(total_avg_time4) : "00:00:00" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Accupancy'" class="text-value">{{ live_occupancy_data4 ? (live_occupancy_data4 | number: "1.0-2") : "0" }}</div>
+                                    <div [hidden]="selected_show4 !== 'Shopper Visits'">Shopper Visits</div>
+                                    <div [hidden]="selected_show4 !== 'PasserBy'">PasserBy</div>
+                                    <div [hidden]="selected_show4 !== 'Turn in rate'">Turn in rate (%)</div>
+                                    <div [hidden]="selected_show4 !== 'Kids Visits'">Kids Visits</div>
+                                    <div [hidden]="selected_show4 !== 'Visits'">Visits</div>
+                                    <div [hidden]="selected_show4 !== 'Traffic Flow'">Traffic Flow</div>
+                                    <div [hidden]="selected_show4 !== 'Avg Time'">Avg Time (min)</div>
+                                    <div [hidden]="selected_show4 !== 'Accupancy'">Accupancy</div>
+                                </div>
+                                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                                    <ng-container *ngIf=" selected_show4 === 'Visits' ||  selected_show4 === 'Traffic Flow' || selected_show4 === 'Kids Visits' || selected_show4 === 'Shopper Visits'  || selected_show4 === 'PasserBy' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="barChartLabels4" [options]="barChartOptions12" [colors]="barChartColours4" [legend]="barChartLegend1" [chartType]="barChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf=" selected_show4 === 'Avg Time' ">
+                                        <canvas baseChart class="chart" [datasets]="barChartData4" [labels]="lineChartLabels4" [options]="barChartOptions11" [colors]="lineChartColours4" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                    <ng-container *ngIf="selected_show4 === 'Accupancy'  || selected_show4 === 'Turn in rate' ">
+                                        <canvas baseChart class="chart" [datasets]="lineChartData4" [labels]="lineChartLabels4" [options]="lineChartOptions1" [colors]="lineChartColours4" [legend]="lineChartLegend1" [chartType]="lineChartType1"></canvas>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-child">
+                        <div class="card-header">
+                            <span style="font-weight: bold;"><i class="fa fa-line-chart"></i> Hiệu quả hoạt động</span>
+                            <span class="float-right pointer" (click)="show_config(config, 5)"><i class="fa fa-cog"></i></span>
+                        </div>
+                        <div  style="min-height:350px;" class="card-body">
+                            <div #container1></div>
+                        </div>
+                    </div>
+                    <div id="divbaocao" style="float: right; font-size: 11px">Báo cáo này đã được tạo vào
+                        {{time_generate_report | date: 'dd/MM/yyyy'}} lúc {{time_generate_report | date: 'hh:mm:ss'}} -
+                        <span style="color:blue; cursor:pointer;" (click)="reset_session()">làm mới báo cáo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #config>
+    <div class="modal-header">
+        <h5 class="modal-title pull-left"><i class="fa fa-cog"></i> Cấu hình</h5>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body bg-modal-body">
+        <ng-container *ngIf="userinfo.organization_id === '0'">
+            <ng-select class="bootstrap selecttimeview ng-select0" [options]="organization_array" [allowClear]="false" [(ngModel)]="organization_id" (selected)="change_organization()">
+            </ng-select>
+        </ng-container>
+        <!-- Textbox chọn -->
+        <div class="config-text-dashboard">
+            <div style="display:block;border:1px solid #ddd; padding:5px;background:white;" (click)="displaylocation = !displaylocation" class="text-select vung-kich">
+                <span>&nbsp;{{ site_label }} <i class="icon-down"> ▼ </i></span>
+            </div>
+        </div>
+        <!-- Chọn địa điểm/ khu vực -->
+        <div [hidden]="!displaylocation" class=" khung-location-dashboard block" (clickOutside)="displaylocation = false" [exclude]="'.vung-kich'">
+            <div id="khung-location-scroll">
+                <div style="position: relative;width: 100%;" class="inputgroup">
+                    <input (keyup)="search_menu()" [(ngModel)]="search_key" style="border:none !important;padding-left: 7px" type="text" class="form-control" placeholder="Tìm kiếm địa điểm/ khu vực" />
+                    <i style="position: absolute;top: 11px; right:8px; color: #e1e2e3; font-size: 15px;" class="fa fa-search" aria-hidden="true"></i>
+                </div>
+                <ul style="padding-left: 0;">
+                    <li *ngFor="let item of menu_tree" (click)=" changemenu(item) " class="menu-{{ item.alevel }} {{ item.site_name === location2 ? 'active' : ''  }}"> {{ item.site_name }} </li>
+                </ul>
+            </div>
+        </div>
+        <div class="config-text-dashboard">
+            <div style="display:block;border:1px solid #ddd; padding:5px;background:white;" (click)="siteSelectionDisplay3 = !siteSelectionDisplay3" class="text-select vung-kich2">
+                <span>&nbsp;{{ time_label }} <i class="icon-down"> ▼ </i></span>
+            </div>
+        </div>
+        <div [hidden]="!siteSelectionDisplay3" (clickOutside)="siteSelectionDisplay3 = false" [exclude]="'.vung-kich2'" class=" khung-location-dashboard block">
+            <div id="khung-location-scroll">
+                <ul id="ul-time-dashboard">
+                    <li *ngFor="let item of time_array" (click)="change_time(item)" class="{{ item.label === time_period2 ? 'active' : '' }}"> {{ item.label }} </li>
+                </ul>
+            </div>
+        </div>
+        <ng-select class="bootstrap selecttimeview ng-select1" [options]="start_time_list" [allowClear]="false" [(ngModel)]="start_time"></ng-select>
+        <ng-select class="bootstrap selecttimeview ng-select2 " [options]="end_time_list" [allowClear]="false" [(ngModel)]="end_time">
+        </ng-select>
+        <ng-select [hidden]="status == 5" class="bootstrap selecttimeview ng-select3" [options]="select_visit_option" [allowClear]="false" [(ngModel)]="selected_show"></ng-select>
+    </div>
+    <div class="modal-footer">
+        <a (click)="modalRef.hide()" class="btn  btn-huy active"> Đóng</a>
+        <button class="btn  btn-primary" (click)="get_apply_event()">
+            Áp dụng
+        </button>
+    </div>
+</ng-template>

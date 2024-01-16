@@ -1,0 +1,182 @@
+<div class="card card-parent">
+  <div class="card-header">
+    <div class="row mr-0 ml-0">
+      <div class="col-12 col-sm-8 col-md-8 p-0">
+        <app-menureportingstore style="display:inline-block" (submit_menu)="get_emit_menu($event)">
+        </app-menureportingstore>
+        <ng-container
+          *ngIf="show_hide_select_head || (select_category == 'Group' && (show_hide_select_head))  ||  (select_category == 'Store' && (show_hide_select_head))">
+          <span class="giomocua" style="margin-left:10px;margin-right:5px;">{{language.Xem_theo}}</span>
+          <ng-select style="display:inline-block;" class="bootstrap selecttimeview select-group-store"
+            [items]="category_option" bindLabel="label" bindValue="value" [clearable]=false
+            [(ngModel)]="select_category"></ng-select>
+        </ng-container>
+      </div>
+      <div class="col-12 col-sm-4 col-md-4 p-0 metric-comparison-time">
+        <app-timeperiod (submit_date)="get_date_from_emit($event)"></app-timeperiod>
+      </div>
+    </div>
+  </div>
+  <div class="card-body card-body-bottom">
+    <div class="row">
+      <div class="container-fluid">
+        <div class="animated fadeIn">
+          <block-ui></block-ui>
+          <div class="card card-child">
+            <div class="card-header">
+              <div class="row">
+                <ul id="headmapmenu_2">
+                  <li style="margin-right:5px">
+                    <!-- <ng-multiselect-dropdown class="multi_2" style="min-width: 180px;width:auto" [placeholder]="' &nbsp; '" [data]="dropdownList" [(ngModel)]="destinationSelectedItems" (onSelect)="destinationOnSelect($event)" (onDeSelect)="destinationOnDeSelect($event)" (onSelectAll)="destinationOnSelectAll($event)" (onDeSelectAll)="destinationOnDeSelectAll($event)" [settings]="destinationIndexOptionSettings">
+                              </ng-multiselect-dropdown> -->
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="dropdownList" bindLabel="label"
+                      bindValue="value" groupBy="group" [multiple]="true" [closeOnSelect]="false"
+                      (change)="destinationOnSelect()" (remove)="validate_source_destination_index()"
+                      [(ngModel)]="destinationSelectedItems">
+                      <ng-template ng-optgroup-tmp let-item="item">
+                        <span style="vertical-align: middle;">{{item.group}}</span>
+                      </ng-template>
+                    </ng-select>
+                  </li>
+                  <li>
+                    <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
+                      <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                      <span style="padding: 4px 0;">-</span>
+                      <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
+                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                    </div>
+                    <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
+                      (click)="get_data()">
+                      {{language.ap_dung}}
+                    </button>
+                  </li>
+                  <li>
+                    <div>
+
+                      <div class="btn-group float-right" dropdown>
+                        <button dropdownToggle type="button"
+                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                        <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
+                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
+                              (click)="exportExcel()"> {{language.xuat_ra_excel}}</a> </li>
+                          <!-- <li role="menuitem"><a class="dropdown-item  float-right">Xuất ra PDF</a> </li> -->
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-body card-body-bottom">
+              <!-- <div class="row">
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-7 d-none d-md-block">
+                  <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
+                      (click)="change_view()">Giờ</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day"
+                      (click)="change_view()">Ngày</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week"
+                      (click)="change_view()">Tuần</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Month"
+                      (click)="change_view()">Tháng</label>
+                    <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Year"
+                      (click)="change_view()">Năm</label>
+                  </div>
+                </div>
+              </div> -->
+              <!-- <div [hidden]="top_status == true" class="row">
+                                <div style="margin-top: -5px;" class="col-sm-12 col-md-6  title-show-com">
+                                </div>
+                                <div class="col-sm-12 col-md-6 ">
+                                    <div id="metric-comapri-hienthi">
+                                        <div class="btn-group  btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Week" (click)="change_view()"> Top 100</label>
+                                            <label class="btn btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Day" (click)="change_view()"> Top 25</label>
+                                            <label class="btn btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour" (click)="change_view()"> Top 10</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+              <div class="row foot-title-show">
+                <div class="title-show1 "> {{site_name}} &nbsp;{{ starttime }} &minus;
+                  {{ endtime }} &nbsp; {{ title_time_period }}: {{ time_period }}
+                </div>
+              </div>
+              <!-- Biểu đồ -->
+              <div class="row">
+                <div class="col-sm-12 col-md-12 ">
+                  <div #container></div>
+                </div>
+              </div>
+              <div style="border-top:1px dotted #a7a4a4" class="row">
+                <div class="table-responsive ">
+                  <table style="width: 100%;min-width: 900px" class="table table-striped table-comparation">
+                    <thead>
+                      <tr>
+                        <th style="min-width: 180px;;padding-left: 2.5rem;">{{site_name}}</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('PasserBy')">PasserBy</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Visits')">Visits</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Shopper Visits')">Shopper Visits</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Turn in rate')"> Turn in rate (%)</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Kids Visits')">Kids Visits</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Avg Time')">Avg time (min)</th>
+                        <th style="min-width: 110px;" *ngIf="check_has_index('Traffic Flow')">Traffic flow</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td></td>
+                        <td *ngIf="check_has_index('PasserBy')"><b>{{this.total_passer_by  |  number:'1.0-2'}}</b>
+                        <td *ngIf="check_has_index('Visits')"><b>{{this.total_num_to_enter  |  number:'1.0-2'}}</b>
+                        </td>
+                        <td *ngIf="check_has_index('Shopper Visits')">
+                          <b>{{this.total_shopper_visits  |  number:'1.0-2'}}</b>
+                        </td>
+                        <td *ngIf="check_has_index('Turn in rate')"><b>{{this.total_turn_in_rate  |  number:'1.0-2'}}
+                            (%)</b> </td>
+                        <td *ngIf="check_has_index('Kids Visits')"><b>{{this.total_kids_visits  |  number:'1.0-2'}}</b>
+                        </td>
+                        <td *ngIf="check_has_index('Avg Time')"> <b>{{toHHMMSS(total_avg_time)}}</b> <br></td>
+                        <td *ngIf="check_has_index('Traffic Flow')"><b>{{this.total_traffic  |  number:'1.0-2'}}</b>
+                      </tr>
+                      <tr *ngFor="let item of chart_data">
+                        <td style="padding-left: 2.5rem;">{{item.site_name}}</td>
+                        <td *ngIf="check_has_index('PasserBy')">{{item.passer_by | number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.passer_by,total_passer_by)}}%)</span>
+                        </td>
+                        <td *ngIf="check_has_index('Visits')">{{item.num_to_enter | number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.num_to_enter,total_num_to_enter)}}%)</span>
+                        </td>
+                        <td *ngIf="check_has_index('Shopper Visits')">{{item.shopper_visits | number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.shopper_visits,total_shopper_visits)}}%)</span>
+                        </td>
+                        <td *ngIf="check_has_index('Turn in rate')">{{item.turn_in_rate | number:'1.0-2'}}
+                          <span class="spancell">(%)</span>
+                        </td>
+                        <td *ngIf="check_has_index('Kids Visits')">{{item.kids_visits | number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.kids_visits,total_kids_visits)}}%)</span>
+                        </td>
+                        <td *ngIf="check_has_index('Avg Time')">{{toHHMMSS(item.avg_time * 60)}}</td>
+                        <td *ngIf="check_has_index('Traffic Flow')">{{item.traffic | number:'1.0-2'}}
+                          <span class="spancell">({{Go_number(item.traffic,this.total_traffic)}}%)</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+      {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
+      {{time_generate_report | date: 'hh:mm:ss'}} -
+      <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
+    </div>
+  </div>
+</div>

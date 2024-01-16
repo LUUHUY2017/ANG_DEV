@@ -1,0 +1,446 @@
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { AppService } from '../../../app.service';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { SelectItem } from 'primeng/api';
+import { IOption } from 'ng-select';
+// highcharts
+import Highcharts from 'highcharts';
+import More from 'highcharts/highcharts-more';
+import Tree from 'highcharts/modules/treemap';
+import Heatmap from 'highcharts/modules/heatmap';
+import { NotifierService } from 'angular-notifier';
+More(Highcharts);
+Tree(Highcharts);
+Heatmap(Highcharts);
+import { TreeNode } from 'primeng/components/common/treenode';
+// Viewchild
+import { MenutreeComponent } from '../../viewchild/menutree/menutree.component';
+import { TimeperiodComponent } from '../../viewchild/timeperiod/timeperiod.component';
+
+import { UserPermissionGuard } from '../../../shared/user_permission.guard';
+
+import { Subscription } from 'rxjs';
+import { language } from '../../../language';
+import { language_en } from '../../../language_en';
+
+@Component({
+  templateUrl: 'heatmap.component.html',
+  styleUrls: ['heatmap.component.scss'],
+})
+export class FootfallHeatMapComponent implements OnInit, OnDestroy {
+  @ViewChild(TimeperiodComponent) TimeInput: TimeperiodComponent;
+  @ViewChild(MenutreeComponent) MenuInput: MenutreeComponent;
+  page_id = environment.Pages.footfall.heatmap;
+  @ViewChild('container', { read: ElementRef }) container: ElementRef;
+  @BlockUI() blockUI: NgBlockUI;
+  organizations = [];
+  organization_id: string;
+  organization_selected = '';
+  siteSelectionDisplay = false;
+  siteTreeList: any; // khai báo site tree list
+  site_name: any;
+  site_id: number;
+  siteNodeSelected: TreeNode;
+  private readonly notifier: NotifierService;
+  // * Site tree by organizations */
+  start_time: string;
+  end_time: string;
+  start_date: any;
+  end_date: any;
+  index_source: string;
+  public startTimeOption: Array<IOption>;
+  public endTimeOption: Array<IOption>;
+  public userinfo: any = JSON.parse(localStorage.getItem(environment.UserLoged));
+  // public navItems = navItems;
+  public sidebarMinimized = true;
+  private changes: MutationObserver;
+  public element: HTMLElement = document.body;
+  // Nghĩa thêm biến dành cho viewchild từ ngày 28/12
+  start_date_to_child: any;
+  end_date_to_child: any;
+  start_date_int: any;
+  end_date_int: any;
+  menu_tree: any;
+  time_period_array: any;
+  time_label: any;
+  time_value = '';
+  organization_array: Array<IOption>;
+  subcriber: Subscription;
+  all_data: any;
+  total_index = 0;
+  valueSuffix = '';
+  // End Nghĩa
+
+  constructor(private router: Router
+    , private appservice: AppService
+    , private userpermission: UserPermissionGuard
+    , notifierService: NotifierService) {
+    this.notifier = notifierService;
+    // thêm mới
+    this.changes = new MutationObserver((mutations) => {
+      this.sidebarMinimized = document.body.classList.contains('sidebar-minimized');
+    });
+
+    this.changes.observe(<Element>this.element, {
+      attributes: true
+    });
+  }
+  url_api = environment.apiUrl + 'exports/';
+  name_of_excel: any;
+  btnApplyValid = false;
+  // ng select
+  dropdownselect: Array<IOption>;
+  time_generate_report = new Date();
+  title_start_date: string;
+  title_end_date: string;
+  time_period: string;
+  title_time_period: string;
+  title_index: string;
+  starttime: string;
+  endtime: string; language: any;
+
+  ngOnInit() {
+    this.get_page_param();
+
+    this.subcriber = this.userpermission.message.subscribe(res => {
+      if (res === 3) {
+        this.got_error('Bạn không có quyền truy cập');
+        this.subcriber.unsubscribe();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.subcriber.unsubscribe();
+  }
+
+  set_default() {
+    const organization_id = this.userinfo.organization_id === '0' ? 6 : Number(this.userinfo.organization_id);
+    return {
+      organization_id: organization_id
+      // , site_id: 0
+      , start_time: '8:00'
+      , end_time: '23:59'
+      , time_value: 'today'
+      , index_source: this.dropdownselect[0].value
+    };
+  }
+
+  get_page_param() {
+    const type_language = JSON.parse(localStorage.getItem(environment.language));
+    type_language === 'vn' ? this.language = language : this.language = language_en;
+    this.blockUI.start(this.language.dang_tai_cau_hinh);
+    this.appservice.get_user_page_parametter(this.page_id).subscribe(
+      param => {
+        if (!environment.production) {
+          // console.log('get_user_page_parametter', param);
+        }
+        try {
+
+          let para = null;
+          this.dropdownselect = param.traffic_index;
+          this.organization_array = param.organization_arr;
+          if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
+            // console.log('trong if');
+            para = param.user_page_parametter;
+          } else {
+            // console.log('ngoai if');
+            para = this.set_default();
+          }
+          this.organization_id = para.organization_id;
+
+          if ('site_id' in para) {
+            this.site_id = para.site_id;
+          }
+          this.time_period_array = param.fba_time_period_metrics;
+          this.start_time = para.start_time;
+          this.end_time = para.end_time;
+          if (para.time_value) {
+            this.get_date(para.time_value);
+          } else if (para.start_date && para.end_date) {
+            this.start_date = para.start_date;
+            this.end_date = para.end_date;
+            this.start_time = this.start_time.replace(/[']/g, '');
+            this.end_time = this.end_time.replace(/[']/g, '');
+            // this.start_date_to_child = this.start_date;
+            // this.end_date_to_child = this.end_date;
+          }
+          this.TimeInput.get_data(para, this.time_period_array);
+          this.index_source = para.index_source;
+          this.startTimeOption = param.start_time_list;
+          this.endTimeOption = param.end_time_list;
+        } catch (error) { this.blockUI.stop(); }
+      }, (error) => {
+        if (!environment.production) {
+          // console.log(error + '');
+        }
+        this.blockUI.stop();
+      }, () => {
+        // this.blockUI.stop();
+        this.get_sitetree();
+      }
+    );
+  }
+
+  get_date(time_value) {
+    const time_array = this.TimeInput.get_time(time_value);
+    // console.log(time_array);
+    this.start_date = this.appservice.convert_date_tostring(time_array.ngaybatdau);
+    this.end_date = this.appservice.convert_date_tostring(time_array.ngayketthuc);
+    this.time_value = time_value;
+  }
+
+  // Nghĩa thêm function ngày 28/12
+  get_sitetree() {
+    this.blockUI.start(this.language.dang_tai_thong_tin_to_chuc);
+    const url = environment.API.sites + '_get_site_for_report';
+    const data = { organization_id: this.organization_id };
+    this.appservice.post(data, url).subscribe(res => {
+      // console.log(res);
+      try {
+        this.menu_tree = res.site_array.slice(0);
+        if (!this.site_id) {
+          this.site_id = this.menu_tree.find(item => Number(item.enables) === 1).id;
+        }
+        this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+      } catch (error) { this.blockUI.stop(); }
+    }, (error) => {
+      this.blockUI.stop();
+      if (!environment.production) {
+        // console.log(error);
+      }
+    }, () => {
+      this.blockUI.stop();
+      this.get_data();
+    });
+  }
+
+  get_date_from_emit(event) {
+    if (event[0].start_date && event[0].end_date) {
+      this.start_date = event[0].start_date;
+      this.end_date = event[0].end_date;
+      this.time_value = '';
+    } else if (event[0].time_value) {
+      this.time_value = event[0].time_value;
+      this.get_date(this.time_value);
+    }
+  }
+
+  get_emit_menu(event) {
+    if (event.organization_id) {
+      this.blockUI.start(this.language.dang_tai_thong_tin_to_chuc);
+      const data = { organization_id: event.organization_id };
+      const url = environment.API.sites + '_get_site_for_report';
+      this.appservice.post(data, url).subscribe(res => {
+        // console.log(res);
+        try {
+          this.menu_tree = res.site_array.slice(0);
+          this.organization_id = event.organization_id;
+          this.site_id = this.menu_tree[0].id;
+          this.MenuInput.get_data(this.menu_tree, this.site_id, this.organization_array, this.organization_id);
+          this.get_data();
+        } catch (error) { }
+      }, (error) => {
+        this.blockUI.stop();
+      }, () => {
+        this.blockUI.stop();
+      });
+    } else if (event.site_id || event.site_id === 0) {
+      this.site_id = event.site_id;
+    }
+  }
+
+  get_data() {
+    const data = {
+      organization_id: this.organization_id
+      , site_id: this.site_id
+      , start_time: '\'' + this.start_time + '\''
+      , end_time: '\'' + this.end_time + '\''
+      , start_date: this.start_date
+      , end_date: this.end_date
+      , index_source: this.index_source
+    };
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    if (!environment.production) {
+      // console.log('get_data', data);
+    }
+    this.value_Suffix();
+    this.time_generate_report = new Date();
+    this.appservice.post(data, environment.API.sp_footfall_heatmap_treemap_coloraxis_sum).subscribe(
+      res => {
+        if (!environment.production) {
+          console.log('res: ', res);
+        }
+        try {
+          this.all_data = res;
+          this.starttime = this.startTimeOption.find(item => item.value === this.start_time).label;
+          this.endtime = this.endTimeOption.find(item => item.value === this.end_time).label;
+          this.title_index = this.index_source;
+          this.total_index = 0;
+          res.forEach(element => {
+            this.total_index += Number(element.value);
+          });
+          const row = Number(res.length);
+          if (this.index_source === 'Avg Time') {
+            this.total_index = Number((this.total_index * 60 / row).toFixed(0));
+          } else if (this.index_source === 'Turn in rate') {
+            this.total_index = Number((this.total_index / row).toFixed(2));
+          }
+          this.site_name = this.MenuInput.menu_tree.find(item => item.id === this.site_id).site_name;
+
+          const start_d = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+          const end_d = new Date(this.end_date.replace(/[']/g, '').replace(/[-]/g, '/'));
+          this.title_start_date = this.appservice.convert_date_tostringdate_by_nghia(start_d, false);
+          this.title_end_date = this.appservice.convert_date_tostringdate_by_nghia(end_d, false);
+          if (this.start_date !== this.end_date) {
+            this.time_period = this.title_start_date + ' - ' + this.title_end_date;
+          } else { this.time_period = this.title_start_date; }
+          this.title_time_period = this.language.ngay;
+          this.chart_heatmap(res);
+        } catch (error) { this.reset_session(); }
+      }, (error) => {
+        this.blockUI.stop();
+      }, () => {
+        let save_data;
+        if (this.time_value !== '') {
+          const data_2 = {
+            organization_id: this.organization_id
+            , site_id: this.site_id
+            , start_time: this.start_time
+            , end_time: this.end_time
+            , time_value: this.time_value
+            , index_source: this.index_source
+          };
+          save_data = data_2;
+        } else {
+          save_data = data;
+        }
+        this.appservice.save_user_page_parametter(this.page_id, JSON.stringify(save_data));
+        this.blockUI.stop();
+      }
+    );
+  }
+
+  Go_number(number, total) {
+    let tong = 0;
+    if (total !== 0) {
+      tong = ((Number(number) / total) * 100);
+    }
+    return tong;
+  }
+
+  value_Suffix() {
+    if (this.index_source === 'Turn in rate') {
+      return this.valueSuffix = ' (%)';
+    } else if (this.index_source === 'Avg Time') {
+      return this.valueSuffix = ' (min)';
+    } else {
+      return this.valueSuffix = '';
+    }
+  }
+
+  toHHMMSS(totalSeconds) {
+    const hh = Math.floor(totalSeconds / 3600).toFixed(0);
+    totalSeconds %= 3600;
+    const mm = Math.floor(totalSeconds / 60).toFixed(0);
+    const sc = (totalSeconds % 60).toFixed(0);
+    const m = String(mm).padStart(2, '00');
+    const h = String(hh).padStart(2, '00');
+    const s = String(sc).padStart(2, '00');
+    return h + ':' + m + ':' + s;
+  }
+
+  chart_heatmap(res: any) {
+    const selft = this;
+    const label = this.index_source.slice(0);
+    Highcharts.setOptions({
+      global: { useUTC: false, }, lang: { decimalPoint: '.', thousandsSep: ' ' }
+    });
+    Highcharts.chart(this.container.nativeElement, {
+      colorAxis: {
+        minColor: environment.POC.colors.heatmap,
+        maxColor: '#FFFFFF',
+      },
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true, style: { zIndex: 2 }, useHTML: true, allowOverlap: false, distance: -50,
+            formatter: function () {
+              if (label === 'Avg Time') {
+                // tslint:disable-next-line:max-line-length
+                return '<span  style="font-family:Roboto, sans-serif;font-weight:bold"> ' + this.point.name + '</span><br> ' + '<span  style="font-family:Roboto, sans-serif;font-weight:200">' + label + selft.value_Suffix() + ':  ' + selft.toHHMMSS(this.point.value * 60) + '</span>';
+                // tslint:disable-next-line:max-line-length
+              } else { return '<span  style="font-family:Roboto, sans-serif;font-weight:bold"> ' + this.point.name + '</span><br> ' + '<span  style="font-family:Roboto, sans-serif;font-weight:200">' + label + selft.value_Suffix() + ':  ' + this.point.value.toLocaleString('en-us', { maximumFractionDigits: 2 }) + '</span>'; }
+            }
+          }
+        },
+      },
+      exporting: { enabled: false },
+      tooltip: {
+        shared: true,
+        formatter: function () {
+          if (label !== 'Avg Time') {
+            // tslint:disable-next-line:max-line-length
+            return '<span  style="font-family:Roboto, sans-serif;font-weight:bold"> ' + this.point.name + '</span> ' + '<span  style="font-family:Roboto, sans-serif;font-weight:200">' + ':  ' + this.point.value.toLocaleString('en-us', { maximumFractionDigits: 2 }) + '</span>';
+            // tslint:disable-next-line:max-line-length
+          } else { return '<span  style="font-family:Roboto, sans-serif;font-weight:bold"> ' + this.point.name + '</span> ' + '<span  style="font-family:Roboto, sans-serif;font-weight:200">' + ':  ' + selft.toHHMMSS(this.point.value * 60) + '</span>'; }
+        }
+      },
+      series: [{
+        type: 'treemap', layoutAlgorithm: 'squarified', data: res, color: environment.POC.colors.heatmap,
+        zIndex: 2, title: { text: '', enabled: false },
+      }],
+      title: { text: '' }
+    });
+  }
+
+  exportExcel(): void {
+    const data = {
+      organization_id: this.organization_id
+      , site_id: this.site_id
+      , start_time: '\'' + this.start_time + '\''
+      , end_time: '\'' + this.end_time + '\''
+      , start_date: this.start_date
+      , end_date: this.end_date
+      , index_source: this.index_source
+    };
+    this.blockUI.start(this.language.dang_xuat_bao_cao);
+    this.appservice.post(data, environment.API.sp_footfall_heatmap_treemap_coloraxis_sum + '_export_excel').subscribe(fileData => {
+      window.open(this.url_api + fileData);
+      this.name_of_excel = fileData;
+      if (!environment.production) {
+        console.log('Successed');
+      }
+    }, (error) => {
+      this.blockUI.stop();
+    }, () => {
+      this.blockUI.stop();
+      const data2 = {
+        name_of_excel: this.name_of_excel
+      };
+      const url = environment.FBA.API.export_metrics_analytic + '_delete_excel';
+      this.appservice.post(data2, url).subscribe(res => {
+        if (!environment.production) {
+          console.log('Deleted');
+        }
+      });
+    }
+    );
+  }
+
+  reset_session() {
+    const data = [];
+    this.appservice.save_user_page_parametter_by_nghia(this.page_id, JSON.stringify(data)).subscribe(res => {
+      this.get_page_param();
+    });
+  }
+
+  got_error(message = 'Có lỗi xảy ra', callback: Function = null) {
+    this.notifier.notify('error', message);
+    if (callback) {
+      callback();
+    }
+  }
+}

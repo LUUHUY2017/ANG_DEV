@@ -1,0 +1,131 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { environment } from '../../../../../../environments/environment';
+import { AppService } from '../../../../../app.service';
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { language } from '../../../../../language';
+import { language_en } from '../../../../../language_en';
+import { FbaMenuComponent } from '../../../../viewchild/fbamenu/fbamenu.component';
+
+// Import BlockUI decorator & optional NgBlockUI type
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+@Component({
+  // selector: 'app-editsetting',
+  templateUrl: './editapplication.component.html',
+  styleUrls: ['./editapplication.component.scss']
+})
+export class FbaEditApplicationComponent implements OnInit {
+  status = 1;
+  @ViewChild(FbaMenuComponent)
+  fileToUpload_1: File = null;
+  fileToUpload_2: File = null;
+  @BlockUI() blockUI: NgBlockUI;
+  dataUpdate: Array<any>;
+  url_img = environment.apiUrl + 'images/fba/';
+  userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+  any_require: BinaryType;
+  can_update = false;
+  language: any;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  // tslint:disable-next-line:max-line-length
+  constructor(public appservice: AppService, private router: Router, private activerouter: ActivatedRoute) {
+    this.language = this.appservice.getLanguage();
+  }
+  ngOnInit() {
+    this.getdata();
+    // this.update_data_permission();
+  }
+  // update_data_permission() {
+  //   const is_admin_of_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+  //   if (!environment.production) {
+  //     console.log(is_admin_of_organization);
+  //   }
+  //   if (is_admin_of_organization.length > 0 || Number(this.userInfo.lever) === 0) {
+  //     this.can_update = true;
+  //   }
+  // }
+  getdata() {
+    this.activerouter.params.subscribe(e => {
+      this.blockUI.start('Đang tải dữ liệu ...');
+      const url = environment.API.fbaAppSetting.getUpdate;
+      const data = {
+        id: e.id
+        , deleted: 0
+      };
+      this.appservice.post(data, url).subscribe(res => {
+        console.log(res);
+        this.dataUpdate = res.retrieveData;
+      },
+        (error) => {
+          console.log(error);
+        }).add(() => {
+          this.blockUI.stop();
+        });
+    });
+  }
+
+  change_status(value) {
+    this.status = value;
+  }
+  readURL(event, number: number) {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = e => this['imageSrc_' + number] = reader.result;
+      reader.readAsDataURL(file);
+    }
+  }
+  handleFileInput(file: FileList, number: Number) {
+    const fileload = file[0];
+    const reader = new FileReader();
+    const newImage = new Image();
+    const imgType = ['image/jpg', 'image/jpeg', 'image/png'];
+    if (!imgType.includes(fileload.type)) {
+      alert('Kiểu ảnh không phù hợp');
+      return;
+    }
+    reader.onload = e => {
+      this['fileToUpload_' + number] = file.item(0);
+    };
+    newImage.onload = e => {
+      if (newImage.height <= this.appservice.uploadImageHeight && newImage.width <= this.appservice.uploadImageWidth) {
+        reader.readAsDataURL(fileload);
+      } else {
+        alert('Kích thước ảnh không phù hợp');
+        this['fileToUpload_' + number] = null;
+      }
+    };
+    newImage.src = window.URL.createObjectURL(fileload);
+  }
+
+  edit_setting(item) {
+    if (!environment.production) {
+      console.log('dữ liệu gửi đi', item.value);
+    }
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const data: FormData = new FormData();
+    if (this.fileToUpload_1) { data.append('company_logo', this.fileToUpload_1, this.fileToUpload_1.name); }
+    if (this.fileToUpload_2) { data.append('application_logo', this.fileToUpload_2, this.fileToUpload_2.name); }
+
+    data.append('data', JSON.stringify(item.value));
+    data.append('access_token', localStorage.getItem(environment.access_token));
+    const url = environment.FBA.API.fba_application_settings + '_update/' + this.activerouter.snapshot.params.id;
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.blockUI.stop();
+      if (res.message === 1) {
+        this.router.navigate(['/fba/setting/application']);
+      } else {
+        this.router.navigate(['/fba/setting/application']);
+      }
+    },
+      (error) => {
+        this.blockUI.stop();
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+}

@@ -1,0 +1,128 @@
+import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { SettingService } from '../setting.service';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
+import { environment } from '../../../../../environments/environment';
+import { AppService } from '../../../../app.service';
+import { MessageService } from '../../../../../../node_modules/primeng/api';
+import { FbaMenuComponent } from '../../../viewchild/fbamenu/fbamenu.component';
+import { language } from '../../../../language';
+import { language_en } from '../../../../language_en';
+
+@Component({
+  selector: 'app-setting',
+  templateUrl: './setting.component.html',
+  styleUrls: ['./setting.component.css'],
+  providers: [MessageService]
+})
+
+export class AdminSettingComponent implements OnInit {
+  @ViewChild(FbaMenuComponent)
+  init_table = false;
+  @BlockUI() blockUI: NgBlockUI;
+  app_setting: any;
+  message = [];
+  table: any;
+  url_img = environment.apiUrl + 'images/fba/';
+  page_id = environment.Pages.fba.fba_application_settings;
+  can_delete = false;
+  userInfo = JSON.parse(localStorage.getItem(environment.UserLoged));
+  language: any; cols: any;
+  type_language = JSON.parse(localStorage.getItem(environment.language));
+  constructor(private Setting: SettingService, private appservice: AppService) {
+    this.type_language === 'vn' ? this.language = language : this.language = language_en;
+    this.cols = [
+      { field: 'order', header: this.language.so_thu_tu },
+      { field: 'organization_name', header: this.language.to_chuc },
+      { field: 'company_logo', header: this.language.logo_cong_ty },
+      { field: 'application_logo', header: this.language.logo_ung_dung },
+    ];
+  }
+  pagination_number = 5;
+
+  ngOnInit() {
+    this.data_permission();
+    this.get_data();
+  }
+  data_permission() {
+    // const is_admin_of_organization = JSON.parse(localStorage.getItem(environment.is_admin_organization));
+    // if (!environment.production) {
+    //   console.log(is_admin_of_organization);
+    // }
+    if (Number(this.userInfo.lever) === 0) {
+      this.cols.push(
+        { field: 'action', header: 'Action' }
+      );
+      this.can_delete = true;
+    }
+  }
+  delete_data(id) {
+    this.blockUI.start(this.language.dang_xu_ly_du_lieu);
+    const data = {
+      id: id
+    };
+    const url = environment.FBA.API.fba_application_settings + '_delete';
+    this.appservice.post(data, url).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      if (res.message === 1) {
+        this.get_data();
+        this.Setting.message.push({
+          message_info: this.language.ban_da_xoa_thanh_cong,
+          alert: 'success'
+        });
+      }
+    },
+      (error) => {
+        this.blockUI.stop();
+        this.Setting.message.push({
+          message_info: this.language.loi_xu_ly_server,
+          alert: 'danger'
+        });
+        setTimeout(() => {
+          this.message = [];
+          this.Setting.message = [];
+        }, 3000);
+      },
+      () => {
+        this.blockUI.stop();
+      });
+  }
+  get_data() {
+    this.blockUI.start(this.language.dang_tai_du_lieu);
+    // console.log(this.Setting.message);
+    this.appservice.get(environment.FBA.API.fba_application_settings).subscribe(res => {
+      if (!environment.production) {
+        console.log(res);
+      }
+      this.app_setting = [];
+      let i = 0;
+      res.application_setting.forEach(element => {
+        i++;
+        this.app_setting.push({
+          order: i,
+          id: element.id,
+          organization_name: element.organization_name,
+          company_logo: element.company_logo,
+          application_logo: element.application_logo
+        });
+      });
+      // this.app_setting = res.application_setting;
+    },
+      (error) => {
+        this.blockUI.stop();
+        // this.blockUI.start('Lỗi không tải được dữ liệu');
+      },
+      () => {
+        this.message = this.Setting.message;
+        // console.log(this.Setting.message);
+        this.blockUI.stop();
+        if (this.Setting.message.length > 0) {
+          setTimeout(() => {
+            this.message = [];
+            this.Setting.message = [];
+          }, 3000);
+        }
+      });
+  }
+}
