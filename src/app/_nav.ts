@@ -25,6 +25,47 @@ export const navItems = [
         url: '/footfall/overview',
         icon: 'fa fa-bar-chart',
       },
+
+
+
+
+      {
+        name: '	Báo cáo tổng hợp', // Footfall Metrics
+        name_en: 'alubar report',
+        title: 'footfall',
+        url: '/footfall/rawdata',
+        icon: 'fa fa-code',
+        children: [
+          {
+            name: 'Theo  ngày', // Footfall Store
+            name_en: 'By day',
+            title: 'footfall',
+            url: '/footfall/customer-daily',
+            icon: 'fa fa-bar-chart',
+          },
+          {
+            name: 'Theo tháng',
+            name_en: 'By month',
+            title: 'footfall',
+            url: '/footfall/customer-month',
+            icon: 'fa fa-bar-chart',
+          },
+          {
+            name: 'Theo năm',
+            name_en: 'By month',
+            title: 'footfall',
+            url: '/footfall/customer-year',
+            icon: 'fa fa-bar-chart',
+          },
+          {
+            name: 'Theo cửa, khu vực',
+            name_en: 'By locations',
+            title: 'footfall',
+            url: '/footfall/customer-entrance',
+            icon: 'fa fa-bar-chart',
+          }
+        ]
+      },
       {
         name: 'Live Accupancy',
         name_en: 'Live Accupancy',

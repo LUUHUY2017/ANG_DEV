@@ -8,39 +8,14 @@ export const environment = {
     production: false,
     suffixApi: 'api',
 
-    //apiUrl: 'http://biapi.localhost:8080/',
-    apiUrl: 'http://119.17.228.46:8080/',
-    UrlSocket: 'https://bisocket.acs.vn:8686/',
-    client_secret: 'pMcVtltzSopwTl24es094rhZFoqoeJcbtRl6bYqs',
+    // VTF
+    apiUrl: 'http://localhost:8080/',
+    UrlSocket: 'http://localhost:8686/',
+    client_secret: 'vI09uuU4qXjIStoXOevMafpm7SXBETHLhlA9PYyS',
+   _netUrl: 'http://localhost:9090/',
 
-
-    // apiUrl: 'https://biapi.acs.vn:8443/',
-    // UrlSocket: 'https://bisocket.acs.vn:8686/',
-    // client_secret: 'pMcVtltzSopwTl24es094rhZFoqoeJcbtRl6bYqs',
-
-    // apiUrl: 'https://devbiapi.acs.vn:8443/',
-    // UrlSocket: 'https://bisocket.acs.vn:8787/',
-    // client_secret: 'zSVK9eeV6FZEl8hUSj7KKGVmnpKSOOVF5i3X5xDQ',
-
-
-    _netUrl: 'https://171.244.9.17:9900/',
-    // _netUrl: 'https://192.168.1.29:9900/',
-    // _netUrl: 'http://localhost:9900/',
-    // apiUrl: 'http://localhost:8080/biapi/public/',
-    // apiUrl: 'http://biapi.localhost:8080/',
-    // apiUrl: 'http://localhost:8080/biapi/public/',
-    // apiUrl: 'http://biapi.localhost:8080/',
-    // apiUrl: 'https://devbiapi.acs.vn:8443/',
-    // apiUrl: 'http://test.neatclean.vn:8080/biapi/public/',
-    // apiUrl: 'https://biapi.acs.vn:8443/',
-    // apiUrl: 'https://devbiapi.acs.vn:8443/',
-    // apiUrl: 'http://biapi.acs.vn:8080/',
-    // apiUrl: 'http://api.bi.acs.vn/',
-    // apiUrl: 'https://api.acs.vn/',
     connectSocketIo: '1',
-    // UrlSocket: 'https://bisocket.acs.vn:8686/',
-    // UrlSocket: 'https://bisocket.acs.vn:8686/',
-    // UrlSocket: 'http://127.0.0.1:8686/',
+    
     oauth_token: 'oauth_token',
     access_token: 'access_token',
     refresh_token: 'refresh_token',
