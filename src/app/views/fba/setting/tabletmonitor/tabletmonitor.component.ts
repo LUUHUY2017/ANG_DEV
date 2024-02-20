@@ -48,7 +48,7 @@ export class TabletMonitorComponent implements OnInit {
     this.type_language === 'vn' ? this.language = language : this.language = language_en;
     // khai báo server kết nối
     // this.socket = io(environment.UrlSocket + '?data=1');
-    this.socket = io(environment.UrlSocket);
+    // this.socket = io(environment.UrlSocket);
     this.notifier = notifierService;
   }
   // Khai báo kiểu dữ kiệu

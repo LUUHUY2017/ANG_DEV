@@ -138,57 +138,57 @@ export namespace MenuItemNameSpace {
                 url: '/footfall/overview',
                 icon: 'fa fa-bar-chart',
             },
-            // {
-            //     name: 'Số khách hiện tại',
-            //     name_en: 'Live Occupancy',
-            //     title: 'footfall',
-            //     url: '/footfall/liveview',
-            //     icon: 'fa fa-bar-chart',
-            // },
-            // {
-            //     name: 'Báo cáo tổng hợp', // Footfall Metrics
-            //     name_en: 'Talubar report',
-            //     title: 'footfall',
-            //     url: '/footfall/rawdata',
-            //     icon: 'fa fa-code',
-            //     children: [
-            //         {
-            //             name: 'Theo ngày', // Footfall Store
-            //             name_en: 'By day',
-            //             title: 'footfall',
-            //             url: '/footfall/customer-daily',
-            //             icon: 'fa fa-bar-chart',
-            //         },
-            //         {
-            //             name: 'Theo tháng',
-            //             name_en: 'By month',
-            //             title: 'footfall',
-            //             url: '/footfall/customer-monthly',
-            //             icon: 'fa fa-bar-chart',
-            //         },
-            //         {
-            //             name: 'Theo năm',
-            //             name_en: 'By year',
-            //             title: 'footfall',
-            //             url: '/footfall/customer-yearly',
-            //             icon: 'fa fa-bar-chart',
-            //         },
-            //         {
-            //             name: 'Theo cửa, khu vực',
-            //             name_en: 'By locations',
-            //             title: 'footfall',
-            //             url: '/footfall/customer-entrance',
-            //             icon: 'fa fa-bar-chart',
-            //         },
-            //         // {
-            //         //     name: 'Ngày',
-            //         //     name_en: 'Gate',
-            //         //     title: 'footfall',
-            //         //     url: '/footfall/report-daily',
-            //         //     icon: 'fa fa-bar-chart',
-            //         // }
-            //     ]
-            // },
+            {
+                name: 'Số khách hiện tại',
+                name_en: 'Live Occupancy',
+                title: 'footfall',
+                url: '/footfall/liveview',
+                icon: 'fa fa-bar-chart',
+            },
+            {
+                name: 'Báo cáo tổng hợp', // Footfall Metrics
+                name_en: 'Talubar report',
+                title: 'footfall',
+                url: '/footfall/rawdata',
+                icon: 'fa fa-code',
+                children: [
+                    {
+                        name: 'Theo ngày', // Footfall Store
+                        name_en: 'By day',
+                        title: 'footfall',
+                        url: '/footfall/customer-daily',
+                        icon: 'fa fa-bar-chart',
+                    },
+                    {
+                        name: 'Theo tháng',
+                        name_en: 'By month',
+                        title: 'footfall',
+                        url: '/footfall/customer-monthly',
+                        icon: 'fa fa-bar-chart',
+                    },
+                    {
+                        name: 'Theo năm',
+                        name_en: 'By year',
+                        title: 'footfall',
+                        url: '/footfall/customer-yearly',
+                        icon: 'fa fa-bar-chart',
+                    },
+                    {
+                        name: 'Theo cửa, khu vực',
+                        name_en: 'By locations',
+                        title: 'footfall',
+                        url: '/footfall/customer-entrance',
+                        icon: 'fa fa-bar-chart',
+                    },
+                    // {
+                    //     name: 'Ngày',
+                    //     name_en: 'Gate',
+                    //     title: 'footfall',
+                    //     url: '/footfall/report-daily',
+                    //     icon: 'fa fa-bar-chart',
+                    // }
+                ]
+            },
             {
                 name: 'Phân tích', // Footfall Metrics
                 name_en: 'Analysis',

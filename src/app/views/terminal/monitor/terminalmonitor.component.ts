@@ -310,7 +310,7 @@ export class TerminalMonitorComponent implements OnInit, OnDestroy {
     var that = this;
     setInterval(function () {
       that.getRealTimeData();
-    }, 15000);
+    }, 50000);
   }
   // done
   getRealTimeData() {

@@ -99,11 +99,11 @@ export class DefaultLayoutComponent implements OnInit {
   version_api = Version.version_api;
   version_service = Version.version_service;
   version_socketio = Version.version_socketio;
-  connectSocketIo = true;
+  connectSocketIo = false;
   constructor(private appservice: AppService, private router: Router, private render2: Renderer2
     , private modalService: BsModalService, private sanitizer: DomSanitizer) {
     this.type_language === 'vn' ? this.language = language : this.language = language_en;
-    this.socket = io(environment.UrlSocket);
+    // this.socket = io(environment.UrlSocket);
     // Check xem nguoi dung co thay doi LocalStorage khong
     const self = this;
     // window.addEventListener('storage', function (e) {
