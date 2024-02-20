@@ -11,7 +11,7 @@
           </app-timeperiod>
           <span style="padding: 0px 10px;font-size:11px;">{{language.So_voi}}</span>
           <app-timeperiod2 class="time_input2 time_no_input2" #TimeInput_2
-            (submit_date2)="get_date_from_emit($event,2)">
+                           (submit_date2)="get_date_from_emit($event,2)">
           </app-timeperiod2>
         </div>
       </div>
@@ -28,19 +28,19 @@
                 <ul id="headmapmenu_2">
                   <li>
                     <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
-                      bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
+                               bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
                   </li>
                   <!-- li-visit -->
                   <li>
                     <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
                       <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
                       <span style="padding: 3px 0;">-</span>
                       <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
                     </div>
                     <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
-                      (click)="get_data()">
+                            (click)="get_data()">
                       {{language.ap_dung}}
                     </button>
                   </li>
@@ -49,11 +49,14 @@
                     <div>
                       <div class="btn-group float-right" dropdown>
                         <button dropdownToggle type="button"
-                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}}
+                                class="btn btn-primary dropdown-toggle float-right btnxuat">
+                          {{language.xuat}}
                         </button>
                         <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
-                          <li role="menuitem"><a style="cursor:pointer" class="dropdown-item float-right"
-                              (click)="exportExcel()"> {{language.xuat_ra_excel}}</a></li>
+                          <li role="menuitem">
+                            <a style="cursor:pointer" class="dropdown-item float-right"
+                               (click)="exportExcel()"> {{language.xuat_ra_excel}}</a>
+                          </li>
                           <!-- <li role="menuitem"><a class="dropdown-item  float-right"  href="#">Xuất ra PDF</a> </li>
                                                     <li role="menuitem"><a class="dropdown-item  float-right" href="#">Other</a></li> -->
                         </ul>
@@ -73,15 +76,15 @@
                   <div class="col-sm-7 d-none d-md-block">
                     <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
                       <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
-                        (click)="change_view()"> {{language.gio}}</label>
+                             (click)="change_view()"> {{language.gio}}</label>
                       <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Day" (click)="change_view()"> {{language.ngay}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Day" (click)="change_view()"> {{language.ngay}}</label>
                       <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Week" (click)="change_view()"> {{language.tuan}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Week" (click)="change_view()"> {{language.tuan}}</label>
                       <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Month" (click)="change_view()"> {{language.thang}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Month" (click)="change_view()"> {{language.thang}}</label>
                       <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Year" (click)="change_view()"> {{language.nam}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Year" (click)="change_view()"> {{language.nam}}</label>
                     </div>
                   </div>
                 </div>
@@ -90,7 +93,8 @@
                     {{site_name}} &nbsp; {{ title_index }} &nbsp; {{ starttime }} &nbsp;&minus;&nbsp; {{ endtime }}
                     &nbsp;
                     {{ title_time_period }}: {{ time_period }}&nbsp; <i style="border-bottom: 1px dotted #7b7b7b;">
-                      {{language.so_voi}} </i> &nbsp;{{time_period_compare}}
+                      {{language.so_voi}}
+                    </i> &nbsp;{{time_period_compare}}
                   </div>
                 </div>
               </ng-container>
@@ -105,24 +109,39 @@
                     <div style="border-top:1px dotted #a7a4a4" class="row">
                       <div class="table-responsive">
                         <table style="width: 100%;min-width: 900px" id="table"
-                          class="table table-striped table-comparation">
+                               class="table table-striped table-comparation">
                           <thead>
                             <tr>
-                              <th style="width:250px;padding-left: 2.5rem;"> {{language.thoi_gian}}
-                                <br> <span style="margin-left:0%;" class="spancell"> ({{ show_label_table }})
+                              <th style="width:250px;padding-left: 2.5rem;">
+                                {{language.thoi_gian}}
+                                <br> <span style="margin-left:0%;" class="spancell">
+                                  ({{ show_label_table }})
                                 </span>
                               </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.visitors ">
-                                {{indexes.visitors}} </th>
+                                {{indexes.visitors}}
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.visitors ">
-                                {{indexes.visitors}} {{language.Compared}} </th>
-                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.traffic_flow">
-                                {{indexes.traffic_flow}} </th>
+                                {{indexes.visitors}} {{language.Compared}}
+                              </th>
+
+                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.exits ">
+                                {{indexes.exits}}
+                              </th>
+                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.exits ">
+                                {{indexes.exits}} {{language.Compared}}
+                              </th>
+
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.traffic_flow">
                                 {{indexes.traffic_flow}}
-                                {{language.Compared}} </th>
+                              </th>
+                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.traffic_flow">
+                                {{indexes.traffic_flow}}
+                                {{language.Compared}}
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.passerby">
-                                {{indexes.passerby}} </th>
+                                {{indexes.passerby}}
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.passerby">
                                 {{indexes.passerby}} {{language.Compared}}
                               </th>
@@ -131,12 +150,15 @@
                               </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.shoppers">
                                 {{indexes.shoppers}}
-                                {{language.Compared}} </th>
-                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.kids_visitors">
-                                {{indexes.kids_visitors}} </th>
+                                {{language.Compared}}
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.kids_visitors">
                                 {{indexes.kids_visitors}}
-                                {{language.Compared}}</th>
+                              </th>
+                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.kids_visitors">
+                                {{indexes.kids_visitors}}
+                                {{language.Compared}}
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.turn_in_rate">
                                 {{indexes.turn_in_rate}}
                               </th>
@@ -144,10 +166,12 @@
                                 {{ remove_percent(indexes.turn_in_rate)}} {{language.Compared}} (%)
                               </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.avg_time ">
-                                {{indexes.avg_time}} (min) </th>
+                                {{indexes.avg_time}} (min)
+                              </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.avg_time ">
                                 {{indexes.avg_time}} {{language.Compared}}
-                                (min)</th>
+                                (min)
+                              </th>
                               <th style="width:250px;font-size:22px;line-height: 20px;">
                                 <span class="fa-icon-green "><i class="fa fa-caret-up"></i></span>
                                 <span class="fa-icon-red pdl-5"><i class="fa fa-caret-down"></i></span>
@@ -168,6 +192,21 @@
                                 <b>{{get_number_int(total_num_to_enter_compare,total_num_to_enter) | number:'1.0-2'}}</b><br>
                                 <span class="spancell">
                                   ({{ get_compar_per(number_chenh_lech,total_num_to_enter_compare ) | number:'1.0-2' }}%)
+                                  <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                                </span>
+                              </td>
+
+                              <!-- tổng số lượng exits -->
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                <b>{{total_num_to_exit  |  number:'1.0-2'}}</b><br>
+                              </td>
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                <b>{{total_num_to_exit_compare > 0 ? ( total_num_to_exit_compare  |  number:'1.0-2') : 0}}</b><br>
+                              </td>
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                <b>{{get_number_int(total_num_to_exit_compare,total_num_to_exit) | number:'1.0-2'}}</b><br>
+                                <span class="spancell">
+                                  ({{ get_compar_per(number_chenh_lech,total_num_to_exit_compare ) | number:'1.0-2' }}%)
                                   <i class="fa fa-{{up_or_down}}">&nbsp;</i>
                                 </span>
                               </td>
@@ -204,8 +243,10 @@
                                 <b>{{total_turn_rate  |  number:'1.0-2'}} (%)</b><br>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.turn_in_rate ">
-                                <b>{{total_turn_rate_compare > 0 ? ( total_turn_rate_compare  |  number:'1.0-2') : 0}}
-                                  (%)</b><br>
+                                <b>
+                                  {{total_turn_rate_compare > 0 ? ( total_turn_rate_compare  |  number:'1.0-2') : 0}}
+                                  (%)
+                                </b><br>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.turn_in_rate ">
                                 <b>{{get_number_int(total_turn_rate_compare,total_turn_rate) | number:'1.0-2'}}</b><br>
@@ -245,12 +286,12 @@
                               </td>
                               <!-- time trung bình  -->
                               <td [hidden]="indexOptionSelected !==indexess.avg_time ">
-                                <b>{{toHHMMSS(total_avgtime) ? toHHMMSS(total_avgtime) : '00:00:00'}}</b><br> <span
-                                  class="spancell">{{language.thoi_gian_trung_binh}}</span>
+                                <b>{{toHHMMSS(total_avgtime) ? toHHMMSS(total_avgtime) : '00:00:00'}}</b><br> <span class="spancell">{{language.thoi_gian_trung_binh}}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.avg_time ">
                                 <b>{{toHHMMSS(total_avgtime_compare) ? toHHMMSS(total_avgtime_compare) : '00:00:00'}}</b><br>
-                                <span class="spancell">{{language.thoi_gian_trung_binh}}
+                                <span class="spancell">
+                                  {{language.thoi_gian_trung_binh}}
                                 </span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.avg_time">
@@ -258,18 +299,21 @@
                                 <span class="spancell">{{language.thoi_gian_chenh_lech}}</span>
                               </td>
                             </tr>
+
+
                             <tr *ngFor="let item of chart_data">
                               <td style="padding-left: 2.5rem;">{{item.time_period}} </td>
                               <!-- hiển thị giá trị visit -->
                               <td [hidden]="indexOptionSelected !==indexess.visitors ">
                                 {{ item.num_to_enter ? (item.num_to_enter |  number:'1.0-2') : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.num_to_enter ? '(' + Go_number(item.num_to_enter, total_num_to_enter) + '%)' : ''}}</span>
+                                <span class="spancell">{{ item.num_to_enter ? '(' + Go_number(item.num_to_enter, total_num_to_enter) + '%)' : ''}}</span>
                               </td>
+
                               <td [hidden]="indexOptionSelected !==indexess.visitors ">
                                 {{item.num_to_enter_compare ? (item.num_to_enter_compare |  number:'1.0-2') : '' }}
                                 <span class="spancell">
-                                  {{ item.num_to_enter_compare ? '('+ Go_number(item.num_to_enter_compare, total_num_to_enter_compare)+'%)' : '&minus;'}}</span>
+                                  {{ item.num_to_enter_compare ? '('+ Go_number(item.num_to_enter_compare, total_num_to_enter_compare)+'%)' : '&minus;'}}
+                                </span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.visitors ">
                                 {{ get_number_int(item.num_to_enter_compare,item.num_to_enter) | number:'1.0-2' }}
@@ -278,16 +322,36 @@
                                   <i class="fa fa-{{up_or_down}}">&nbsp;</i>
                                 </span>
                               </td>
+
+                              <!-- hiển thị giá trị exits -->
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                {{ item.num_to_exit ? (item.num_to_exit |  number:'1.0-2') : '&minus; '}}
+                                <span class="spancell">{{ item.num_to_exit ? '(' + Go_number(item.num_to_exit, total_num_to_exit) + '%)' : ''}}</span>
+                              </td>
+
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                {{item.num_to_exit_compare ? (item.num_to_exit_compare |  number:'1.0-2') : '' }}
+                                <span class="spancell">
+                                  {{ item.num_to_exit_compare ? '('+ Go_number(item.num_to_exit_compare, total_num_to_exit_compare)+'%)' : '&minus;'}}
+                                </span>
+                              </td>
+                              <td [hidden]="indexOptionSelected !==indexess.exits ">
+                                {{ get_number_int(item.num_to_exit_compare,item.num_to_exit) | number:'1.0-2' }}
+                                <span class="spancell">
+                                  ({{ get_compar_per(number_chenh_lech , item.num_to_exit_compare) | number:'1.0-2' }}%)
+                                  <i class="fa fa-{{up_or_down}}">&nbsp;</i>
+                                </span>
+                              </td>
+
+
                               <!--  hiển thị giá trị traffic -->
                               <td [hidden]="indexOptionSelected !==indexess.traffic_flow">
                                 {{ item.traffic ? (item.traffic |  number:'1.0-2')  : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.traffic ? '('+ Go_number(item.traffic, total_num_to_traffic) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.traffic ? '('+ Go_number(item.traffic, total_num_to_traffic) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.traffic_flow">
                                 {{item.traffic_compare ?  (item.traffic_compare  |  number:'1.0-2') : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.traffic_compare ? '(' + Go_number(item.traffic_compare, total_num_to_traffic_compare) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.traffic_compare ? '(' + Go_number(item.traffic_compare, total_num_to_traffic_compare) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.traffic_flow">
                                 {{ get_number_int(item.traffic_compare,item.traffic) | number:'1.0-2' }}
@@ -299,13 +363,11 @@
                               <!--  hiển thị giá trị PasserBy -->
                               <td [hidden]="indexOptionSelected !==indexess.passerby">
                                 {{ item.passer_by ? (item.passer_by |  number:'1.0-2')  : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.passer_by ? '('+ Go_number(item.passer_by, total_passer_by) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.passer_by ? '('+ Go_number(item.passer_by, total_passer_by) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.passerby">
                                 {{item.passer_by_compare ?  (item.passer_by_compare  |  number:'1.0-2') : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.passer_by_compare ? '(' + Go_number(item.passer_by_compare, total_passer_by_compare) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.passer_by_compare ? '(' + Go_number(item.passer_by_compare, total_passer_by_compare) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.passerby">
                                 {{ get_number_int(item.passer_by_compare,item.passer_by) | number:'1.0-2' }}
@@ -317,13 +379,11 @@
                               <!--  hiển thị giá trị Kids Visits -->
                               <td [hidden]="indexOptionSelected !==indexess.kids_visitors">
                                 {{ item.kids_visits ? (item.kids_visits |  number:'1.0-2')  : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.kids_visits ? '('+ Go_number(item.kids_visits, total_kids) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.kids_visits ? '('+ Go_number(item.kids_visits, total_kids) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.kids_visitors">
                                 {{item.kids_visits_compare ?  (item.kids_visits_compare  |  number:'1.0-2') : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.kids_visits_compare ? '('+ Go_number(item.kids_visits_compare, total_kids_compare) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.kids_visits_compare ? '('+ Go_number(item.kids_visits_compare, total_kids_compare) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.kids_visitors">
                                 {{ get_number_int(item.kids_visits_compare,item.kids_visits) | number:'1.0-2' }}
@@ -351,13 +411,11 @@
                               <!--  hiển thị giá trị Shopper Visits -->
                               <td [hidden]="indexOptionSelected !==indexess.shoppers">
                                 {{ item.shopper_visits ? (item.shopper_visits |  number:'1.0-2')  : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.shopper_visits ? '('+ Go_number(item.shopper_visits, total_shopper_visits) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.shopper_visits ? '('+ Go_number(item.shopper_visits, total_shopper_visits) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.shoppers">
                                 {{item.shopper_visits_compare ?  (item.shopper_visits_compare  |  number:'1.0-2') : '&minus; '}}
-                                <span
-                                  class="spancell">{{ item.shopper_visits_compare ? '(' + Go_number(item.shopper_visits_compare, total_shopper_visits_compare) + '%)' : '' }}</span>
+                                <span class="spancell">{{ item.shopper_visits_compare ? '(' + Go_number(item.shopper_visits_compare, total_shopper_visits_compare) + '%)' : '' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.shoppers">
                                 {{ get_number_int(item.shopper_visits_compare,item.shopper_visits) | number:'1.0-2' }}
@@ -369,11 +427,11 @@
 
                               <!-- hiển thị thời gian -->
                               <td class="{{item.avg_time  ? '' : 'td_center'}}"
-                                [hidden]="indexOptionSelected !==indexess.avg_time ">
+                                  [hidden]="indexOptionSelected !==indexess.avg_time ">
                                 <span>{{item.avg_time ? toHHMMSS(item.avg_time *60) :  '&minus; ' }}</span>
                               </td>
                               <td class="{{item.avg_time_compare  ? '' : 'td_center'}}"
-                                [hidden]="indexOptionSelected !==indexess.avg_time ">
+                                  [hidden]="indexOptionSelected !==indexess.avg_time ">
                                 <span>{{item.avg_time_compare ? toHHMMSS(item.avg_time_compare *60) : '&minus; ' }}</span>
                               </td>
                               <td [hidden]="indexOptionSelected !==indexess.avg_time">
@@ -391,7 +449,8 @@
               <ng-container *ngIf="show_error">
                 <div class="show_info_error">
                   <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
-                  {{language.vui_long}}<a (click)="get_data();" style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}} </div>
+                  {{language.vui_long}}<a (click)="get_data();" style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                </div>
               </ng-container>
 
             </div>
@@ -399,7 +458,8 @@
         </div>
       </div>
     </div>
-    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+    <div id="divbaocao" style="float: right; font-size: 11px">
+      {{language.bao_cao_duoc_tao}}
       {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
       {{time_generate_report | date: 'hh:mm:ss'}} -
       <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
@@ -414,8 +474,11 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
-        {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+    <p>
+      {{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+        {{language.bam_vao_day}}
+      </a> {{language.de_tai_lai}}
+    </p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>
