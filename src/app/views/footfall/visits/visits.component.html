@@ -94,46 +94,63 @@
                     <table style="width: 100%;min-width: 900px" class="table table-striped table-visit">
                       <thead>
                         <tr>
-                          <th style="width: 400px;padding-left: 2.5rem;">{{language.thoi_gian}}
+                          <th style="width: 400px;padding-left: 2.5rem;">
+                            {{language.thoi_gian}}
                             <br> <span style="margin-left:0%;" class="spancell">
                               ({{show_label_table}})
                             </span>
                           </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.passerby">
-                            {{indexes.passerby}}</th>
+                            {{indexes.passerby}}
+                          </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.shoppers">
                             {{indexes.shoppers}}
                           </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.visitors">
-                            {{indexes.visitors}}</th>
+                            {{indexes.visitors}}
+                          </th>
+                          <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.exits">
+                            {{indexes.exits}}
+                          </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.turn_in_rate">
                             {{ indexes.turn_in_rate}}
                           </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.kids_visitors">
-                            {{indexes.kids_visitors}}</th>
+                            {{indexes.kids_visitors}}
+                          </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !== indexess.traffic_flow">
                             {{indexes.traffic_flow}}
                           </th>
                           <th style="width: 400px" [hidden]="this.indexOptionSelected !==indexess.avg_time">
-                            {{indexes.avg_time}} {{language_index_vn.min}}</th>
+                            {{indexes.avg_time}} {{language_index_vn.min}}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td></td>
                           <td [hidden]="this.indexOptionSelected !== indexess.passerby">
-                            <b>{{this.total_passer_by |  number:'1.0-2'}}</b> </td>
+                            <b>{{this.total_passer_by |  number:'1.0-2'}}</b>
+                          </td>
                           <!-- <br><span class="spancell"></span> -->
                           <td [hidden]="this.indexOptionSelected !== indexess.shoppers">
-                            <b>{{this.total_shopper_visits |  number:'1.0-2'}}</b></td>
+                            <b>{{this.total_shopper_visits |  number:'1.0-2'}}</b>
+                          </td>
                           <td [hidden]="this.indexOptionSelected !== indexess.visitors">
-                            <b>{{this.total_num_to_enter |  number:'1.0-2'}}</b></td>
+                            <b>{{this.total_num_to_enter |  number:'1.0-2'}}</b>
+                          </td>
+                          <td [hidden]="this.indexOptionSelected !== indexess.exits">
+                            <b>{{this.total_num_to_exit |  number:'1.0-2'}}</b>
+                          </td>
                           <td [hidden]="this.indexOptionSelected !== indexess.kids_visitors">
-                            <b>{{this.total_kids |  number:'1.0-2'}}</b></td>
+                            <b>{{this.total_kids |  number:'1.0-2'}}</b>
+                          </td>
                           <td [hidden]="this.indexOptionSelected !== indexess.turn_in_rate">
-                            <b>{{this.total_turn_rate |  number:'1.0-2'}} (%)</b></td>
+                            <b>{{this.total_turn_rate |  number:'1.0-2'}} (%)</b>
+                          </td>
                           <td [hidden]="this.indexOptionSelected !== indexess.traffic_flow">
-                            <b>{{this.total_traffic |  number:'1.0-2'}}</b></td>
+                            <b>{{this.total_traffic |  number:'1.0-2'}}</b>
+                          </td>
                           <td [hidden]="this.indexOptionSelected !==indexess.avg_time">
                             <b>{{toHHMMSS(total_avg_time) }}</b>
                           </td>
@@ -153,6 +170,7 @@
                               {{item.kids_visits |  number:'1.0-2'}}
                               <span class="spancell">({{Go_number(item.kids_visits, total_kids)}}%)</span>
                             </td>
+
                             <td [hidden]="this.indexOptionSelected !== indexess.turn_in_rate">
                               {{item.turn_in_rate |  number:'1.0-2'}}
                               <span class="spancell">(%)</span>
@@ -161,9 +179,14 @@
                               {{item.num_to_enter |  number:'1.0-2'}}
                               <span class="spancell">({{Go_number(item.num_to_enter, total_num_to_enter)}}%)</span>
                             </td>
+                            <td [hidden]="this.indexOptionSelected !== indexess.exits">
+                              {{item.num_to_exit |  number:'1.0-2'}}
+                              <span class="spancell">({{Go_number(item.num_to_exit, total_num_to_exit)}}%)</span>
+                            </td>
                             <td [hidden]="this.indexOptionSelected !== indexess.traffic_flow">
                               {{item.traffic |  number:'1.0-2'}}
-                              <span class="spancell">({{Go_number(item.traffic, total_traffic)}}%)</span></td>
+                              <span class="spancell">({{Go_number(item.traffic, total_traffic)}}%)</span>
+                            </td>
                             <td [hidden]="this.indexOptionSelected !==indexess.avg_time">
                               {{toHHMMSS(item.avg_time * 60)}}
                             </td>
