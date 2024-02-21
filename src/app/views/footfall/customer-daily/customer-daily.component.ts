@@ -157,6 +157,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
       , start_date: this.start_date
       , end_date: this.start_date
       , view_by: this.viewDataBy
+      , indexOptionSelected: this.indexOptionSelected
     };
     const indexViewBy = 1;
     this.scheduleComponent.getParametter(dataFromParent, indexViewBy);
@@ -174,6 +175,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
       , start_date: this.start_date
       , end_date: this.start_date
       , view_by: this.viewDataBy
+      , indexOptionSelected: this.indexOptionSelected
     };
     const indexViewBy = 1;
     this.scheduleComponent.getParametter(dataFromParent, indexViewBy);
@@ -201,8 +203,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
           }
 
           this.indexOption = param.traffic_index.filter((e) =>
-            e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits'
-          );
+            e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
           if (!environment.production) {
             console.warn('this.indexOption', this.indexOption);
