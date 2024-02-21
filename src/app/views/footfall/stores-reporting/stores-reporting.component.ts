@@ -467,6 +467,7 @@ export class FootfallStoresReportingComponent implements OnInit {
     let i = 0;
     const chart_xAxis = [];
     const num_to_enter = [];
+    const num_to_exit = [];
     const traffic = [];
     const avg_time = [];
     const passer_by = [];
@@ -476,6 +477,7 @@ export class FootfallStoresReportingComponent implements OnInit {
     this.chart_data.forEach(element => {
       chart_xAxis[i] = element.site_name;
       num_to_enter[i] = Number(element.num_to_enter);
+      num_to_exit[i] = Number(element.num_to_exit);
       traffic[i] = Number(element.traffic);
       avg_time[i] = this.toMM(Number(element.avg_time));
       avg_time[i] = (Number(element.avg_time));
@@ -624,7 +626,7 @@ export class FootfallStoresReportingComponent implements OnInit {
         {
           name: this.indexes.exits, color: color.exits, type: 'column',
           // tslint:disable-next-line: max-line-length
-          yAxis: selft.set_position(this.indexess.exits), data: num_to_enter, showInLegend: selft.check_has_index(this.indexess.exits),
+          yAxis: selft.set_position(this.indexess.exits), data: num_to_exit, showInLegend: selft.check_has_index(this.indexess.exits),
           visible: selft.check_has_index(this.indexess.exits),
         },
 
