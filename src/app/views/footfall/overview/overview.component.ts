@@ -708,11 +708,12 @@ export class FootfallOverviewComponent implements OnInit {
             this.blockUI.stop();
           }
           this.data = res;
-          this.reset_to_zero('total_num_to_enter' + i, 'total_traffic' + i, 'total_avg_time' + i, 'total_passer_by' + i,
+          this.reset_to_zero('total_num_to_enter' + i,'total_num_to_exit' + i, 'total_traffic' + i, 'total_avg_time' + i, 'total_passer_by' + i,
             'total_shopper_visits' + i, 'total_kids' + i, 'total_turn_rate' + i, 'lineChartData' + i, 'total_seconds' + i);
           let si = 0;
           res.forEach(element => {
             this['total_num_to_enter' + i] += Number(element.num_to_enter);
+            this['total_num_to_exit' + i] += Number(element.num_to_exit);
             this['total_traffic' + i] += Number(element.traffic);
             this['total_avg_time' + i] += Number(element.avg_time);
             this['total_passer_by' + i] += Number(element.passer_by);
@@ -729,6 +730,7 @@ export class FootfallOverviewComponent implements OnInit {
           this['total_turn_rate' + i] = Number(this['total_passer_by' + i]) > 0 ? ((Number(this['total_num_to_enter' + i]) / Number(this['total_passer_by' + i])) * 100).toFixed(2) : 0;
 
           const visit = [];
+          const exit = [];
           const traffic_num = [];
           const avg_time = [];
           const passer_by = [];
@@ -737,6 +739,7 @@ export class FootfallOverviewComponent implements OnInit {
           const turn_in_rate = [];
           this.data.forEach(element => {
             const num_to_enter = Number(element.num_to_enter);
+            const num_to_exit = Number(element.num_to_exit);
             const traffic = Number(element.traffic);
             const avg = Number(element.avg_time);
             const pass = Number(element.passer_by);
@@ -744,6 +747,7 @@ export class FootfallOverviewComponent implements OnInit {
             const kids = Number(element.kids_visits);
             const turn = Number(element.turn_in_rate);
             visit.push(num_to_enter);
+            exit.push(num_to_exit);
             traffic_num.push(traffic);
             avg_time.push(avg);
             passer_by.push(pass);
@@ -760,6 +764,10 @@ export class FootfallOverviewComponent implements OnInit {
             this['barChartData' + i] = [{ data: visit, label: this['title_index_name' + i] }];
             this['suffix' + i] = '';
             this['data_show' + i] = this['total_num_to_enter' + i];
+          } else if (this['selected_show' + i] === this.indexess.exits) {
+            this['barChartData' + i] = [{ data: exit, label: this['title_index_name' + i] }];
+            this['suffix' + i] = '';
+            this['data_show' + i] = this['total_num_to_exit' + i];
           } else if (this['selected_show' + i] === this.indexess.traffic_flow) {
             this['barChartData' + i] = [{ data: traffic_num, label: this['title_index_name' + i]  }];
             this['suffix' + i] = '';
@@ -1083,7 +1091,7 @@ export class FootfallOverviewComponent implements OnInit {
   }
 
   is_column_chart_box(selected_show) {
-    if (selected_show === this.indexess.visitors || selected_show === this.indexess.traffic_flow
+    if (selected_show === this.indexess.visitors || selected_show === this.indexess.exits  || selected_show === this.indexess.traffic_flow
       || selected_show === this.indexess.kids_visitors || selected_show === this.indexess.shoppers
       || selected_show === this.indexess.passerby) {
       return true;
