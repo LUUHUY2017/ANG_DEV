@@ -118,7 +118,16 @@
                                   ({{ show_label_table }})
                                 </span>
                               </th>
-                              <th style="width:250px" [hidden]="indexOptionSelected !==indexess.visitors ">
+
+                              <th style="width:250px">
+                                {{time_period}}
+                              </th>
+                              <th style="width:250px">
+                                {{time_period_compare}}
+                              </th>
+
+
+                              <!--<th style="width:250px" [hidden]="indexOptionSelected !==indexess.visitors ">
                                 {{indexes.visitors}}
                               </th>
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.visitors ">
@@ -171,11 +180,14 @@
                               <th style="width:250px" [hidden]="indexOptionSelected !==indexess.avg_time ">
                                 {{indexes.avg_time}} {{language.Compared}}
                                 (min)
-                              </th>
+                              </th>-->
+
+
                               <th style="width:250px;font-size:22px;line-height: 20px;">
                                 <span class="fa-icon-green "><i class="fa fa-caret-up"></i></span>
                                 <span class="fa-icon-red pdl-5"><i class="fa fa-caret-down"></i></span>
                               </th>
+
                             </tr>
                           </thead>
                           <tbody>
