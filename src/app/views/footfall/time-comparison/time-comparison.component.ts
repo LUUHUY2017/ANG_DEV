@@ -22,6 +22,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class FootfallTimeComparisonComponent implements OnInit {
   @ViewChild('TimeInput') TimeInput: TimeperiodComponent;
   @ViewChild('TimeInput_2') TimeInput_2: Timeperiod2Component;
+
   @ViewChild(MenutreeComponent) MenuInput: MenutreeComponent;
   page_id = environment.Pages.footfall.time_comparison;
   @BlockUI() blockUI: NgBlockUI;
@@ -165,6 +166,12 @@ export class FootfallTimeComparisonComponent implements OnInit {
         }
         this.viewDataBy = para.view_by;
         this.indexOptionSelected = para.indexOptionSelected;
+
+        this.time_period_array = this.time_period_array.filter(item => item.value != 'last_fourteen_day');
+        if (!environment.production) {
+          console.warn('this.time_period_array', this.time_period_array);
+        }
+
         this.TimeInput.get_data(para, this.time_period_array);
         this.TimeInput_2.get_data_compare(para, this.time_period_array);
         this.get_sitetree();
