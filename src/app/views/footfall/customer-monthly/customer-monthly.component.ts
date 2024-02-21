@@ -72,8 +72,8 @@ export class FootfallCustomerMonthlyComponent implements OnInit {
     duLieuThuTuCacCua: any[] = [];
     show_label_table: string;
     btnApplyValid = false;
-    // indexOption: Array<IOption>;
-    // indexOptionSelected: string;
+     indexOption: Array<IOption>;
+     indexOptionSelected: string;
     operation: string;
     time_value: any = '';
     time_generate_report = new Date();
