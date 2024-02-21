@@ -1164,7 +1164,7 @@ export class DashboardComponent implements OnInit {
           }
           this.data = res;
           let si = 0;
-          this.reset_to_zero('total_num_to_enter' + i, 'tt_passer' + i, 'total_traffic' + i, 'total_avg_time' + i, 'tt_shop_visits' + i,
+          this.reset_to_zero('total_num_to_enter' + i,'total_num_to_exit' + i, 'tt_passer' + i, 'total_traffic' + i, 'total_avg_time' + i, 'tt_shop_visits' + i,
             'tt_turn_rate' + i, 'tt_kids_visits' + i, 'tt_conver' + i, 'tt_atv' + i, 'tt_avg_item' + i, 'tt_sales_yeild' + i,
             'tt_transactions' + i, 'tt_sales' + i, 'tt_missed_sales' + i, 'tt_loyal_visits' + i, 'tt_loy_tran' + i, 'tt_loy_conver' + i,
             'miss_loyal_conversion' + i, 'tt_sales_hour' + i, 'tt_shopper_on_sh' + i, 'tt_sales_on_sh' + i,
@@ -1173,6 +1173,7 @@ export class DashboardComponent implements OnInit {
             this['tt_sales_hour' + i] += Number(element.sales_hour);
             this['tt_passer' + i] += Number(element.passer_by);
             this['total_num_to_enter' + i] += Number(element.num_to_enter);
+            this['total_num_to_exit' + i] += Number(element.num_to_exit);
             this['tt_shop_visits' + i] += Number(element.shopper_visits);
             this['total_avg_time' + i] += Number(element.avg_time);
             this['tt_kids_visits' + i] += Number(element.kids_visits);
@@ -1234,6 +1235,7 @@ export class DashboardComponent implements OnInit {
 
           // /*----------Hiển thị biểu đồ ô1 ----------*/
           const visit = [];
+          const exit = [];
           const traffic_num = [];
           const avg_time = [];
           const turn_in_rate = [];
@@ -1257,6 +1259,7 @@ export class DashboardComponent implements OnInit {
           this.data.forEach(element => {
             const miss_loy = Number(element.loyal_conversion) > 0 ? Number(100 - (Number(element.loyal_conversion))) : 0;
             visit.push(Number(element.num_to_enter));
+            exit.push(Number(element.num_to_exit));
             traffic_num.push(Number(element.traffic));
             avg_time.push(Number(element.avg_time));
             kids_visits.push(Number(element.kids_visits));
@@ -1286,6 +1289,10 @@ export class DashboardComponent implements OnInit {
             this['suffix' + i] = '';
             this['barChartData' + i] = [{ data: visit, label: this['title_index_name' + i] }];
             this['data_show' + i] = this['total_num_to_enter' + i];
+          } else if (this['selected_show' + i] === this.indexess.exits) {
+            this['suffix' + i] = '';
+            this['barChartData' + i] = [{ data: exit, label: this['title_index_name' + i] }];
+            this['data_show' + i] = this['total_num_to_exit' + i];
           } else if (this['selected_show' + i] === this.indexess.traffic_flow) {
             this['suffix' + i] = '';
             this['data_show' + i] = this['total_traffic' + i];
@@ -1461,6 +1468,7 @@ export class DashboardComponent implements OnInit {
     let i = 0;
     const chart_xAxis = [];
     const num_to_enter = [];
+    const num_to_exit = [];
     const traffic = [];
     const avg_time = [];
     const passer_by = [];
@@ -1485,6 +1493,7 @@ export class DashboardComponent implements OnInit {
     this.data.forEach(element => {
       chart_xAxis[i] = element.time_period;
       num_to_enter[i] = Number(element.num_to_enter);
+      num_to_exit[i] = Number(element.num_to_exit);
       traffic[i] = Number(element.traffic);
       avg_time[i] = (Number(element.avg_time));
       passer_by[i] = (Number(element.passer_by));
@@ -1661,6 +1670,11 @@ export class DashboardComponent implements OnInit {
           name: this.indexes.visitors, color: c_.visits, type: 'column', visible: selft.check_has_index(this.indexess.visitors),
           // tslint:disable-next-line: max-line-length
           yAxis: selft.set_position(this.indexess.visitors), data: num_to_enter, showInLegend: selft.check_has_index(this.indexess.visitors),
+        },
+        {
+          name: this.indexes.exits, color: c_.exits, type: 'column', visible: selft.check_has_index(this.indexess.exits),
+          // tslint:disable-next-line: max-line-length
+          yAxis: selft.set_position(this.indexess.exits), data: num_to_exit, showInLegend: selft.check_has_index(this.indexess.exits),
         }, {
           name: this.indexes.shoppers, color: c_.shopper_visits, type: 'column', visible: selft.check_has_index(this.indexess.shoppers),
           yAxis: selft.set_position(this.indexess.shoppers), data: shopper_visits,
@@ -1882,7 +1896,7 @@ export class DashboardComponent implements OnInit {
     // tslint:disable-next-line: max-line-length
     this.group_select.percent = [this.indexess.turn_in_rate, this.indexess.conversion_rate, this.indexess.member_visitors, this.indexess.member_transactions, this.indexess.member_conversion_rate, this.indexess.missed_member_rate, this.indexess.cx_index, this.indexess.nps_index];
     // tslint:disable-next-line: max-line-length
-    this.group_select.people = [this.indexess.passerby, this.indexess.visitors, this.indexess.shoppers, this.indexess.kids_visitors, this.indexess.traffic_flow];
+    this.group_select.people = [this.indexess.passerby, this.indexess.visitors,this.indexess.exits, this.indexess.shoppers, this.indexess.kids_visitors, this.indexess.traffic_flow];
     this.group_select.vnd1 = [this.indexess.sales_yield, this.indexess.atv, this.indexess.sales_on_sales_hour];
     this.group_select.vnd2 = [this.indexess.missed_sales_opportunity, this.indexess.sales];
     this.group_select.avg_item = [this.indexess.avg_items];
@@ -1892,7 +1906,7 @@ export class DashboardComponent implements OnInit {
   }
 
   is_column_chart_box(selected_show) {
-    if (selected_show === this.indexess.visitors || selected_show === this.indexess.traffic_flow
+    if (selected_show === this.indexess.visitors || selected_show === this.indexess.exits || selected_show === this.indexess.traffic_flow
       || selected_show === this.indexess.passerby || selected_show === this.indexess.shoppers
       || selected_show === this.indexess.kids_visitors || selected_show === this.indexess.atv
       || selected_show === this.indexess.sales_yield || selected_show === this.indexess.sales
