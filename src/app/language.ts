@@ -75,6 +75,7 @@ export const language = {
     so_luong_khach_hien_tai: 'Số lượng khách hàng tới mua sắm đến thời điểm hiện tại',
     tong_khach_vao: 'Tổng lượt khách vào',
     tong_khach_ra: 'Tổng lượt khách ra',
+    tong_khach_vao_ra: 'Tổng lượt khách vào ra',
     cau_hoi_khao_sat: 'Câu hỏi khảo sát',
     dang_dien_ra: 'Đang diễn ra',
     sap_dien_ra: 'Sắp diễn ra',

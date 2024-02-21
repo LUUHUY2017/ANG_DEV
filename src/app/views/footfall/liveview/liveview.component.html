@@ -15,19 +15,24 @@
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin-right:10px;">
                   <!-- <ng-select class="bootstrap selecttimeview below giomocua" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="open_time"></ng-select> -->
                   <ng-select class="bootstrap selecttimeview below giomocua" [items]="startTimeOption" bindLabel="label"
-                    bindValue="value" [clearable]=false [(ngModel)]="open_time"></ng-select>
+                             bindValue="value" [clearable]=false [(ngModel)]="open_time"></ng-select>
                 </div>
                 <button style="border-radius: unset !important;" type="button" class="btn btn-primary buttonview"
-                  (click)="get_live()">{{language.ap_dung}}</button>
+                        (click)="get_live()">
+                  {{language.ap_dung}}
+                </button>
               </li>
               <li>
                 <div class="btn-group float-right" dropdown>
                   <button style="border-radius: unset !important;margin-left: 10px;" dropdownToggle type="button"
-                    class="btn btn-primary dropdown-toggle float-right dis-645 buttonxuat">
-                    {{language.xuat_bao_cao}} </button>
+                          class="btn btn-primary dropdown-toggle float-right dis-645 buttonxuat">
+                    {{language.xuat_bao_cao}}
+                  </button>
                   <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
-                    <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
-                        (click)="exportExcel()">{{language.xuat_ra_excel}}</a></li>
+                    <li role="menuitem">
+                      <a style="cursor: pointer;" class="dropdown-item float-right"
+                         (click)="exportExcel()">{{language.xuat_ra_excel}}</a>
+                    </li>
                     <!-- <li role="menuitem"><a class="dropdown-item float-right" href="#">Xuất ra PDF</a></li> -->
                   </ul>
                 </div>
@@ -45,19 +50,25 @@
                 <div class="col-md-12">
                   <!-- <span><img id="" src="assets/img/avatars/live.png"></span> -->
                   <h1 id="label_now">
-              {{language.ngay_bay_gio}}</h1>
+                    {{language.ngay_bay_gio}}
+                  </h1>
                   <!-- <h4 id="">{{language.day}} {{curent_year}} {{language.thang}} {{curent_month}} {{language.nam}}  {{curent_day}} ,
                      <span style="color: orange">{{curent_hour}} {{language.gio}} {{curent_minute}} {{language.phut}}</span></h4> -->
-                     <h4 id=""> {{curent_year}}-{{curent_month}}-{{curent_day}}
-                      <span style="color: orange">{{curent_hour}}:{{curent_minute}}:{{seconds}}</span></h4>
+                  <h4 id="">
+                    {{curent_year}}-{{curent_month}}-{{curent_day}}
+                    <span style="color: orange">{{curent_hour}}:{{curent_minute}}:{{seconds}}</span>
+                  </h4>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-5">
                   <span id="1" style="font-size:60px">{{live_occupancy_data  | number:'1.0-2'}} </span>
                   <ng-template #tolTemplate>
-                    {{language.khach_hang_dang_mua_sam}}<label>{{occupancy_str_compare  | number:'1.0-2'}}
-                      {{language.so_voi_hom_qua}}</label> </ng-template>
+                    {{language.khach_hang_dang_mua_sam}}<label>
+                      {{occupancy_str_compare  | number:'1.0-2'}}
+                      {{language.so_voi_hom_qua}}
+                    </label>
+                  </ng-template>
                   <span><img id="" src="assets/img/avatars/{{ occupancy_updown }}" placement="right"></span>
                   <h6 id="">{{language.khach_hang_dang_mua_sam}}</h6>
                 </div>
@@ -74,8 +85,12 @@
               <div class="row">
                 <div class="col-md-5">
                   <span id="1" style="font-size:60px">{{live_enters_data | number:'1.0-2'}} </span>
-                  <ng-template #contentvisit><label>{{enters_str_compare | number:'1.0-2'}}
-                      {{language.so_voi_hom_qua}}</label></ng-template>
+                  <ng-template #contentvisit>
+                    <label>
+                      {{enters_str_compare | number:'1.0-2'}}
+                      {{language.so_voi_hom_qua}}
+                    </label>
+                  </ng-template>
                   <span><img id="" src="assets/img/avatars/{{enters_updown}}" placement="right"></span>
                   <h6 id=""> {{language.so_luong_khach_hien_tai}}</h6>
                 </div>
@@ -99,9 +114,6 @@
                   <div #chart_enter class="bieudo1 float-right"></div>
                 </div>
               </div> -->
-
-
-
               <!-- <div class="row">
                 <div class="col-md-6">
                   <h5 id="">Exits<br /> <span style="font-size: 80%"> Số lượng khách hàng tới mua sắm đã rời đi</span>
@@ -140,11 +152,11 @@
               <li class="khungchonthoigian">
                 <!-- <ng-select class="bootstrap selecttimeview" [options]="startTimeOption" [allowClear]="false" [(ngModel)]="start_time"></ng-select> -->
                 <ng-select class="bootstrap selecttimeview" [items]="startTimeOption" bindLabel="label"
-                  bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                           bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
                 <span>-</span>
                 <!-- <ng-select class="bootstrap selecttimeview" [options]="endTimeOption" [allowClear]="false" [(ngModel)]="end_time"></ng-select> -->
                 <ng-select class="bootstrap selecttimeview" [items]="endTimeOption" bindLabel="label" bindValue="value"
-                  [clearable]=false [(ngModel)]="end_time"></ng-select>
+                           [clearable]=false [(ngModel)]="end_time"></ng-select>
 
               </li>
               <li style="padding-left: 5px;" class="cotthoigian">
@@ -155,9 +167,11 @@
               <li>
                 <!-- <ng-select class="bootstrap selectTimePriod" [options]="timePriodOption" [allowClear]="false" [(ngModel)]="level_traffic"></ng-select> -->
                 <ng-select class="bootstrap selectTimePriod" [items]="timePriodOption" bindLabel="label"
-                  bindValue="value" [clearable]=false [(ngModel)]="level_traffic"></ng-select>
+                           bindValue="value" [clearable]=false [(ngModel)]="level_traffic"></ng-select>
                 <button style="border-radius: unset !important;" type="button" class="btn btn-primary buttonview"
-                  (click)="getTrafficDataHistory()">{{language.xem}}</button>
+                        (click)="getTrafficDataHistory()">
+                  {{language.xem}}
+                </button>
               </li>
             </ul>
 
@@ -168,11 +182,17 @@
             <div class="col-sm-7 d-none d-md-block">
               <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
                 <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 1 ? 'box-shadown' : ''}}"
-                  (click)="ClickshowChart(1)"><img src="assets/img/avatars/linechart.jpg"></button>
+                        (click)="ClickshowChart(1)">
+                  <img src="assets/img/avatars/linechart.jpg">
+                </button>
                 <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 2 ? 'box-shadown' : ''}}"
-                  (click)="ClickshowChart(2)"><img src="assets/img/avatars/barchart.jpg"></button>
+                        (click)="ClickshowChart(2)">
+                  <img src="assets/img/avatars/barchart.jpg">
+                </button>
                 <button type="button" class="btn btn-outline-secondary btnchart {{showChart == 3 ? 'box-shadown' : ''}}"
-                  (click)="ClickshowChart(3)"><img src="assets/img/avatars/tblchart.jpg"></button>
+                        (click)="ClickshowChart(3)">
+                  <img src="assets/img/avatars/tblchart.jpg">
+                </button>
               </div>
             </div>
           </div>
@@ -188,30 +208,41 @@
               <div #container_historyColumnChart [hidden]="showChart == 1 || showChart == 3 || show_error == true">
               </div>
               <div style="margin-bottom: -1rem;" [hidden]="showChart == 1 || showChart == 2 || show_error == true"
-                class="table-responsive">
+                   class="table-responsive">
                 <table style="width: 100%;min-width: 900px;" [mfData]="data_history" #mf="mfDataTable"
-                  [mfRowsOnPage]="20" id="table" class="table table-striped">
+                       [mfRowsOnPage]="20" id="table" class="table table-striped">
                   <thead>
                     <tr>
                       <th style="min-width:250px"></th>
                       <th style="min-width:250px"> {{language_index_vn.Visitors}}</th>
                       <th style="min-width:250px">{{language_index_vn.Exits}}</th>
+                      <th style="min-width:250px">{{language_index_vn.Traffic}}</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td></td>
-                      <td><b>{{total_visit | number:'1.0-2'}}</b> <br><span
-                          class="spancell">{{language.tong_khach_vao}}</span> </td>
-                      <td><b>{{total_exit | number:'1.0-2'}}</b><br><span
-                          class="spancell">{{language.tong_khach_ra}}</span></td>
+                      <td>
+                        <b>{{total_visit | number:'1.0-2'}}</b> <br><span class="spancell">{{language.tong_khach_vao}}</span>
+                      </td>
+                      <td>
+                        <b>{{total_exit | number:'1.0-2'}}</b><br><span class="spancell">{{language.tong_khach_ra}}</span>
+                      </td>
+                      <td>
+                        <b>{{total_traffic | number:'1.0-2'}}</b><br><span class="spancell">{{language.tong_khach_vao_ra}}</span>
+                      </td>
                     </tr>
                     <tr *ngFor="let item of mf.data">
                       <td>{{item.time_period}}</td>
-                      <td>{{item.num_to_enter | number:'1.0-2'}} <span
-                          class="spancell">({{Go_number(item.num_to_enter,total_visit)}}%)</span></td>
-                      <td>{{item.num_to_exit | number:'1.0-2'}} <span
-                          class="spancell">({{Go_number(item.num_to_enter,total_visit)}}%) </span></td>
+                      <td>
+                        {{item.num_to_enter | number:'1.0-2'}} <span class="spancell">({{Go_number(item.num_to_enter,total_visit)}}%)</span>
+                      </td>
+                      <td>
+                        {{item.num_to_exit | number:'1.0-2'}} <span class="spancell">({{Go_number(item.num_to_exit,total_visit)}}%) </span>
+                      </td>
+                      <td>
+                        {{item.traffic | number:'1.0-2'}}  
+                      </td>
                     </tr>
                   </tbody>
                   <tfoot class="heatmap_table-tfoot">
@@ -227,12 +258,13 @@
                 <div class="show_info_error">
                   <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
                   {{language.vui_long}}<a (click)="get_data();"
-                    style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                                          style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
                 </div>
               </ng-container>
             </div>
           </div>
-          <div id="divbaocao" style="float: right; font-size: 11px"> {{language.bao_cao_duoc_tao}}
+          <div id="divbaocao" style="float: right; font-size: 11px">
+            {{language.bao_cao_duoc_tao}}
             {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
             {{time_generate_report | date: 'hh:mm:ss'}} -
             <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
@@ -250,8 +282,11 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
-        {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+    <p>
+      {{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+        {{language.bam_vao_day}}
+      </a> {{language.de_tai_lai}}
+    </p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>

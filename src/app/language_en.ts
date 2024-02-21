@@ -79,6 +79,7 @@ export const language_en = {
     // tong_khach_ra: 'Total Out',
     tong_khach_vao: 'Total In',
     tong_khach_ra: 'Total Out',
+    tong_khach_vao_ra: 'Total In Out',
     cau_hoi_khao_sat: 'Survey question',
     dang_dien_ra: 'Ongoing',
     sap_dien_ra: 'Upcoming',
