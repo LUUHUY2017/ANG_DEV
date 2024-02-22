@@ -181,10 +181,9 @@ export class FootfallVisitsComponent implements OnInit {
           } else {
             const defaultOrgId = param.organization_arr.length > 0 ? param.organization_arr[0].value : 6;
             para = this.set_default(defaultOrgId);
-            // para = this.set_default();
           }
-          if (!environment.production) {
-          }
+
+        
           this.time_period_array = param.fba_time_period_metrics;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;

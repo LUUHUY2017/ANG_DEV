@@ -31,33 +31,37 @@
               <div class="row">
                 <ul id="headmapmenu_2">
                   <li>
-                     <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
-                      bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select> 
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                               bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
                   </li>
                   <li>
                     <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
                       <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
                       <span style="padding: 4px 0;">-</span>
                       <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
                     </div>
                     <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
-                      (click)="submitChange()">
+                            (click)="submitChange()">
                       {{language.ap_dung}}
                     </button>
                   </li>
                   <li>
                     <div>
                       <div class="btn-group float-right" dropdown>
-                        <button  type="button"  (click) ="showPopupRegister()"  class="btn btn-primary float-right btnnhanbaocao  "> {{language.nhan_bao_cao}} </button>
+                        <button type="button" (click)="showPopupRegister()" class="btn btn-primary float-right btnnhanbaocao  "> {{language.nhan_bao_cao}} </button>
                         <button dropdownToggle type="button"
-                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                                class="btn btn-primary dropdown-toggle float-right btnxuat">
+                          {{language.xuat}}
+                        </button>
                         <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
                           <!-- <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
                                 (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li> -->
-                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
-                              (click)="export_xls('customer-daily')">{{language.xuat_ra_excel}}</a> </li>
+                          <li role="menuitem">
+                            <a style="cursor: pointer;" class="dropdown-item float-right"
+                               (click)="export_xls('customer-daily')">{{language.xuat_ra_excel}}</a>
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -102,8 +106,10 @@
               <!-- style="border-top:1px dotted #a7a4a4" -->
               <ng-container *ngIf="!show_error">
                 <div class="row">
-                  <h5 style="text-align: center;width: 100%;font-weight: bold;"> {{language.Bao_cao_khach_hang_nam}}
-                    {{style_start_date | date:  'yyyy'}} </h5>
+                  <h5 style="text-align: center;width: 100%;font-weight: bold;">
+                    {{language.Bao_cao_khach_hang_nam}}
+                    {{style_start_date | date:  'yyyy'}}
+                  </h5>
                 </div>
                 <div class="row">
                   <div class="table-responsive ">
@@ -133,7 +139,7 @@
                               {{item.site_name}}
                             </th>
                           </ng-container>
-                          <th rowspan="3" style="text-align: center;vertical-align: inherit; width:80px" ">
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit; width:80px">
                             {{language.Subtotal}}
                           </th>
                         </tr>
@@ -208,7 +214,7 @@
                 <div class="show_info_error">
                   <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
                   {{language.vui_long}}<a (click)="get_data();"
-                    style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                                          style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
                 </div>
               </ng-container>
             </div>
@@ -216,7 +222,8 @@
         </div>
       </div>
     </div>
-    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+    <div id="divbaocao" style="float: right; font-size: 11px">
+      {{language.bao_cao_duoc_tao}}
       {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
       {{time_generate_report | date: 'hh:mm:ss'}} -
       <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
@@ -232,8 +239,11 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
-        {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+    <p>
+      {{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+        {{language.bam_vao_day}}
+      </a> {{language.de_tai_lai}}
+    </p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>
@@ -241,4 +251,4 @@
 </ng-template>
 <notifier-container></notifier-container>
 <app-storereportingschedule (childrenEvent)="sendParamToChildren()" [pageId]="page_id"
-  [defaultModule]="defaultModule"></app-storereportingschedule>
+                            [defaultModule]="defaultModule"></app-storereportingschedule>

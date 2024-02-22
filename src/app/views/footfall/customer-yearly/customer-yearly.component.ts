@@ -196,19 +196,9 @@ export class FootfallCustomerYearlyComponent implements OnInit {
         }
         try {
           let para = null;
-          if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
-            para = param.user_page_parametter;
-          } else {
-            const defaultOrgId = param.organization_arr.length > 0 ? param.organization_arr[0].value : 6;
-            para = this.set_default(defaultOrgId);
-          }
 
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
-
-          if (!environment.production) {
-            console.warn('this.indexOption', this.indexOption);
-          }
 
           this.indexes = param.list_index;
           this.indexess = param.list_index_value;
@@ -216,9 +206,17 @@ export class FootfallCustomerYearlyComponent implements OnInit {
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
           this.endTimeOption = param.end_time_list;
+         
+
+          if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
+            para = param.user_page_parametter;
+          } else {
+            const defaultOrgId = param.organization_arr.length > 0 ? param.organization_arr[0].value : 6;
+            para = this.set_default(defaultOrgId);
+          }
+
           this.organization_id = para.organization_id;
           this.indexOptionSelected = para.indexOptionSelected;
-
           if ('site_id' in para) {
             this.site_id = para.site_id;
           }

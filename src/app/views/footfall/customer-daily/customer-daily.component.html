@@ -96,18 +96,21 @@
                           <th rowspan="3" style="text-align: center;vertical-align: inherit;width:80px">
                             {{language.Time}}
                           </th>
+
                           <th rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
                             {{language.FLOOR}}
                           </th>
+
                           <ng-container *ngFor="let item of parent_store; let i = index">
                             <th style="text-align: center;vertical-align: inherit;width:80px"
                                 [attr.colspan]="item.number">
                               {{item.site_name}}
                             </th>
                           </ng-container>
-                          <th rowspan="3" style="text-align: center;vertical-align: inherit; width:80px" ">
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit; width:80px" >
                             {{language.Subtotal}}
                           </th>
+
                         </tr>
                         <tr role="row">
                           <ng-container *ngFor="let item of chilld_store">

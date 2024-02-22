@@ -181,13 +181,10 @@ export class FootfallCustomerEntranceComponent implements OnInit {
         try {
           let para = null;
           this.indexOption = param.traffic_index;
+          this.indexes = param.list_index;
+          this.indexess = param.list_index_value;
 
-          if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
-            para = param.user_page_parametter;
-          } else {
-            const defaultOrgId = param.organization_arr.length > 0 ? param.organization_arr[0].value : 6;
-            para = this.set_default(defaultOrgId);
-          }
+
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
@@ -195,14 +192,18 @@ export class FootfallCustomerEntranceComponent implements OnInit {
             console.warn('this.indexOption', this.indexOption);
           }
 
-          this.indexes = param.list_index;
-          this.indexess = param.list_index_value;
-
-
           this.time_period_array = param.fba_time_period_metrics;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
           this.endTimeOption = param.end_time_list;
+
+          if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
+            para = param.user_page_parametter;
+          } else {
+            const defaultOrgId = param.organization_arr.length > 0 ? param.organization_arr[0].value : 6;
+            para = this.set_default(defaultOrgId);
+          }
+
           this.organization_id = para.organization_id;
           this.indexOptionSelected = para.indexOptionSelected;
           if ('list_site_id' in para) {

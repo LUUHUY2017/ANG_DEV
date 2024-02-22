@@ -206,6 +206,22 @@ export class FootfallCustomerDailyComponent implements OnInit {
         }
         try {
           let para = null;
+
+          this.indexOption = param.traffic_index.filter((e) =>
+            e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
+
+          if (!environment.production) {
+            console.warn('this.indexOption2', this.indexOption);
+          }
+
+          this.indexes = param.list_index;
+          this.indexess = param.list_index_value;
+          this.save_session = param.save_session;
+          this.organization_array = param.organization_arr;
+          this.startTimeOption = param.start_time_list;
+          this.endTimeOption = param.end_time_list;
+     
+        
           if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
             para = param.user_page_parametter;
           } else {
@@ -213,24 +229,8 @@ export class FootfallCustomerDailyComponent implements OnInit {
             para = this.set_default(defaultOrgId);
           }
 
-          this.indexOption = param.traffic_index.filter((e) =>
-            e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
-
-          if (!environment.production) {
-            console.warn('this.indexOption', this.indexOption);
-          }
-
-
-          this.indexes = param.list_index;
-          this.indexess = param.list_index_value;
-
-          this.save_session = param.save_session;
-          this.organization_array = param.organization_arr;
-          this.startTimeOption = param.start_time_list;
-          this.endTimeOption = param.end_time_list;
           this.organization_id = para.organization_id;
           this.indexOptionSelected = para.indexOptionSelected;
-
 
           if ('site_id' in para) {
             this.site_id = para.site_id;
@@ -272,6 +272,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
   set_default(defaultOrgId: any) {
     const organization_id = this.userinfo.organization_id === '0' ? defaultOrgId : Number(this.userinfo.organization_id);
     const value_index = this.indexOption[0].value;
+   
     return {
       organization_id: organization_id
       // , site_id: 0
@@ -283,6 +284,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
       , indexOptionSelected: value_index
 
     };
+   
   }
 
   Go_number(number, total) {
