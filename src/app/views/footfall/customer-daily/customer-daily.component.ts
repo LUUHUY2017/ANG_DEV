@@ -332,7 +332,6 @@ export class FootfallCustomerDailyComponent implements OnInit {
           this.reset_to_zero('total_num_to_enter', 'total_num_to_exit', 'avg_traffic');
           this.reset__array_to_null('duLieuChiTiet', 'duLieuTongVaoCacCua', 'duLieuTongRaCacCua', 'duLieuTrungBinhCacCua', 'duLieuThuTuCacCua', 'duLieuTongVaoRaCacCua', 'duLieuTongChung');
 
-
           // try {
           this.total_ins = 0;
           this.data.forEach(element => {
