@@ -83,7 +83,15 @@
                   <div class="table-responsive ">
                     <table id="customer-daily" style="min-width:950px; " class="table  table-bordered table-striped table-visit text-nowrap">
                       <thead>
-                        <!-- Time -->
+                        <tr role="row">
+                          <th  [attr.colspan]="colspanAll"  hidden style="text-align: center;vertical-align: inherit;width:80px">
+                            <h5 style="text-align: center;width: 100%;font-weight: bold;">
+                              {{language.Bao_cao_khach_hang_ngay}}
+                              {{style_start_date | date: 'dd'}}/{{style_start_date | date: 'MM'}}/{{style_start_date | date:  'yyyy'}}
+                            </h5>
+                          </th>
+                        </tr>
+
                         <tr role="row">
                           <th rowspan="3" style="text-align: center;vertical-align: inherit;width:80px">
                             {{language.Time}}
@@ -116,76 +124,52 @@
                       </thead>
 
 
-
                       <tbody>
                         <!-- Total -->
                         <tr role="row">
-                          <td rowspan="2" style="text-align: center;vertical-align: inherit;font-weight: bold">
+                          <td rowspan="1" style="text-align: center;vertical-align: inherit;font-weight: bold">
                             {{language.ToTal}}
                           </td>
+
                           <td style="text-align: center;vertical-align: inherit;font-weight: bold">
-                            {{language.In}}
+                            {{indexCheckedShow}}
                           </td>
 
-                          <ng-container *ngFor="let item of duLieuTongVaoCacCua">
+                          <ng-container *ngFor="let item of duLieuTongChung">
                             <td style="text-align: center;vertical-align: inherit">
                               {{item ? (item | number: "1.0-2") : '_'}}
                             </td>
                           </ng-container>
-                        </tr>
-                        <tr role="row">
-                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">
-                            {{language.Out}}
-                          </td>
-                          <ng-container *ngFor="let item of duLieuTongRaCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}}
-                            </td>
-                          </ng-container>
-                        </tr>
 
-                        <!-- Average of In and Out -->
-                        <tr style="font-weight: bold" role="row">
-                          <td colspan="2" style="text-align: left;vertical-align: inherit; ">
-                            {{language.Average_of_In_and_Out}}
-                          </td>
-                          <ng-container *ngFor="let item of duLieuTrungBinhCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}}
-                            </td>
-                          </ng-container>
                         </tr>
 
                         <!-- Rank of In and Out -->
                         <tr role="row">
                           <td colspan="2" style="text-align: left;vertical-align: inherit;font-weight: bold">
-                            {{language.Rank_of_In_and_Out}}
+                            {{language.Rank}}
                           </td>
+
                           <ng-container *ngFor="let item of duLieuThuTuCacCua">
                             <td style="text-align: center;vertical-align: inherit">
                               {{item ? (item | number: "1.0-2") : '_'}}
                             </td>
                           </ng-container>
+
                           <td style="text-align: center;vertical-align: inherit"></td>
                         </tr>
 
                         <ng-container *ngFor="let item of duLieuChiTiet">
                           <tr role="row">
-                            <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
+                            <td rowspan="1" style="text-align: center;vertical-align: inherit;width:80px">
                               {{item.time_period}}
                             </td>
-                            <td style="text-align: center;vertical-align: inherit">{{language.In}} </td>
-                            <ng-container *ngFor="let in of item.ins">
-                              <td style="text-align: center;vertical-align: inherit">{{in ? in  : '_'}}</td>
-                            </ng-container>
-                          </tr>
-                          <tr role="row">
 
-                            <td style="text-align: center;vertical-align: inherit">{{language.Out}} </td>
-                            <ng-container *ngFor="let out of item.outs">
-                              <td style="text-align: center;vertical-align: inherit">{{out ? out  : '_'}}</td>
+                            <td style="text-align: center;vertical-align: inherit">{{indexCheckedShow}} </td>
+                            <ng-container *ngFor="let e of item.numbers">
+                              <td style="text-align: center;vertical-align: inherit">{{e ? e  : '_'}}</td>
                             </ng-container>
                           </tr>
+
                         </ng-container>
 
                       </tbody>
@@ -193,10 +177,6 @@
                   </div>
                 </div>
               </ng-container>
-
-
-
-
 
 
               <ng-container *ngIf="show_error">
