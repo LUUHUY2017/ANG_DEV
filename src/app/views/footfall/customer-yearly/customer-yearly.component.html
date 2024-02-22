@@ -108,20 +108,33 @@
                 <div class="row">
                   <div class="table-responsive ">
                     <table id="customer-daily" style="min-width:950px; "
-                      class="table  table-bordered table-striped table-visit text-nowrap">
+                           class="table  table-bordered table-striped table-visit text-nowrap">
                       <thead>
+                        <tr role="row">
+                          <th [attr.colspan]="colspanAll" hidden style="text-align: center;vertical-align: inherit;width:80px">
+                            <h5 style="text-align: center;width: 100%;font-weight: bold;">
+                              {{language.Bao_cao_khach_hang_nam}}
+                              {{style_start_date | date:  'yyyy'}}
+                            </h5>
+                          </th>
+                        </tr>
+
                         <!-- Time -->
                         <tr role="row">
                           <th rowspan="3" style="text-align: center;vertical-align: inherit;width:80px">
-                            {{language.Month}}</th>
+                            {{language.Month}}
+                          </th>
                           <th rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
-                            {{language.FLOOR}}</th>
+                            {{language.FLOOR}}
+                          </th>
 
                           <ng-container *ngFor="let item of parent_store">
-                            <th [attr.colspan]="item.number" style="text-align: center;width:80px">{{item.site_name}}
+                            <th [attr.colspan]="item.number" style="text-align: center;width:80px">
+                              {{item.site_name}}
                             </th>
                           </ng-container>
-                          <th rowspan="3" style="text-align: center;vertical-align: inherit; "> {{language.Subtotal}}
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit; ">
+                            {{language.Subtotal}}
                           </th>
                         </tr>
                         <tr role="row">
@@ -140,62 +153,49 @@
                       <tbody>
                         <!-- Total -->
                         <tr role="row">
-                          <td rowspan="2" style="text-align: center;vertical-align: inherit;font-weight: bold">
+                          <td rowspan="1" style="text-align: center;vertical-align: inherit;font-weight: bold">
                             {{language.ToTal}}
                           </td>
-                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">{{language.In}}</td>
 
-                          <ng-container *ngFor="let item of duLieuTongVaoCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
-                          </ng-container>
-                        </tr>
-                        <tr role="row">
-                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">{{language.Out}}</td>
-                          <ng-container *ngFor="let item of duLieuTongRaCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
-                          </ng-container>
-                        </tr>
+                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">
+                            {{indexCheckedShow}}
+                          </td>
 
-                        <!-- Average of In and Out -->
-                        <tr style="font-weight: bold" role="row">
-                          <td colspan="2" style="text-align: left;vertical-align: inherit; ">
-                            {{language.Average_of_In_and_Out}} </td>
-                          <ng-container *ngFor="let item of duLieuTrungBinhCacCua">
+                          <ng-container *ngFor="let item of duLieuTongChung">
                             <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
+                              {{item ? (item | number: "1.0-2") : '_'}}
+                            </td>
                           </ng-container>
+
                         </tr>
 
                         <!-- Rank of In and Out -->
                         <tr role="row">
                           <td colspan="2" style="text-align: left;vertical-align: inherit;font-weight: bold">
-                            {{language.Rank_of_In_and_Out}} </td>
+                            {{language.Rank}}
+                          </td>
+
                           <ng-container *ngFor="let item of duLieuThuTuCacCua">
                             <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
+                              {{item ? (item | number: "1.0-2") : '_'}}
+                            </td>
                           </ng-container>
+
                           <td style="text-align: center;vertical-align: inherit"></td>
                         </tr>
 
                         <ng-container *ngFor="let item of duLieuChiTiet">
                           <tr role="row">
-                            <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
-                              {{chuyen_so_sang_ten_thang(item.time_period)}}
+                            <td rowspan="1" style="text-align: center;vertical-align: inherit;width:80px">
+                              {{item.time_period}}
                             </td>
-                            <td style="text-align: center;vertical-align: inherit">{{language.In}}</td>
-                            <ng-container *ngFor="let in of item.ins">
-                              <td style="text-align: center;vertical-align: inherit">{{in ? in  : '_'}}</td>
-                            </ng-container>
-                          </tr>
-                          <tr role="row">
 
-                            <td style="text-align: center;vertical-align: inherit">{{language.Out}}</td>
-                            <ng-container *ngFor="let out of item.outs">
-                              <td style="text-align: center;vertical-align: inherit">{{out ? out  : '_'}}</td>
+                            <td style="text-align: center;vertical-align: inherit">{{indexCheckedShow}} </td>
+                            <ng-container *ngFor="let e of item.numbers">
+                              <td style="text-align: center;vertical-align: inherit">{{e ? e  : '_'}}</td>
                             </ng-container>
                           </tr>
+
                         </ng-container>
 
                       </tbody>

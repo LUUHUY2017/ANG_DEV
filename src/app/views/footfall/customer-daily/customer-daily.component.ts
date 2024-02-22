@@ -224,7 +224,6 @@ export class FootfallCustomerDailyComponent implements OnInit {
           this.indexes = param.list_index;
           this.indexess = param.list_index_value;
 
-
           this.save_session = param.save_session;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;

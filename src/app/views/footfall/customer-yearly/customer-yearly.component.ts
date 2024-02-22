@@ -66,11 +66,16 @@ export class FootfallCustomerYearlyComponent implements OnInit {
   menu_tree: any;
   parent_store: any;
   data: any;
+
   duLieuChiTiet: any[] = [];
   duLieuTongVaoCacCua: any[] = [];
   duLieuTongRaCacCua: any[] = [];
   duLieuTrungBinhCacCua: any[] = [];
   duLieuThuTuCacCua: any[] = [];
+  duLieuTongVaoRaCacCua: any[] = [];
+  duLieuTongChung: any[] = [];
+
+
   show_label_table: string;
   btnApplyValid = false;
   indexOption: Array<IOption>;
@@ -92,17 +97,20 @@ export class FootfallCustomerYearlyComponent implements OnInit {
   total_turn_rate = 0; total_seconds = 0;
   type: string;
   checked: boolean;
-  indexes: any; index_viewby = 1; show_error = false;
+  indexes: any; indexess: any; index_viewby = 1; show_error = false;
   public modalRef: BsModalRef;
   type_language = JSON.parse(localStorage.getItem(environment.language));
   chilld_store: any;
+  indexCheckedShow: string;
+  colspanAll = 3;
+
   constructor(private router: Router,
     private appservice: AppService,
     private modalService: BsModalService
     , notifierService: NotifierService) {
     this.notifier = notifierService;
     this.type_language === 'vn' ? this.language = language : this.language = language_en;
-    this.indexes = indexes;
+    this.indexes = this.indexess = indexes;
   }
   url_api = environment.apiUrl + 'exports/';
   name_of_excel: any; language: any;
@@ -202,7 +210,8 @@ export class FootfallCustomerYearlyComponent implements OnInit {
             console.warn('this.indexOption', this.indexOption);
           }
 
-
+          this.indexes = param.list_index;
+          this.indexess = param.list_index_value;
 
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
@@ -312,75 +321,132 @@ export class FootfallCustomerYearlyComponent implements OnInit {
         try {
           this.data = res; // data cho bảng
           if (!environment.production) {
-            console.log('this.data', this.data);
+            console.warn('this.data', this.data);
           }
           this.reset_to_zero('total_num_to_enter', 'total_num_to_exit', 'avg_traffic');
-          // tslint:disable-next-line: max-line-length
-          this.reset__array_to_null('duLieuChiTiet', 'duLieuTongVaoCacCua', 'duLieuTongRaCacCua', 'duLieuTrungBinhCacCua', 'duLieuThuTuCacCua');
+          this.reset__array_to_null('duLieuChiTiet', 'duLieuTongVaoCacCua', 'duLieuTongRaCacCua', 'duLieuTrungBinhCacCua', 'duLieuThuTuCacCua', 'duLieuTongVaoRaCacCua', 'duLieuTongChung');
+
+
           // try {
           this.total_ins = 0;
           this.data.forEach(element => {
-
             let item = this.duLieuChiTiet.find(o => o.time_period === element.time_period);
             if (item === undefined) {
+
               const ins = new Array(this.chilld_store.length + 1);
               for (let i = 0; i < ins.length; i++) {
                 ins[i] = null;
               }
+
               const outs = new Array(this.chilld_store.length + 1);
               for (let i = 0; i < outs.length; i++) {
                 outs[i] = null;
               }
+
+              const traffics = new Array(this.chilld_store.length + 1);
+              for (let i = 0; i < traffics.length; i++) {
+                traffics[i] = null;
+              }
+
+
+              const numbers = new Array(this.chilld_store.length + 1);
+              for (let i = 0; i < numbers.length; i++) {
+                numbers[i] = null;
+              }
+
               item = {
                 'time_period': element.time_period,
                 'ins': ins,
                 'outs': outs,
+                'traffics': traffics,
+                'numbers': numbers,
               };
               this.duLieuChiTiet.push(item);
             }
+
+
             for (const i in this.chilld_store) {
               if (this.chilld_store[i].id === element.site_id) {
+
                 item.ins[i] = element.num_to_enter;
                 if (element.num_to_enter !== null) {
                   if (item.ins[this.chilld_store.length] !== null) {
-                    // tslint:disable-next-line: max-line-length
                     item.ins[this.chilld_store.length] = Number(item.ins[this.chilld_store.length]) + Number(element.num_to_enter);
                   } else {
                     item.ins[this.chilld_store.length] = Number(element.num_to_enter);
                   }
                 }
+
                 item.outs[i] = element.num_to_exit;
                 if (element.num_to_exit !== null) {
                   if (item.outs[this.chilld_store.length] !== null) {
-                    // tslint:disable-next-line: max-line-length
                     item.outs[this.chilld_store.length] = Number(item.outs[this.chilld_store.length]) + Number(element.num_to_exit);
                   } else {
                     item.outs[this.chilld_store.length] = Number(element.num_to_exit);
                   }
                 }
+
+
+
+                item.traffics[i] = element.traffic;
+                if (element.traffic !== null) {
+                  if (item.traffics[this.chilld_store.length] !== null) {
+                    item.traffics[this.chilld_store.length] = Number(item.traffics[this.chilld_store.length]) + Number(element.traffic);
+                  } else {
+                    item.traffics[this.chilld_store.length] = Number(element.traffic);
+                  }
+                }
+
+                if (this.indexOptionSelected == this.indexess.visitors) {
+                  item.numbers = item.ins;
+                  this.indexCheckedShow = language.In;
+                } else if (this.indexOptionSelected == this.indexess.exits) {
+                  item.numbers = item.outs;
+                  this.indexCheckedShow = language.Out;
+                }
+                else if (this.indexOptionSelected == this.indexess.traffic_flow) {
+                  item.numbers = item.traffics;
+                  this.indexCheckedShow = language.InOut;
+                }
+
+
               }
             }
-
-
           });
+
 
           this.duLieuTongVaoCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTongVaoCacCua.length; i++) {
             this.duLieuTongVaoCacCua[i] = null;
           }
+
           this.duLieuTongRaCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTongRaCacCua.length; i++) {
             this.duLieuTongRaCacCua[i] = null;
           }
+
           this.duLieuTrungBinhCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
             this.duLieuTrungBinhCacCua[i] = null;
           }
+
           this.duLieuThuTuCacCua = new Array(this.chilld_store.length);
           for (let i = 0; i < this.duLieuThuTuCacCua.length; i++) {
             this.duLieuThuTuCacCua[i] = null;
           }
-          // tslint:disable-next-line: forin
+
+          this.duLieuTongVaoRaCacCua = new Array(this.chilld_store.length);
+          for (let i = 0; i < this.duLieuTongVaoRaCacCua.length; i++) {
+            this.duLieuTongVaoRaCacCua[i] = null;
+          }
+
+
+          this.duLieuTongChung = new Array(this.chilld_store.length);
+          for (let i = 0; i < this.duLieuTongChung.length; i++) {
+            this.duLieuTongChung[i] = null;
+          }
+
+
           for (let i = 0; i < this.duLieuTongVaoCacCua.length; i++) {
             this.duLieuChiTiet.forEach(element => {
               if (element.ins[i] !== null) {
@@ -393,10 +459,10 @@ export class FootfallCustomerYearlyComponent implements OnInit {
             });
           }
 
-          // tslint:disable-next-line: forin
+
           for (let i = 0; i < this.duLieuTongRaCacCua.length; i++) {
             this.duLieuChiTiet.forEach(element => {
-              if (element.ins[i] !== null) {
+              if (element.outs[i] !== null) {
                 if (this.duLieuTongRaCacCua[i] === null) {
                   this.duLieuTongRaCacCua[i] = Number(element.outs[i]);
                 } else {
@@ -406,8 +472,32 @@ export class FootfallCustomerYearlyComponent implements OnInit {
             });
           }
 
-          for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
 
+          for (let i = 0; i < this.duLieuTongVaoRaCacCua.length; i++) {
+            this.duLieuChiTiet.forEach(element => {
+              if (element.traffics[i] !== null) {
+                if (this.duLieuTongVaoRaCacCua[i] === null) {
+                  this.duLieuTongVaoRaCacCua[i] = Number(element.traffics[i]);
+                } else {
+                  this.duLieuTongVaoRaCacCua[i] = Number(this.duLieuTongVaoRaCacCua[i]) + Number(element.traffics[i]);
+                }
+              }
+            });
+          }
+
+          if (this.indexOptionSelected == this.indexess.visitors) {
+            this.duLieuTongChung = this.duLieuTongVaoCacCua;
+          } else if (this.indexOptionSelected == this.indexess.exits) {
+            this.duLieuTongChung = this.duLieuTongRaCacCua;
+          }
+          else if (this.indexOptionSelected == this.indexess.traffic_flow) {
+            this.duLieuTongChung = this.duLieuTongVaoRaCacCua;
+          }
+
+
+
+
+          for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
             let tt;
             if (this.duLieuTongVaoCacCua[i] !== null) {
               tt = Number(this.duLieuTongVaoCacCua[i]);
@@ -425,7 +515,6 @@ export class FootfallCustomerYearlyComponent implements OnInit {
             }
           }
 
-
           const duLieuTrungBinhCacCuaTG = new Array();
           for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
             if (this.duLieuTrungBinhCacCua[i] !== null) {
@@ -435,8 +524,8 @@ export class FootfallCustomerYearlyComponent implements OnInit {
               }
             }
           }
-          duLieuTrungBinhCacCuaTG.sort(function (a, b) { return b - a; });
 
+          duLieuTrungBinhCacCuaTG.sort(function (a, b) { return b - a; });
           for (let i = 0; i < this.duLieuTrungBinhCacCua.length - 1; i++) {
             if (this.duLieuTrungBinhCacCua[i] !== null) {
               const index = duLieuTrungBinhCacCuaTG.findIndex(o => o === this.duLieuTrungBinhCacCua[i]);
@@ -445,14 +534,26 @@ export class FootfallCustomerYearlyComponent implements OnInit {
               }
             }
           }
+
+
+          if (this.parent_store.length > 0) {
+            this.parent_store.forEach(e => {
+              this.colspanAll += e.number;
+            });
+          }
+
+
+
           if (!environment.production) {
-            console.log('duLieuTrungBinhCacCuaTG', duLieuTrungBinhCacCuaTG);
-            console.log('this.duLieuTongVaoCacCua', this.duLieuTongVaoCacCua);
-            console.log('this.duLieuTongRaCacCua', this.duLieuTongRaCacCua);
-            console.log('this.duLieuTrungBinhCacCua', this.duLieuTrungBinhCacCua);
+            console.warn('duLieuChiTiet', this.duLieuChiTiet);
+            console.warn('duLieuTrungBinhCacCuaTG', duLieuTrungBinhCacCuaTG);
+            console.warn('this.duLieuTongVaoCacCua', this.duLieuTongVaoCacCua);
+            console.warn('this.duLieuTongRaCacCua', this.duLieuTongRaCacCua);
+            console.warn('this.duLieuTongVaRaCacCua', this.duLieuTongVaoRaCacCua);
+            console.warn('this.duLieuTrungBinhCacCua', this.duLieuTrungBinhCacCua);
           }
           // } catch (error) {
-          //     console.log('ôi lỗi', error);
+          //     console.warn('ôi lỗi', error);
           // }
 
           this.starttime = this.startTimeOption.find(item => item.value === this.start_time).label;
@@ -465,6 +566,8 @@ export class FootfallCustomerYearlyComponent implements OnInit {
             this.blockUI.stop();
           }
           this.appservice.save_user_page_parametter(this.page_id, JSON.stringify(data));
+
+
         } catch (error) {
           this.blockUI.stop();
         }
