@@ -29,33 +29,37 @@
               <div class="row">
                 <ul id="headmapmenu_2">
                   <li>
-                     <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
-                      bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select> 
+                    <ng-select class="bootstrap selecttimeview select-visits" [items]="indexOption" bindLabel="label"
+                               bindValue="value" [clearable]=false [(ngModel)]="indexOptionSelected"></ng-select>
                   </li>
                   <li>
                     <div class="btn-group btn-group-toggle ml" data-toggle="buttons">
                       <ng-select class="bootstrap selecttimeview starttime" [items]="startTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="start_time"></ng-select>
                       <span style="padding: 4px 0;">-</span>
                       <ng-select class="bootstrap selecttimeview endtime" [items]="endTimeOption" bindLabel="label"
-                        bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
+                                 bindValue="value" [clearable]=false [(ngModel)]="end_time"></ng-select>
                     </div>
                     <button type="button" class="btn btn-primary btnapdung" [disabled]="btnApplyValid"
-                      (click)="submitChange()">
+                            (click)="submitChange()">
                       {{language.ap_dung}}
                     </button>
                   </li>
                   <li>
                     <div>
                       <div class="btn-group float-right" dropdown>
-                        <button  type="button"  (click) ="showPopupRegister()"  class="btn btn-primary float-right btnnhanbaocao  "> {{language.nhan_bao_cao}} </button>
+                        <button type="button" (click)="showPopupRegister()" class="btn btn-primary float-right btnnhanbaocao  "> {{language.nhan_bao_cao}} </button>
                         <button dropdownToggle type="button"
-                          class="btn btn-primary dropdown-toggle float-right btnxuat"> {{language.xuat}} </button>
+                                class="btn btn-primary dropdown-toggle float-right btnxuat">
+                          {{language.xuat}}
+                        </button>
                         <ul *dropdownMenu class="dropdown-menu float-right" role="menu">
                           <!-- <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
                                   (click)="exportExcel()">{{language.xuat_ra_excel}}</a> </li> -->
-                          <li role="menuitem"><a style="cursor: pointer;" class="dropdown-item float-right"
-                              (click)="export_xls('customer-daily')">{{language.xuat_ra_excel}}</a> </li>
+                          <li role="menuitem">
+                            <a style="cursor: pointer;" class="dropdown-item float-right"
+                               (click)="export_xls('customer-daily')">{{language.xuat_ra_excel}}</a>
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -72,13 +76,13 @@
                   <div class="col-sm-7 d-none d-md-block">
                     <div class="btn-group btn-group-toggle float-right ml btnngaygio" data-toggle="buttons">
                       <label class="btn btn-custom btn-outline-secondary" [(ngModel)]="viewDataBy" btnRadio="Hour"
-                        (click)="get_data()">{{language.gio}}</label>
+                             (click)="get_data()">{{language.gio}}</label>
                       <label *ngIf="index_viewby >= 2" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Day" (click)="get_data()">{{language.ngay}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Day" (click)="get_data()">{{language.ngay}}</label>
                       <!-- <label *ngIf="index_viewby >= 3" class="btn btn-custom btn-outline-secondary"
                         [(ngModel)]="viewDataBy" btnRadio="Week" (click)="get_data()">{{language.tuan}}</label> -->
                       <label *ngIf="index_viewby > 4" class="btn btn-custom btn-outline-secondary"
-                        [(ngModel)]="viewDataBy" btnRadio="Month" (click)="get_data()">{{language.thang}}</label>
+                             [(ngModel)]="viewDataBy" btnRadio="Month" (click)="get_data()">{{language.thang}}</label>
                       <!-- <label *ngIf="index_viewby >= 5" class="btn btn-custom btn-outline-secondary"
                         [(ngModel)]="viewDataBy" btnRadio="Year" (click)="get_data()">{{language.nam}}</label> -->
                     </div>
@@ -101,25 +105,38 @@
               <ng-container *ngIf="!show_error">
                 <div class="row">
                   <h5 style="text-align: center;width: 100%;font-weight: bold;">
-                    {{language.Bao_cao_khach_hang_theo_loi_vao}}</h5>
+                    {{language.Bao_cao_khach_hang_theo_loi_vao}}
+                  </h5>
                 </div>
                 <div class="row">
                   <div class="table-responsive ">
                     <table id="customer-daily" style="min-width:950px; "
-                      class="table  table-bordered table-striped table-visit text-nowrap">
+                           class="table  table-bordered table-striped table-visit text-nowrap">
                       <thead>
+                        <tr role="row">
+                          <th [attr.colspan]="colspanAll" hidden style="text-align: center;vertical-align: inherit;width:80px">
+                            <h5 style="text-align: center;width: 100%;font-weight: bold;">
+                              {{language.Bao_cao_khach_hang_theo_loi_vao}}
+                            </h5>
+                          </th>
+
+                        </tr>
                         <!-- Time -->
                         <tr role="row">
                           <th rowspan="3" style="text-align: center;vertical-align: inherit;width:80px">
-                            {{language.Time}}</th>
+                            {{language.Time}}
+                          </th>
                           <th rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
-                            {{language.FLOOR}}</th>
+                            {{language.FLOOR}}
+                          </th>
 
                           <ng-container *ngFor="let item of parent_store">
-                            <th [attr.colspan]="item.number" style="text-align: center;width:80px">{{item.site_name}}
+                            <th [attr.colspan]="item.number" style="text-align: center;width:80px">
+                              {{item.site_name}}
                             </th>
                           </ng-container>
-                          <th rowspan="3" style="text-align: center;vertical-align: inherit; "> {{language.Subtotal}}
+                          <th rowspan="3" style="text-align: center;vertical-align: inherit; ">
+                            {{language.Subtotal}}
                           </th>
                         </tr>
                         <tr role="row">
@@ -135,66 +152,53 @@
                         </tr>
                         <!--End Time -->
                       </thead>
+
                       <tbody>
                         <!-- Total -->
                         <tr role="row">
-                          <td rowspan="2" style="text-align: center;vertical-align: inherit;font-weight: bold">
+                          <td rowspan="1" style="text-align: center;vertical-align: inherit;font-weight: bold">
                             {{language.ToTal}}
                           </td>
-                          <td style="text-align: center;vertical-align: inherit;font-weight: bold"> {{language.In}}</td>
 
-                          <ng-container *ngFor="let item of duLieuTongVaoCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
-                          </ng-container>
-                        </tr>
-                        <tr role="row">
-                          <td style="text-align: center;vertical-align: inherit;font-weight: bold"> {{language.Out}}
+                          <td style="text-align: center;vertical-align: inherit;font-weight: bold">
+                            {{indexCheckedShow}}
                           </td>
-                          <ng-container *ngFor="let item of duLieuTongRaCacCua">
-                            <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
-                          </ng-container>
-                        </tr>
 
-                        <!-- Average of In and Out -->
-                        <tr style="font-weight: bold" role="row">
-                          <td colspan="2" style="text-align: left;vertical-align: inherit; ">
-                            {{language.Average_of_In_and_Out}} </td>
-                          <ng-container *ngFor="let item of duLieuTrungBinhCacCua">
+                          <ng-container *ngFor="let item of duLieuTongChung">
                             <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
+                              {{item ? (item | number: "1.0-2") : '_'}}
+                            </td>
                           </ng-container>
+
                         </tr>
 
                         <!-- Rank of In and Out -->
                         <tr role="row">
                           <td colspan="2" style="text-align: left;vertical-align: inherit;font-weight: bold">
-                            {{language.Rank_of_In_and_Out}} </td>
+                            {{language.Rank}}
+                          </td>
+
                           <ng-container *ngFor="let item of duLieuThuTuCacCua">
                             <td style="text-align: center;vertical-align: inherit">
-                              {{item ? (item | number: "1.0-2") : '_'}} </td>
+                              {{item ? (item | number: "1.0-2") : '_'}}
+                            </td>
                           </ng-container>
+
                           <td style="text-align: center;vertical-align: inherit"></td>
                         </tr>
 
                         <ng-container *ngFor="let item of duLieuChiTiet">
                           <tr role="row">
-                            <td rowspan="2" style="text-align: center;vertical-align: inherit;width:80px">
-                              {{ this.viewDataBy === 'Month' ? chuyen_so_sang_ten_thang(item.time_period) :  item.time_period}}
+                            <td rowspan="1" style="text-align: center;vertical-align: inherit;width:80px">
+                              {{item.time_period}}
                             </td>
-                            <td style="text-align: center;vertical-align: inherit">{{language.In}}</td>
-                            <ng-container *ngFor="let in of item.ins">
-                              <td style="text-align: center;vertical-align: inherit">{{in ? in  : '_'}}</td>
-                            </ng-container>
-                          </tr>
-                          <tr role="row">
 
-                            <td style="text-align: center;vertical-align: inherit">{{language.Out}}</td>
-                            <ng-container *ngFor="let out of item.outs">
-                              <td style="text-align: center;vertical-align: inherit">{{out ? out  : '_'}}</td>
+                            <td style="text-align: center;vertical-align: inherit">{{indexCheckedShow}} </td>
+                            <ng-container *ngFor="let e of item.numbers">
+                              <td style="text-align: center;vertical-align: inherit">{{e ? e  : '_'}}</td>
                             </ng-container>
                           </tr>
+
                         </ng-container>
 
                       </tbody>
@@ -207,7 +211,7 @@
                 <div class="show_info_error">
                   <i class="fa fa-exclamation-triangle yellow">&nbsp;</i>{{language.khong_the_ket_noi}}.
                   {{language.vui_long}}<a (click)="get_data();"
-                    style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
+                                          style="color: #ac8e49; cursor: pointer;">&nbsp;{{language.bam_vao_day}}&nbsp;</a>{{language.de_tai_lai}}
                 </div>
               </ng-container>
             </div>
@@ -215,7 +219,8 @@
         </div>
       </div>
     </div>
-    <div id="divbaocao" style="float: right; font-size: 11px">{{language.bao_cao_duoc_tao}}
+    <div id="divbaocao" style="float: right; font-size: 11px">
+      {{language.bao_cao_duoc_tao}}
       {{time_generate_report | date:  'dd/MM/yyyy'}} {{language.luc}}
       {{time_generate_report | date: 'hh:mm:ss'}} -
       <span style="color:blue; cursor:pointer;" (click)="reset_session()">{{language.lam_moi_bao_cao}}</span>
@@ -231,8 +236,11 @@
     </button>
   </div>
   <div class="modal-body">
-    <p>{{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
-        {{language.bam_vao_day}} </a> {{language.de_tai_lai}}</p>
+    <p>
+      {{language.Co_loi_xay_ra_Vui_long_nhan}}<a style="color: blue; cursor: pointer;" (click)="reset_session()">
+        {{language.bam_vao_day}}
+      </a> {{language.de_tai_lai}}
+    </p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="reset_session()">{{language.Tai_lai}}</button>
@@ -240,4 +248,4 @@
 </ng-template>
 <notifier-container></notifier-container>
 <app-storereportingschedule (childrenEvent)="sendParamToChildren()" [pageId]="page_id"
-  [defaultModule]="defaultModule"></app-storereportingschedule>
+                            [defaultModule]="defaultModule"></app-storereportingschedule>

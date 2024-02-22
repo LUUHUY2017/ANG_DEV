@@ -20,7 +20,6 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 import { StoreReportingFFScheduleComponent } from '../../useremailmodule/footfall/storereporting/storereporting.component';
 import { NotifierService } from 'angular-notifier';
-import { isBuffer } from 'util';
 More(Highcharts);
 Tree(Highcharts);
 Heatmap(Highcharts);
@@ -63,11 +62,16 @@ export class FootfallCustomerEntranceComponent implements OnInit {
   time_period_array: any;
   menu_tree: any;
   data: any;
+
   duLieuChiTiet: any[] = [];
   duLieuTongVaoCacCua: any[] = [];
   duLieuTongRaCacCua: any[] = [];
   duLieuTrungBinhCacCua: any[] = [];
   duLieuThuTuCacCua: any[] = [];
+  duLieuTongVaoRaCacCua: any[] = [];
+  duLieuTongChung: any[] = [];
+
+
   parent_store: any;
   chilld_store: any;
   show_label_table: string;
@@ -91,10 +95,14 @@ export class FootfallCustomerEntranceComponent implements OnInit {
   total_turn_rate = 0; total_seconds = 0;
   type: string;
   checked: boolean;
-  indexes: any; index_viewby = 1; show_error = false;
+  indexes: any; indexess: any; index_viewby = 1; show_error = false;
   public modalRef: BsModalRef;
   type_language = JSON.parse(localStorage.getItem(environment.language));
   site_parent_id: any;
+  indexCheckedShow: string;
+  colspanAll = 3;
+
+
   constructor(private router: Router,
     private appservice: AppService,
     private modalService: BsModalService
@@ -186,6 +194,11 @@ export class FootfallCustomerEntranceComponent implements OnInit {
           if (!environment.production) {
             console.warn('this.indexOption', this.indexOption);
           }
+
+          this.indexes = param.list_index;
+          this.indexess = param.list_index_value;
+
+
           this.time_period_array = param.fba_time_period_metrics;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
@@ -314,64 +327,121 @@ export class FootfallCustomerEntranceComponent implements OnInit {
 
             let item = this.duLieuChiTiet.find(o => o.time_period === element.time_period);
             if (item === undefined) {
+
               const ins = new Array(this.chilld_store.length + 1);
               for (let i = 0; i < ins.length; i++) {
                 ins[i] = null;
               }
+
               const outs = new Array(this.chilld_store.length + 1);
               for (let i = 0; i < outs.length; i++) {
                 outs[i] = null;
               }
+
+              const traffics = new Array(this.chilld_store.length + 1);
+              for (let i = 0; i < traffics.length; i++) {
+                traffics[i] = null;
+              }
+
+
+              const numbers = new Array(this.chilld_store.length + 1);
+              for (let i = 0; i < numbers.length; i++) {
+                numbers[i] = null;
+              }
+
               item = {
                 'time_period': element.time_period,
                 'ins': ins,
                 'outs': outs,
+                'traffics': traffics,
+                'numbers': numbers,
               };
               this.duLieuChiTiet.push(item);
             }
+
             for (const i in this.chilld_store) {
               if (this.chilld_store[i].id === element.site_id) {
+
                 item.ins[i] = element.num_to_enter;
                 if (element.num_to_enter !== null) {
                   if (item.ins[this.chilld_store.length] !== null) {
-                    // tslint:disable-next-line: max-line-length
                     item.ins[this.chilld_store.length] = Number(item.ins[this.chilld_store.length]) + Number(element.num_to_enter);
                   } else {
                     item.ins[this.chilld_store.length] = Number(element.num_to_enter);
                   }
                 }
+
                 item.outs[i] = element.num_to_exit;
                 if (element.num_to_exit !== null) {
                   if (item.outs[this.chilld_store.length] !== null) {
-                    // tslint:disable-next-line: max-line-length
                     item.outs[this.chilld_store.length] = Number(item.outs[this.chilld_store.length]) + Number(element.num_to_exit);
                   } else {
                     item.outs[this.chilld_store.length] = Number(element.num_to_exit);
                   }
                 }
+
+
+
+                item.traffics[i] = element.traffic;
+                if (element.traffic !== null) {
+                  if (item.traffics[this.chilld_store.length] !== null) {
+                    item.traffics[this.chilld_store.length] = Number(item.traffics[this.chilld_store.length]) + Number(element.traffic);
+                  } else {
+                    item.traffics[this.chilld_store.length] = Number(element.traffic);
+                  }
+                }
+
+                if (this.indexOptionSelected == this.indexess.visitors) {
+                  item.numbers = item.ins;
+                  this.indexCheckedShow = language.In;
+                } else if (this.indexOptionSelected == this.indexess.exits) {
+                  item.numbers = item.outs;
+                  this.indexCheckedShow = language.Out;
+                }
+                else if (this.indexOptionSelected == this.indexess.traffic_flow) {
+                  item.numbers = item.traffics;
+                  this.indexCheckedShow = language.InOut;
+                }
+
+
               }
             }
 
 
           });
 
+
           this.duLieuTongVaoCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTongVaoCacCua.length; i++) {
             this.duLieuTongVaoCacCua[i] = null;
           }
+
           this.duLieuTongRaCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTongRaCacCua.length; i++) {
             this.duLieuTongRaCacCua[i] = null;
           }
+
           this.duLieuTrungBinhCacCua = new Array(this.chilld_store.length + 1);
           for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
             this.duLieuTrungBinhCacCua[i] = null;
           }
+
           this.duLieuThuTuCacCua = new Array(this.chilld_store.length);
           for (let i = 0; i < this.duLieuThuTuCacCua.length; i++) {
             this.duLieuThuTuCacCua[i] = null;
           }
-          // tslint:disable-next-line: forin
+
+          this.duLieuTongVaoRaCacCua = new Array(this.chilld_store.length);
+          for (let i = 0; i < this.duLieuTongVaoRaCacCua.length; i++) {
+            this.duLieuTongVaoRaCacCua[i] = null;
+          }
+
+
+          this.duLieuTongChung = new Array(this.chilld_store.length);
+          for (let i = 0; i < this.duLieuTongChung.length; i++) {
+            this.duLieuTongChung[i] = null;
+          }
+
           for (let i = 0; i < this.duLieuTongVaoCacCua.length; i++) {
             this.duLieuChiTiet.forEach(element => {
               if (element.ins[i] !== null) {
@@ -384,10 +454,10 @@ export class FootfallCustomerEntranceComponent implements OnInit {
             });
           }
 
-          // tslint:disable-next-line: forin
+
           for (let i = 0; i < this.duLieuTongRaCacCua.length; i++) {
             this.duLieuChiTiet.forEach(element => {
-              if (element.ins[i] !== null) {
+              if (element.outs[i] !== null) {
                 if (this.duLieuTongRaCacCua[i] === null) {
                   this.duLieuTongRaCacCua[i] = Number(element.outs[i]);
                 } else {
@@ -395,6 +465,28 @@ export class FootfallCustomerEntranceComponent implements OnInit {
                 }
               }
             });
+          }
+
+
+          for (let i = 0; i < this.duLieuTongVaoRaCacCua.length; i++) {
+            this.duLieuChiTiet.forEach(element => {
+              if (element.traffics[i] !== null) {
+                if (this.duLieuTongVaoRaCacCua[i] === null) {
+                  this.duLieuTongVaoRaCacCua[i] = Number(element.traffics[i]);
+                } else {
+                  this.duLieuTongVaoRaCacCua[i] = Number(this.duLieuTongVaoRaCacCua[i]) + Number(element.traffics[i]);
+                }
+              }
+            });
+          }
+
+          if (this.indexOptionSelected == this.indexess.visitors) {
+            this.duLieuTongChung = this.duLieuTongVaoCacCua;
+          } else if (this.indexOptionSelected == this.indexess.exits) {
+            this.duLieuTongChung = this.duLieuTongRaCacCua;
+          }
+          else if (this.indexOptionSelected == this.indexess.traffic_flow) {
+            this.duLieuTongChung = this.duLieuTongVaoRaCacCua;
           }
 
           for (let i = 0; i < this.duLieuTrungBinhCacCua.length; i++) {
@@ -435,6 +527,16 @@ export class FootfallCustomerEntranceComponent implements OnInit {
               }
             }
           }
+
+
+
+          if (this.parent_store.length > 0) {
+            this.parent_store.forEach(e => {
+              this.colspanAll += e.number;
+            });
+          }
+
+
           if (!environment.production) {
             console.log('duLieuTrungBinhCacCuaTG', duLieuTrungBinhCacCuaTG);
             console.log('this.duLieuTongVaoCacCua', this.duLieuTongVaoCacCua);
@@ -663,9 +765,9 @@ export class FootfallCustomerEntranceComponent implements OnInit {
     try {
       const _Start_date = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
       const _End_date = new Date(this.end_date.replace(/[']/g, '').replace(/[-]/g, '/'));
-      const Start_S = _Start_date.getDate() + '-' + _Start_date.getMonth() + '-' + _Start_date.getFullYear();
-      const End_S = _End_date.getDate() + '-' + _End_date.getMonth() + '-' + _End_date.getFullYear();
-      const Name_S = Start_S === End_S ? Start_S : Start_S + ' _  ' + End_S;
+      const Start_S = _Start_date.getDate() + '-' + (_Start_date.getMonth() + 1) + '-' + _Start_date.getFullYear();
+      const End_S = _End_date.getDate() + '-' + (_End_date.getMonth() + 1) + '-' + _End_date.getFullYear();
+      const Name_S = Start_S === End_S ? Start_S : Start_S + ' _ ' + End_S;
 
       let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
       tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
