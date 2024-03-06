@@ -35,8 +35,8 @@ export const environment = {
   // _netUrl: 'http://113.190.40.247:9090/',
 
   // VTF
-  apiUrl: 'http://14.162.144.81:8686/',
-  UrlSocket: 'http://14.162.144.81:8686/',
+  apiUrl: 'https://vivocity.acs.vn:8443/',
+  UrlSocket: 'https://vivocity.acs.vn:8443/',
   //client_secret: 'vI09uuU4qXjIStoXOevMafpm7SXBETHLhlA9PYyS',
   client_secret: 'pMcVtltzSopwTl24es094rhZFoqoeJcbtRl6bYqs',
   _netUrl: 'http://localhost:9090/',

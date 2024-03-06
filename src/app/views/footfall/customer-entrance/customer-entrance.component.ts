@@ -188,9 +188,7 @@ export class FootfallCustomerEntranceComponent implements OnInit {
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
-          if (!environment.production) {
-            console.warn('this.indexOption', this.indexOption);
-          }
+       
 
           this.time_period_array = param.fba_time_period_metrics;
           this.organization_array = param.organization_arr;

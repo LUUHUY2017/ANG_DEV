@@ -240,10 +240,7 @@ export class FootfallCustomerMonthlyComponent implements OnInit {
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
-          if (!environment.production) {
-            console.warn('this.indexOption', this.indexOption);
-          }
-
+       
           this.indexes = param.list_index;
           this.indexess = param.list_index_value;
           this.organization_array = param.organization_arr;
