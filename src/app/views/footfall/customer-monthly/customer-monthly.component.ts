@@ -240,13 +240,13 @@ export class FootfallCustomerMonthlyComponent implements OnInit {
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
-       
+
           this.indexes = param.list_index;
           this.indexess = param.list_index_value;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
           this.endTimeOption = param.end_time_list;
-         
+
 
           if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
             para = param.user_page_parametter;
@@ -255,7 +255,7 @@ export class FootfallCustomerMonthlyComponent implements OnInit {
             para = this.set_default(defaultOrgId);
           }
 
-        
+
           this.organization_id = para.organization_id;
           this.indexOptionSelected = para.indexOptionSelected;
           if ('site_id' in para) {
@@ -771,9 +771,10 @@ export class FootfallCustomerMonthlyComponent implements OnInit {
 
   export_xls(element) {
     try {
-
+      const time_on_now = new Date();
       const _date_S = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
-      const _date_SS = (_date_S.getMonth() + 1) + '-' + _date_S.getFullYear();
+      //const _date_SS = (_date_S.getMonth() + 1) + '-' + _date_S.getFullYear();
+      const _date_SS = time_on_now.getDate() + '-' + (time_on_now.getMonth() + 1) + '-' + time_on_now.getFullYear();
 
       let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
       tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';

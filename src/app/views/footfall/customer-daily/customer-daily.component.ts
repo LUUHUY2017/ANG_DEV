@@ -209,15 +209,15 @@ export class FootfallCustomerDailyComponent implements OnInit {
 
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
-        
+
           this.indexes = param.list_index;
           this.indexess = param.list_index_value;
           this.save_session = param.save_session;
           this.organization_array = param.organization_arr;
           this.startTimeOption = param.start_time_list;
           this.endTimeOption = param.end_time_list;
-     
-        
+
+
           if (param.user_page_parametter.length > 0 || !this.appservice.isEmptyObject(param.user_page_parametter)) {
             para = param.user_page_parametter;
           } else {
@@ -268,7 +268,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
   set_default(defaultOrgId: any) {
     const organization_id = this.userinfo.organization_id === '0' ? defaultOrgId : Number(this.userinfo.organization_id);
     const value_index = this.indexOption[0].value;
-   
+
     return {
       organization_id: organization_id
       // , site_id: 0
@@ -280,7 +280,7 @@ export class FootfallCustomerDailyComponent implements OnInit {
       , indexOptionSelected: value_index
 
     };
-   
+
   }
 
   Go_number(number, total) {
@@ -742,8 +742,12 @@ export class FootfallCustomerDailyComponent implements OnInit {
 
   export_xls(element) {
     try {
+      const time_on_now = new Date();
+
       const _date_S = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
-      const _date_SS = _date_S.getDate() + '-' + (_date_S.getMonth() + 1) + '-' + _date_S.getFullYear();
+     // const _date_SS = _date_S.getDate() + '-' + (_date_S.getMonth() + 1) + '-' + _date_S.getFullYear();
+      const _date_SS = time_on_now.getDate() + '-' + (time_on_now.getMonth() + 1) + '-' + time_on_now.getFullYear();
+
 
       let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
       tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';

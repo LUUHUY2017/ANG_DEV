@@ -20,7 +20,7 @@ import { DescriptionMailComponent } from './views/descriptionmail/descriptionmai
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'footfall/overview',
     pathMatch: 'full',
   },
   {

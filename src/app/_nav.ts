@@ -67,8 +67,8 @@ export const navItems = [
         ]
       },
       {
-        name: 'Live Accupancy',
-        name_en: 'Live Accupancy',
+        name: 'Live Occupancy',
+        name_en: 'Live Occupancy',
         title: 'footfall',
         url: '/footfall/liveview',
         icon: 'fa fa-bar-chart',

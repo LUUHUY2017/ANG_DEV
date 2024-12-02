@@ -188,7 +188,7 @@ export class FootfallCustomerEntranceComponent implements OnInit {
           this.indexOption = param.traffic_index.filter((e) =>
             e.value == 'Visitors' || e.value == 'Traffic Flow' || e.value == 'Exits');
 
-       
+
 
           this.time_period_array = param.fba_time_period_metrics;
           this.organization_array = param.organization_arr;
@@ -762,11 +762,15 @@ export class FootfallCustomerEntranceComponent implements OnInit {
 
   export_xls(element) {
     try {
+      const time_on_now = new Date();
+
       const _Start_date = new Date(this.start_date.replace(/[']/g, '').replace(/[-]/g, '/'));
       const _End_date = new Date(this.end_date.replace(/[']/g, '').replace(/[-]/g, '/'));
       const Start_S = _Start_date.getDate() + '-' + (_Start_date.getMonth() + 1) + '-' + _Start_date.getFullYear();
       const End_S = _End_date.getDate() + '-' + (_End_date.getMonth() + 1) + '-' + _End_date.getFullYear();
-      const Name_S = Start_S === End_S ? Start_S : Start_S + ' _ ' + End_S;
+      //const Name_S = Start_S === End_S ? Start_S : Start_S + ' _ ' + End_S;
+
+      const Name_S = time_on_now.getDate() + '-' + (time_on_now.getMonth() + 1) + '-' + time_on_now.getFullYear();
 
       let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
       tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';

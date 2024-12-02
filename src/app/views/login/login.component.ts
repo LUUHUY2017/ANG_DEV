@@ -142,7 +142,8 @@ export class LoginComponent implements OnInit {
       // lấy version
       console.log('environment.version', environment.version);
       localStorage.setItem('version', String(environment.version));
-      this.router.navigate(['/dashboard']);
+      // this.router.navigate(['/dashboard']);
+      this.router.navigate(['/footfall/overview']);
       // this.get_data_necessary();
     }, (error) => {
       this.isLoginError = true;
@@ -220,7 +221,7 @@ export class LoginComponent implements OnInit {
   }
   Get_module(page_module_array: Array<any>, invisible_menu_item: Array<any>) {
     const pushData: Array<MenuObject.MenuItemNameSpace.MenuItem> = [
-      new MenuObject.MenuItemNameSpace.DefaultMenuItem()
+      // new MenuObject.MenuItemNameSpace.DefaultMenuItem()
     ];
     for (let i = 0; i < page_module_array.length; i++) {
       // tạo ra các object cụ thể

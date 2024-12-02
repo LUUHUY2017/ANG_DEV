@@ -8,7 +8,7 @@ export const environment = {
     production: false,
     suffixApi: 'api',
 
-    apiUrl: 'http://localhost:8686/',
+    apiUrl: 'https://retail.acs.vn:8443/',
     // apiUrl: 'http://119.17.228.46:8080/',
     UrlSocket: 'https://bisocket.acs.vn:8686/',
     client_secret: 'pMcVtltzSopwTl24es094rhZFoqoeJcbtRl6bYqs',

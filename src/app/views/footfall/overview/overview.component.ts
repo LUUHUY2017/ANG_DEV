@@ -760,6 +760,8 @@ export class FootfallOverviewComponent implements OnInit {
 
           this['title_index_name' + i] = this.select_visit_option.find(item => item.value === this['selected_show' + i]).label;
 
+
+
           if (this['selected_show' + i] === this.indexess.visitors) {
             this['barChartData' + i] = [{ data: visit, label: this['title_index_name' + i] }];
             this['suffix' + i] = '';
@@ -1091,6 +1093,10 @@ export class FootfallOverviewComponent implements OnInit {
   }
 
   is_column_chart_box(selected_show) {
+
+    console.log("selected_show",selected_show);
+    console.log("this.indexess",this.indexess);
+
     if (selected_show === this.indexess.visitors || selected_show === this.indexess.exits  || selected_show === this.indexess.traffic_flow
       || selected_show === this.indexess.kids_visitors || selected_show === this.indexess.shoppers
       || selected_show === this.indexess.passerby) {
