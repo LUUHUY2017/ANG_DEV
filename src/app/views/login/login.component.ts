@@ -142,8 +142,8 @@ export class LoginComponent implements OnInit {
       // lấy version
       console.log('environment.version', environment.version);
       localStorage.setItem('version', String(environment.version));
-      // this.router.navigate(['/dashboard']);
-      this.router.navigate(['/footfall/overview']);
+       this.router.navigate(['/dashboard']);
+      //this.router.navigate(['/footfall/overview']);
       // this.get_data_necessary();
     }, (error) => {
       this.isLoginError = true;
